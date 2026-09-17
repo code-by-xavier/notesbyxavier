@@ -40,6 +40,7 @@ Everything you need to launch and customize your publication:
 - **[Authoring Guide](docs/authoring-guide.md)** — Writing essays, formatting text, and adding images.
 - **[Customization Guide](docs/configuration.md)** — Setting your publication name, avatar, bio, and social links.
 - **[Deployment Guide](docs/deployment.md)** — Publishing to Cloudflare Pages, Vercel, or Google Cloud Run.
+- **[Upstream Sync Guide](docs/upstream-sync.md)** — Safely importing updates from the master repository without touching your live content.
 
 ---
 
