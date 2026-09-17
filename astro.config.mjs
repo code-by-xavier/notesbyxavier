@@ -3,7 +3,7 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://notesbyxavier.com',
+  site: 'https://example.com',
   output: 'static',
   integrations: [mdx(), sitemap()],
   markdown: {

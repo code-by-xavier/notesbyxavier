@@ -1,12 +1,12 @@
-# Deployment Guide for NOTES
+# Deployment Guide for NoteBy
 
-NOTES is built with Astro in static output mode (`output: 'static'`). It compiles down to pure HTML, CSS, and zero-runtime client JavaScript, making it deployable anywhere with sub-second speeds.
+NoteBy is built with Astro in static output mode (`output: 'static'`). It compiles down to pure HTML, CSS, and zero-runtime client JavaScript, making it deployable anywhere with sub-second speeds.
 
 ---
 
 ## 1. Google Cloud Run (Recommended for CLSTRE Ecosystem)
 
-NOTES includes a multi-stage, production-ready `Dockerfile` that serves static files using an Alpine Nginx image weighing under 25MB.
+NoteBy includes a multi-stage, production-ready `Dockerfile` that serves static files using an Alpine Nginx image weighing under 25MB.
 
 ### Step 1: Build and Tag Docker Image
 
@@ -14,7 +14,7 @@ NOTES includes a multi-stage, production-ready `Dockerfile` that serves static f
 # Set your GCP Project ID and Region
 export PROJECT_ID="your-gcp-project-id"
 export REGION="us-central1"
-export SERVICE_NAME="notes"
+export SERVICE_NAME="noteby"
 
 # Build image with Google Cloud Build or local Docker
 gcloud builds submit --tag gcr.io/${PROJECT_ID}/${SERVICE_NAME}:latest
@@ -40,7 +40,7 @@ gcloud run deploy ${SERVICE_NAME} \
 ```bash
 gcloud beta run domain-mappings create \
   --service ${SERVICE_NAME} \
-  --domain notesbyxavier.com \
+  --domain yourdomain.com \
   --region ${REGION}
 ```
 
@@ -50,7 +50,7 @@ gcloud beta run domain-mappings create \
 
 Cloudflare Pages provides instant global edge deployment with zero configuration:
 
-1. Connect your GitHub repository (`XPANSION-ORG/NOTES`).
+1. Connect your GitHub repository (`CLSTRE-ORG/noteby`).
 2. Set the build configuration:
    - **Framework preset**: Astro
    - **Build command**: `pnpm build`
@@ -74,10 +74,10 @@ Cloudflare Pages provides instant global edge deployment with zero configuration
 
 ```bash
 # Build local container image
-docker build -t notes:latest .
+docker build -t noteby:latest .
 
 # Run container on port 80 or 8080
-docker run -d -p 8080:8080 --name notes-app notes:latest
+docker run -d -p 8080:8080 --name noteby-app noteby:latest
 ```
 
 ---

@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Only the latest release of NOTES receives active security updates and patches.
+Only the latest release of NoteBy receives active security updates and patches.
 
 | Version | Supported |
 | ------- | --------- |
@@ -11,7 +11,7 @@ Only the latest release of NOTES receives active security updates and patches.
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability within NOTES, please do not open a public issue.
+If you discover a security vulnerability within NoteBy, please do not open a public issue.
 
 Please report all security vulnerabilities privately:
 

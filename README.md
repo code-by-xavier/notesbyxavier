@@ -1,4 +1,4 @@
-# NOTES
+# NoteBy
 
 > An open-source, minimalist static publishing engine built on [Astro](https://astro.build).
 
@@ -6,7 +6,7 @@ Designed for writers, thinkers, and essayists who value calm typography, high-si
 
 ---
 
-## Why NOTES?
+## Why NoteBy?
 
 - **Distraction-Free Reading**: High-contrast editorial serif typography with comfortable line-height and optimal reading column width.
 - **Automatic Table of Contents**: Dynamic left-hand sidebar that indexes headings and tracks reading progress.
@@ -45,12 +45,12 @@ Everything you need to launch and customize your publication:
 
 ## Author and Community
 
-NOTES is an open-source initiative created under the **CLSTRE** tech ecosystem.
+NoteBy is an open-source initiative created under the **CLSTRE** tech ecosystem.
 
 - **Brand**: [CLSTRE](https://clstre.com)
 - **Author & Lead Developer**: [Xavier Lawrence](https://notesbyxavier.com) ([XLawrence@clstre.com](mailto:XLawrence@clstre.com))
 - **Support Contact**: [support@clstre.com](mailto:support@clstre.com)
-- **Showcase Site**: [notesbyxavier.com](https://notesbyxavier.com)
+- **Showcase Instance**: [notesbyxavier.com](https://notesbyxavier.com)
 
 ---
 

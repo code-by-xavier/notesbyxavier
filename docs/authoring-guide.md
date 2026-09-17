@@ -1,6 +1,6 @@
-# Writing Essays in NOTES
+# Writing Essays in NoteBy
 
-Writing a new piece in NOTES is as simple as creating a text file. You focus purely on thinking and writing — the system automatically handles typography, reading time calculations, mobile responsiveness, and table of contents generation.
+Writing a new piece in NoteBy is as simple as creating a text file. You focus purely on thinking and writing — the system automatically handles typography, reading time calculations, mobile responsiveness, and table of contents generation.
 
 ---
 
@@ -70,10 +70,10 @@ If you are still working on an essay and don't want it published to the world ye
 draft: true
 ```
 
-NOTES will keep it private until you change it to `draft: false`.
+NoteBy will keep it private until you change it to `draft: false`.
 
 ---
 
 ## Future Roadmap: Visual Editor
 
-NOTES is designed from the ground up for distraction-free writing. Future releases will include a companion lightweight, browser-based visual editor so non-technical writers can draft and publish directly from their web browser.
+NoteBy is designed from the ground up for distraction-free writing. Future releases will include a companion lightweight, browser-based visual editor so non-technical writers can draft and publish directly from their web browser.
