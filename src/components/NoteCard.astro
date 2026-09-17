@@ -6,6 +6,7 @@ interface Props {
   slug: string;
   pubDate: Date | string;
   tags?: string[];
+  category?: string;
   readingTime?: string;
   coverImage?: string;
 }
@@ -17,6 +18,7 @@ const {
   slug,
   pubDate,
   tags = [],
+  category,
   readingTime = '5 min read',
   coverImage,
 } = Astro.props;
@@ -31,6 +33,8 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
   <div class="note-card__content">
     <div class="note-card__header">
       <div class="note-card__meta">
+        {category && <span class="note-card__category">{category}</span>}
+        {category && <span class="note-card__dot">·</span>}
         <time datetime={new Date(pubDate).toISOString()}>{formattedDate}</time>
         <span class="note-card__dot">·</span>
         <span>{readingTime}</span>
@@ -51,7 +55,7 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
       </a>
     </h2>
 
-        {subtitle && <p class="note-card__subtitle">{subtitle}</p>}
+    {subtitle && <p class="note-card__subtitle">{subtitle}</p>}
     <p class="note-card__description">{description}</p>
   </div>
 
@@ -63,7 +67,6 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
 </article>
 
 <style lang="scss">
-  /* Card layout */
   .note-card {
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
@@ -73,6 +76,7 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     flex-direction: column;
     justify-content: flex-start;
     width: 100%;
+    height: 100%;
     box-sizing: border-box;
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 
@@ -87,6 +91,7 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
       min-width: 0;
       display: flex;
       flex-direction: column;
+      flex: 1;
     }
 
     &__header {
@@ -109,6 +114,12 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
       letter-spacing: 0.02em;
       text-transform: uppercase;
       white-space: nowrap;
+    }
+
+    &__category {
+      font-weight: 600;
+      color: var(--accent-color);
+      letter-spacing: 0.03em;
     }
 
     &__dot {

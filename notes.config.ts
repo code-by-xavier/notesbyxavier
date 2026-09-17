@@ -1,3 +1,8 @@
+export interface CategoryConfig {
+  name: string;
+  description?: string;
+}
+
 export interface NotesConfig {
   siteTitle: string;
   authorName: string;
@@ -8,6 +13,7 @@ export interface NotesConfig {
   domain: string;
   description: string;
   repository?: string;
+  categories?: CategoryConfig[];
   socials: {
     github?: string;
     twitter?: string;
@@ -27,17 +33,31 @@ export interface NotesConfig {
 }
 
 export const notesConfig: NotesConfig = {
-  siteTitle: 'NoteBy',
+  siteTitle: 'Notesby',
   authorName: 'Jane Doe',
   authorBio: 'Writer, thinker, and researcher. Publishing long-form perspectives on technology, design, and architecture.',
   authorAvatar: '/images/avatar-placeholder.svg',
   favicon: '/favicon.webp',
   ogImage: '/images/og-image.png',
   domain: 'https://example.com',
-  description: 'An open-source, minimalist static publishing engine designed for distraction-free reading.',
-  repository: 'https://github.com/CLSTRE-ORG/noteby',
+  description: 'An open-source, minimalist static publishing engine where every post is a note.',
+  repository: 'https://github.com/CLSTRE-ORG/Notesby',
+  categories: [
+    {
+      name: 'Essays',
+      description: 'Deep-dive explorations, systems design, and architectural blueprints.',
+    },
+    {
+      name: 'Op-Eds',
+      description: 'Perspectives on technology, digital sovereignty, and the modern web.',
+    },
+    {
+      name: 'Field Notes',
+      description: 'Rapid dispatches, benchmarks, and engineering observations.',
+    },
+  ],
   socials: {
-    github: 'https://github.com/CLSTRE-ORG/noteby',
+    github: 'https://github.com/CLSTRE-ORG/Notesby',
     twitter: 'https://x.com',
     linkedin: 'https://linkedin.com',
     email: 'hello@example.com',
@@ -50,6 +70,6 @@ export const notesConfig: NotesConfig = {
   ],
   footer: {
     copyrightText: `© ${new Date().getFullYear()} Jane Doe. All rights reserved.`,
-    poweredByText: 'Built with NoteBy — an open-source static publishing engine by CLSTRE.',
+    poweredByText: 'Built with Notesby — an open-source static publishing engine by CLSTRE.',
   },
 };

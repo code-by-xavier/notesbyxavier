@@ -13,6 +13,7 @@ const notes = defineCollection({
     coverImage: z.string().optional(),
     coverImageAlt: z.string().optional(),
     tags: z.array(z.string()).default([]),
+    category: z.string().default('Essays'),
     draft: z.boolean().default(false),
   }),
 });

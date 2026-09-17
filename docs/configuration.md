@@ -11,7 +11,7 @@ You do not need programming knowledge to edit this file. Simply change the words
 ```typescript
 export const notesConfig = {
   // 1. Your Identity & Branding
-  siteTitle: 'NoteBy',                            // The name shown on your homepage
+  siteTitle: 'Notesby',                           // The name shown on your homepage
   authorName: 'Jane Doe',                         // Your name
   authorBio: 'Writer, thinker, and researcher.',  // A 1-2 sentence bio about yourself
   authorAvatar: '/images/avatar-placeholder.svg', // Your profile photo (shown in top left circle)
@@ -21,9 +21,16 @@ export const notesConfig = {
   // 2. Your Web Address & Search Engine Info
   domain: 'https://example.com',                  // Your website address
   description: 'An open-source, minimalist static publishing engine.', // Short description used by search engines
-  repository: 'https://github.com/CLSTRE-ORG/noteby', // Optional link to your GitHub repo
+  repository: 'https://github.com/CLSTRE-ORG/Notesby', // Optional link to your GitHub repo
   
-  // 3. Social Media Links (leave empty if you don't use one)
+  // 3. Category Row Sliders (Shown on the homepage)
+  categories: [
+    { name: 'Essays', description: 'Deep-dive explorations and system blueprints.' },
+    { name: 'Op-Eds', description: 'Perspectives on technology and the modern web.' },
+    { name: 'Field Notes', description: 'Rapid dispatches and engineering observations.' },
+  ],
+
+  // 4. Social Media Links (leave empty if you don't use one)
   socials: {
     twitter: 'https://x.com/yourhandle',
     github: 'https://github.com/yourhandle',
@@ -31,7 +38,7 @@ export const notesConfig = {
     email: 'hello@example.com',
   },
   
-  // 4. Navigation Links (Menu in the top right)
+  // 5. Navigation Links (Menu in the top right)
   navLinks: [
     { label: 'Notes', href: '/' },
     { label: 'About', href: '/about' },
@@ -39,19 +46,10 @@ export const notesConfig = {
     { label: 'CLSTRE ↗', href: 'https://clstre.com', external: true },
   ],
   
-  // 5. Footer Notices
+  // 6. Footer Notices
   footer: {
     copyrightText: '© 2026 Jane Doe. All rights reserved.',
-    poweredByText: 'Built with NoteBy — an open-source static publishing engine by CLSTRE.',
+    poweredByText: 'Built with Notesby — an open-source static publishing engine by CLSTRE.',
   },
 };
 ```
-
----
-
-## Replacing Your Profile Picture
-
-1. Find your photo and save it as a square image.
-2. Put it in `public/images/` (e.g. `avatar.webp` or `avatar.png`).
-3. Set `authorAvatar: '/images/avatar.webp'` in `notes.config.ts`.
-4. NoteBy automatically formats it into a circle beside your name in the header!

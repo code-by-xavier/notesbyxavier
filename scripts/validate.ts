@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { notesConfig } from '../notes.config';
 
-console.log('Running NoteBy validation suite...');
+console.log('Running Notesby validation suite...');
 
 let hasErrors = false;
 
@@ -40,5 +40,5 @@ if (hasErrors) {
   console.error('\nValidation failed with errors.');
   process.exit(1);
 } else {
-  console.log('\nAll NoteBy validation checks passed cleanly.');
+  console.log('\nAll Notesby validation checks passed cleanly.');
 }

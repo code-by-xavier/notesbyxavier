@@ -1,0 +1,233 @@
+---
+import NoteCard from './NoteCard.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  title: string;
+  description?: string;
+  notes: CollectionEntry<'notes'>[];
+}
+
+const { title, description, notes } = Astro.props;
+const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+---
+
+<section class="category-slider" data-category-slider id={sliderId}>
+  <div class="category-slider__header">
+    <div class="category-slider__info">
+      <div class="category-slider__title-row">
+        <h2 class="category-slider__title">{title}</h2>
+        <span class="category-slider__count">{notes.length} {notes.length === 1 ? 'note' : 'notes'}</span>
+      </div>
+      {description && <p class="category-slider__description">{description}</p>}
+    </div>
+
+    <div class="category-slider__controls" aria-label={`Controls for ${title} slider`}>
+      <button
+        type="button"
+        class="slider-btn slider-btn--prev"
+        data-slider-prev
+        aria-label={`Scroll ${title} left`}
+        disabled
+      >
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="slider-btn slider-btn--next"
+        data-slider-next
+        aria-label={`Scroll ${title} right`}
+      >
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="category-slider__viewport">
+    <div class="category-slider__track" data-slider-track>
+      {notes.map((note) => (
+        <div class="category-slider__item">
+          <NoteCard
+            title={note.data.title}
+            subtitle={note.data.subtitle}
+            description={note.data.description}
+            slug={note.id.replace(/\.(md|mdx)$/, '')}
+            pubDate={note.data.pubDate}
+            tags={note.data.tags}
+            category={note.data.category}
+            readingTime="5 min read"
+            coverImage={note.data.coverImage}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  function setupCategorySliders() {
+    const sliders = document.querySelectorAll<HTMLElement>('[data-category-slider]');
+
+    sliders.forEach((slider) => {
+      const track = slider.querySelector<HTMLElement>('[data-slider-track]');
+      const prevBtn = slider.querySelector<HTMLButtonElement>('[data-slider-prev]');
+      const nextBtn = slider.querySelector<HTMLButtonElement>('[data-slider-next]');
+
+      if (!track || !prevBtn || !nextBtn) return;
+
+      const updateButtons = () => {
+        const atStart = track.scrollLeft <= 5;
+        const atEnd = track.scrollLeft >= track.scrollWidth - track.clientWidth - 5;
+        prevBtn.disabled = atStart;
+        nextBtn.disabled = atEnd;
+      };
+
+      prevBtn.addEventListener('click', () => {
+        const cardWidth = track.firstElementChild?.clientWidth || 360;
+        track.scrollBy({ left: -(cardWidth + 24), behavior: 'smooth' });
+      });
+
+      nextBtn.addEventListener('click', () => {
+        const cardWidth = track.firstElementChild?.clientWidth || 360;
+        track.scrollBy({ left: cardWidth + 24, behavior: 'smooth' });
+      });
+
+      track.addEventListener('scroll', updateButtons, { passive: true });
+      window.addEventListener('resize', updateButtons, { passive: true });
+      updateButtons();
+    });
+  }
+
+  // Run on initial load
+  setupCategorySliders();
+  document.addEventListener('astro:page-load', setupCategorySliders);
+</script>
+
+<style lang="scss">
+  .category-slider {
+    margin-bottom: 3.5rem;
+
+    &:last-child {
+      margin-bottom: 1.5rem;
+    }
+
+    &__header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    &__info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    &__title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.35rem;
+    }
+
+    &__title {
+      font-family: var(--font-family-headings);
+      font-size: 1.55rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    &__count {
+      font-family: var(--font-family-base);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.15rem 0.55rem;
+      border-radius: 9999px;
+      background-color: var(--surface-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      letter-spacing: 0.02em;
+    }
+
+    &__description {
+      font-family: var(--font-family-base);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    &__controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .slider-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background-color: var(--surface-color);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover:not(:disabled) {
+        border-color: var(--accent-color);
+        background-color: var(--accent-color);
+        color: #ffffff;
+      }
+
+      &:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+    }
+
+    &__viewport {
+      position: relative;
+      overflow: hidden;
+      margin: 0 -0.5rem;
+      padding: 0.5rem;
+    }
+
+    &__track {
+      display: flex;
+      gap: 1.5rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 0.5rem;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    &__item {
+      flex: 0 0 380px;
+      scroll-snap-align: start;
+      max-width: 85vw;
+      display: flex;
+
+      @media (max-width: 640px) {
+        flex: 0 0 85vw;
+      }
+    }
+  }
+</style>
