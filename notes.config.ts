@@ -2,6 +2,9 @@ export interface NotesConfig {
   siteTitle: string;
   authorName: string;
   authorBio: string;
+  authorAvatar?: string;
+  favicon?: string;
+  ogImage?: string;
   domain: string;
   description: string;
   repository?: string;
@@ -15,6 +18,7 @@ export interface NotesConfig {
     label: string;
     href: string;
     external?: boolean;
+    isRss?: boolean;
   }[];
   footer: {
     copyrightText: string;
@@ -26,23 +30,26 @@ export const notesConfig: NotesConfig = {
   siteTitle: 'Notes by Xavier',
   authorName: 'Xavier Lawrence',
   authorBio: 'Founder & Cloud Architect. Writing about software engineering, autonomous systems, and sovereign infrastructure.',
-  domain: 'https://notesbyxavier.com',
+  authorAvatar: '/images/xavier-avatar.webp',
+  favicon: '/images/xavier-avatar.webp',
+  ogImage: '/images/og-image.png',
+  domain: 'https://www.notesbyxavier.com',
   description: 'Essays, architectural blueprints, and personal reflections by Xavier Lawrence.',
   repository: 'https://github.com/XPANSION-ORG/NOTES',
   socials: {
-    github: 'https://github.com/XPANSION-ORG',
-    twitter: 'https://x.com',
-    linkedin: 'https://linkedin.com',
-    email: 'xavier@clstre.com',
+    github: 'https://github.com/XPANSION-ORG/NOTES',
+    twitter: 'https://x.com/notesbyxavier',
+    linkedin: 'https://www.linkedin.com/in/notesbyxavier/',
+    email: 'XLawrence@clstre.com',
   },
   navLinks: [
     { label: 'Notes', href: '/' },
     { label: 'About', href: '/about' },
-    { label: 'RSS', href: '/rss.xml' },
-    { label: 'CLSTRE ↗', href: 'https://clstre.com', external: true },
+    { label: 'RSS', href: '/rss.xml', isRss: true },
+    { label: 'CLSTRE ↗', href: 'https://www.clstre.com', external: true },
   ],
   footer: {
-    copyrightText: `© ${new Date().getFullYear()} Xavier Lawrence. All rights reserved.`,
+    copyrightText: `© ${new Date().getFullYear()} notesbyxavier.com. All rights reserved.`,
     poweredByText: 'Built with NOTES — an open-source static publishing engine.',
   },
 };

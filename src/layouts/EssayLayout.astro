@@ -9,7 +9,10 @@ interface Props {
   subtitle?: string;
   description: string;
   pubDate: Date | string;
+  updatedDate?: Date | string;
   headings: HeadingItem[];
+  coverImage?: string;
+  coverImageAlt?: string;
   readingTime?: string;
 }
 
@@ -18,7 +21,10 @@ const {
   subtitle,
   description,
   pubDate,
+  updatedDate,
   headings = [],
+  coverImage,
+  coverImageAlt,
   readingTime = '10 min read',
 } = Astro.props;
 
@@ -28,10 +34,17 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
 }).format(new Date(pubDate));
 ---
 
-<BaseLayout title={title} description={description} isEssay={true}>
+<BaseLayout
+  title={title}
+  description={description}
+  isEssay={true}
+  pubDate={pubDate}
+  updatedDate={updatedDate}
+  image={coverImage}
+>
   <div class="essay-layout">
     <div class="container essay-layout__container">
-      <!-- Left Sidebar: Contents TOC (Dario Amodei Style) -->
+      <!-- Left Sidebar: Contents TOC -->
       <TableOfContents headings={headings} />
 
       <!-- Main Reading Column -->
@@ -45,6 +58,18 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
             <span>{readingTime}</span>
           </div>
         </header>
+
+        <!-- Optional Header Cover Image -->
+        {
+          coverImage && (
+            <figure class="essay-cover">
+              <img src={coverImage} alt={coverImageAlt || title} class="essay-cover__img" />
+              {coverImageAlt && (
+                <figcaption class="essay-cover__caption">{coverImageAlt}</figcaption>
+              )}
+            </figure>
+          )
+        }
 
         <div class="prose-editorial essay-content">
           <slot />
@@ -68,7 +93,7 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
 
 <style lang="scss">
   .essay-layout {
-    padding-top: 2rem;
+    padding-top: 2.5rem;
 
     &__container {
       display: flex;
@@ -84,36 +109,37 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     min-width: 0;
   }
 
-  .essay-header {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
+    .essay-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--border-color);
 
     &__title {
-      font-family: 'Newsreader', Charter, Georgia, serif;
-      font-size: 3rem;
+      font-family: var(--font-family-headings);
+      font-size: 2.65rem;
       font-weight: 600;
       line-height: 1.15;
       letter-spacing: -0.025em;
       color: var(--text-primary);
-      margin-bottom: 0.85rem;
+      margin-bottom: 0.6rem;
 
       @media (max-width: 680px) {
-        font-size: 2.25rem;
+        font-size: 2.1rem;
       }
     }
 
     &__subtitle {
-      font-family: 'Newsreader', Charter, Georgia, serif;
-      font-size: 1.4rem;
+      font-family: var(--font-family-serif);
+      font-size: 1.25rem;
       font-style: italic;
       color: var(--text-secondary);
       line-height: 1.4;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
     }
 
     &__meta {
-      font-size: 0.9rem;
+      font-family: var(--font-family-base);
+      font-size: 0.8125rem;
       color: var(--text-muted);
       display: flex;
       align-items: center;
@@ -126,13 +152,36 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     }
   }
 
+  // Optional Cover Image
+  .essay-cover {
+    margin: 0 0 2.75rem 0;
+
+    &__img {
+      width: 100%;
+      height: auto;
+      max-height: 440px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      display: block;
+    }
+
+    &__caption {
+      margin-top: 0.6rem;
+      font-family: var(--font-family-base);
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+  }
+
   .essay-footer {
     margin-top: 4.5rem;
     padding-top: 2.5rem;
     border-top: 1px solid var(--border-color);
 
     &__author-name {
-      font-family: 'Newsreader', Charter, Georgia, serif;
+      font-family: var(--font-family-headings);
       font-size: 1.35rem;
       font-weight: 600;
       color: var(--text-primary);
@@ -140,6 +189,7 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     }
 
     &__author-bio {
+      font-family: var(--font-family-base);
       font-size: 0.9375rem;
       color: var(--text-secondary);
       line-height: 1.6;
@@ -150,6 +200,7 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-family: var(--font-family-base);
       font-size: 0.9375rem;
       font-weight: 500;
     }

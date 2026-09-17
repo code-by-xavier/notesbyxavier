@@ -12,26 +12,29 @@ const sortedNotes = allNotes.sort(
 
 <BaseLayout>
   <section class="home-hero">
-    <div class="reading-container">
+    <div class="container home-hero__container">
       <h1 class="home-hero__title">{notesConfig.siteTitle}</h1>
       <p class="home-hero__bio">{notesConfig.authorBio}</p>
     </div>
   </section>
 
   <section class="notes-feed">
-    <div class="reading-container">
-      <div class="notes-feed__list">
-        {sortedNotes.map((note) => (
-          <NoteCard
-            title={note.data.title}
-            subtitle={note.data.subtitle}
-            description={note.data.description}
-            slug={note.id.replace(/\.mdx?$/, '')}
-            pubDate={note.data.pubDate}
-            tags={note.data.tags}
-            readingTime="10 min read"
-          />
-        ))}
+    <div class="container notes-feed__container">
+      <div class="notes-grid">
+        {
+          sortedNotes.map((note) => (
+            <NoteCard
+              title={note.data.title}
+              subtitle={note.data.subtitle}
+              description={note.data.description}
+              slug={note.id.replace(/\.(md|mdx)$/, '')}
+              pubDate={note.data.pubDate}
+              tags={note.data.tags}
+              readingTime="10 min read"
+              coverImage={note.data.coverImage}
+            />
+          ))
+        }
       </div>
     </div>
   </section>
@@ -39,31 +42,56 @@ const sortedNotes = allNotes.sort(
 
 <style lang="scss">
   .home-hero {
-    padding: 4rem 1.5rem 2.5rem;
+    padding: 3.5rem 0 2.25rem;
     border-bottom: 1px solid var(--border-color);
 
+    &__container {
+      max-width: var(--container-max-width);
+    }
+
     &__title {
-      font-family: 'Newsreader', Charter, Georgia, serif;
+      font-family: var(--font-family-headings);
       font-size: 2.75rem;
       font-weight: 600;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
       color: var(--text-primary);
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
+
+      @media (max-width: 640px) {
+        font-size: 2.15rem;
+      }
     }
 
     &__bio {
-      font-size: 1.15rem;
+      font-family: var(--font-family-base);
+      font-size: 1.05rem;
       color: var(--text-secondary);
-      line-height: 1.6;
+      line-height: 1.55;
+      max-width: 720px;
     }
   }
 
   .notes-feed {
-    padding: 1.5rem 1.5rem;
+    padding: 2.5rem 0 4.5rem;
 
-    &__list {
-      display: flex;
-      flex-direction: column;
+    &__container {
+      max-width: var(--container-max-width);
+    }
+  }
+
+  // 3 or 4 Column Responsive Grid
+  // Keeps cards wide and horizontal (landscape aspect ratio)
+  .notes-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 </style>

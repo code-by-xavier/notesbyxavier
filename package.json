@@ -1,22 +1,25 @@
 {
   "name": "notes",
   "version": "1.0.0",
-  "description": "An open-source, minimalist static essay and notes publishing engine inspired by Dario Amodei.",
+  "description": "An open-source, minimalist static essay and notes publishing engine for deep-dive technical essays and thoughts.",
   "type": "module",
   "scripts": {
     "dev": "astro dev --port 4330",
     "start": "astro dev --port 4330",
     "build": "astro build",
     "preview": "astro preview --port 4330",
-    "typecheck": "astro check && tsc --noEmit"
+    "typecheck": "astro check && tsc --noEmit",
+    "validate": "tsx ./scripts/validate.ts && astro check && tsc --noEmit"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
+    "@astrojs/mdx": "^4.3.14",
     "@astrojs/rss": "^4.0.11",
     "@astrojs/sitemap": "^3.2.1",
     "astro": "^5.18.2",
     "reading-time": "^1.5.0",
     "sass": "^1.83.4",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   }
 }

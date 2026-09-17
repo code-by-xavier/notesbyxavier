@@ -7,41 +7,71 @@ interface Props {
 }
 
 const { isEssay = false } = Astro.props;
+const avatarUrl = notesConfig.authorAvatar;
+const initials = notesConfig.authorName
+  .split(' ')
+  .map((n) => n[0])
+  .join('')
+  .toUpperCase();
 ---
 
 <header class="site-header">
   <div class="site-header__container">
+    <!-- Left: Optional Back Arrow + Profile Avatar (Circle) + Name directly attached -->
     <div class="site-header__left">
-      {isEssay ? (
-        <a href="/" class="site-header__back-btn" aria-label="Return to all notes">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </a>
-      ) : (
-        <a href="/" class="site-header__brand-subtle">
-          <span>Notes</span>
-        </a>
-      )}
-    </div>
-
-    <div class="site-header__center">
-      <a href="/" class="site-header__author">
-        {notesConfig.authorName}
+      <a href="/" class="site-header__brand" aria-label={`${notesConfig.authorName} - Home`}>
+        {isEssay && (
+          <span class="site-header__back-arrow" title="Back to all notes">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </span>
+        )}
+        <div class="site-header__avatar">
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={notesConfig.authorName}
+              class="avatar-img"
+              onerror="this.style.display='none'; if (this.nextElementSibling) this.nextElementSibling.style.display='flex';"
+            />
+            <span class="avatar-fallback" style="display: none;">{initials}</span>
+          ) : (
+            <span class="avatar-fallback">{initials}</span>
+          )}
+        </div>
+        <span class="site-header__name">{notesConfig.authorName}</span>
       </a>
     </div>
 
+    <!-- Center: Clean spacing (empty to let content breathe) -->
+    <div class="site-header__center"></div>
+
+    <!-- Right: Mobile Notes link + Desktop Navigation + Theme Toggle -->
     <div class="site-header__right">
-      <nav class="site-header__nav">
+      <!-- Visible strictly on mobile: quick link to main notes feed -->
+      <a href="/" class="site-header__mobile-link" aria-label="Go to main notes">
+        Notes
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="site-header__nav" aria-label="Main Navigation">
         {notesConfig.navLinks.map((link) => (
           <a
             href={link.href}
-            class="site-header__link"
+            class:list={['site-header__link', { 'site-header__link--rss': link.isRss }]}
             target={link.external ? '_blank' : undefined}
             rel={link.external ? 'noopener noreferrer' : undefined}
           >
-            {link.label}
+            {link.isRss && (
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rss-icon">
+                <path d="M4 11a9 9 0 0 1 9 9"></path>
+                <path d="M4 4a16 16 0 0 1 16 16"></path>
+                <circle cx="5" cy="19" r="1"></circle>
+              </svg>
+            )}
+            <span>{link.label}</span>
           </a>
         ))}
       </nav>
@@ -59,6 +89,7 @@ const { isEssay = false } = Astro.props;
     top: 0;
     z-index: 100;
     transition: background-color 0.25s ease;
+    border-bottom: 1px solid var(--border-subtle);
 
     &__container {
       max-width: var(--container-max-width);
@@ -71,62 +102,107 @@ const { isEssay = false } = Astro.props;
     }
 
     &__left {
-      flex: 1;
       display: flex;
       align-items: center;
+      flex-shrink: 0;
     }
 
-    &__back-btn {
+    &__brand {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      color: var(--text-secondary);
-      transition: all 0.15s ease;
-
-      &:hover {
-        color: var(--text-primary);
-        background-color: var(--surface-color);
-      }
-    }
-
-    &__brand-subtle {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-
-      &:hover {
-        color: var(--text-primary);
-      }
-    }
-
-    &__center {
-      flex: 2;
-      text-align: center;
-    }
-
-    &__author {
-      font-family: 'Newsreader', Charter, Georgia, serif;
-      font-size: 1.5rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      color: var(--text-primary);
+      gap: 0.65rem;
+      text-decoration: none;
+      transition: opacity 0.15s ease;
 
       &:hover {
         opacity: 0.85;
       }
     }
 
-    &__right {
+    &__back-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      margin-right: -0.15rem;
+      transition: transform 0.15s ease, color 0.15s ease;
+
+      .site-header__brand:hover & {
+        transform: translateX(-2px);
+        color: var(--text-primary);
+      }
+    }
+
+    &__avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--surface-color);
+      border: 1.5px solid var(--border-color);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      flex-shrink: 0;
+
+      .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .avatar-fallback {
+        font-family: var(--font-family-base);
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        letter-spacing: 0.02em;
+      }
+    }
+
+    &__name {
+      font-family: var(--font-family-base);
+      font-size: 0.9375rem; // Clean 15px
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    &__center {
       flex: 1;
+    }
+
+    &__right {
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 1.25rem;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    // Mobile link to main notes feed
+    &__mobile-link {
+      font-family: var(--font-family-base);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      background-color: var(--surface-color);
+      border: 1px solid var(--border-color);
+      transition: all 0.15s ease;
+
+      &:hover {
+        color: var(--text-primary);
+        border-color: var(--accent-color);
+      }
+
+      @media (min-width: 640px) {
+        display: none;
+      }
     }
 
     &__nav {
@@ -134,18 +210,28 @@ const { isEssay = false } = Astro.props;
       align-items: center;
       gap: 1.25rem;
 
-      @media (min-width: 768px) {
+      @media (min-width: 640px) {
         display: flex;
       }
     }
 
     &__link {
+      font-family: var(--font-family-base);
       font-size: 0.875rem;
       font-weight: 500;
       color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
 
       &:hover {
         color: var(--text-primary);
+      }
+
+      &--rss {
+        .rss-icon {
+          color: #f97316;
+        }
       }
     }
   }

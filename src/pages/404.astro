@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="404 — Page Not Found">
+  <div class="reading-container not-found-page">
+    <span class="not-found-page__code">404</span>
+    <h1 class="not-found-page__title">Note Not Found</h1>
+    <p class="not-found-page__message">
+      The essay or page you are looking for does not exist, has been moved, or is still being drafted.
+    </p>
+    <div class="not-found-page__actions">
+      <a href="/" class="not-found-page__button">
+        ← Return to all notes
+      </a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style lang="scss">
+  .not-found-page {
+    padding: 6rem 1.5rem 8rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &__code {
+      font-family: var(--font-family-mono);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--accent-color);
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+      padding: 0.25rem 0.75rem;
+      background-color: var(--tag-bg);
+      border-radius: 9999px;
+    }
+
+    &__title {
+      font-family: var(--font-family-headings);
+      font-size: 2.75rem;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    &__message {
+      font-family: var(--font-family-base);
+      font-size: 1.0625rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 480px;
+      margin-bottom: 2.25rem;
+    }
+
+    &__actions {
+      display: flex;
+      justify-content: center;
+    }
+
+    &__button {
+      font-family: var(--font-family-base);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.25rem;
+      font-size: 0.90625rem;
+      font-weight: 500;
+      color: var(--surface-color);
+      background-color: var(--text-primary);
+      border-radius: 8px;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+
+      &:hover {
+        opacity: 0.88;
+        transform: translateY(-1px);
+      }
+    }
+  }
+</style>

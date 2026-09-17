@@ -5,7 +5,7 @@ import EssayLayout from '../../layouts/EssayLayout.astro';
 export async function getStaticPaths() {
   const notes = await getCollection('notes');
   return notes.map((note) => ({
-    params: { slug: note.id.replace(/\.mdx?$/, '') },
+    params: { slug: note.id.replace(/\.(md|mdx)$/, '') },
     props: { note },
   }));
 }
@@ -20,6 +20,8 @@ const { Content, headings } = await render(note);
   description={note.data.description}
   pubDate={note.data.pubDate}
   headings={headings}
+  coverImage={note.data.coverImage}
+  coverImageAlt={note.data.coverImageAlt}
 >
   <Content />
 </EssayLayout>
