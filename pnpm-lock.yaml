@@ -30,7 +30,7 @@ importers:
         specifier: ^1.83.4
         version: 1.104.1
       tsx:
-        specifier: ^4.23.13
+        specifier: ^4.19.2
         version: 4.23.13
       typescript:
         specifier: ^5.7.3

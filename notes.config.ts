@@ -1,3 +1,8 @@
+export interface CategoryConfig {
+  name: string;
+  description?: string;
+}
+
 export interface NotesConfig {
   siteTitle: string;
   authorName: string;
@@ -8,6 +13,7 @@ export interface NotesConfig {
   domain: string;
   description: string;
   repository?: string;
+  categories?: CategoryConfig[];
   socials: {
     github?: string;
     twitter?: string;
@@ -35,9 +41,23 @@ export const notesConfig: NotesConfig = {
   ogImage: '/images/og-image.png',
   domain: 'https://www.notesbyxavier.com',
   description: 'Essays, architectural blueprints, and personal reflections by Xavier Lawrence.',
-  repository: 'https://github.com/CLSTRE-ORG/NOTES',
+  repository: 'https://github.com/code-by-xavier/notesbyxavier',
+  categories: [
+    {
+      name: 'Essays',
+      description: 'Deep-dive explorations, systems design, and architectural blueprints.',
+    },
+    {
+      name: 'Op-Eds',
+      description: 'Perspectives on technology, digital sovereignty, and the modern web.',
+    },
+    {
+      name: 'Field Notes',
+      description: 'Rapid dispatches, benchmarks, and engineering observations.',
+    },
+  ],
   socials: {
-    github: 'https://github.com/CLSTRE-ORG/NOTES',
+    github: 'https://github.com/code-by-xavier/notesbyxavier',
     twitter: 'https://x.com/notesbyxavier',
     linkedin: 'https://www.linkedin.com/in/notesbyxavier/',
     email: 'XLawrence@clstre.com',
@@ -50,6 +70,6 @@ export const notesConfig: NotesConfig = {
   ],
   footer: {
     copyrightText: `© ${new Date().getFullYear()} notesbyxavier.com. All rights reserved.`,
-    poweredByText: 'Built with NOTES — an open-source static publishing engine.',
+    poweredByText: 'Built with Notesby — an open-source static publishing engine by CLSTRE.',
   },
 };

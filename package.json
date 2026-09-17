@@ -1,7 +1,7 @@
 {
-  "name": "notes",
+  "name": "notesbyxavier",
   "version": "1.0.0",
-  "description": "An open-source, minimalist static essay and notes publishing engine for deep-dive technical essays and thoughts.",
+  "description": "Essays, architectural blueprints, and personal notes by Xavier Lawrence.",
   "type": "module",
   "scripts": {
     "dev": "astro dev --port 4330",
@@ -23,10 +23,10 @@
     "typescript": "^5.7.3"
   },
   "author": "Xavier Lawrence <XLawrence@clstre.com> (https://notesbyxavier.com)",
-  "homepage": "https://github.com/CLSTRE-ORG/NOTES",
+  "homepage": "https://github.com/code-by-xavier/notesbyxavier",
   "bugs": {
-    "url": "https://github.com/CLSTRE-ORG/NOTES/issues",
-    "email": "support@clstre.com"
+    "url": "https://github.com/code-by-xavier/notesbyxavier/issues",
+    "email": "XLawrence@clstre.com"
   },
   "license": "MIT"
 }

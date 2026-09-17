@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import NoteCard from '../components/NoteCard.astro';
+import CategorySlider from '../components/CategorySlider.astro';
 import { getCollection } from 'astro:content';
 import { notesConfig } from '../../notes.config';
 
@@ -8,6 +8,47 @@ const allNotes = await getCollection('notes', ({ data }) => !data.draft);
 const sortedNotes = allNotes.sort(
   (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
 );
+
+// Group notes by category
+const categoryMap = new Map<string, typeof sortedNotes>();
+
+sortedNotes.forEach((note) => {
+  const cat = note.data.category || 'Essays';
+  if (!categoryMap.has(cat)) {
+    categoryMap.set(cat, []);
+  }
+  categoryMap.get(cat)!.push(note);
+});
+
+// Build ordered category list
+const configCategories = notesConfig.categories || [
+  { name: 'Essays', description: 'Deep-dive explorations, systems design, and architectural blueprints.' },
+  { name: 'Op-Eds', description: 'Perspectives on technology, digital sovereignty, and the modern web.' },
+  { name: 'Field Notes', description: 'Rapid dispatches, benchmarks, and engineering observations.' },
+];
+
+const orderedCategories: { name: string; description?: string; notes: typeof sortedNotes }[] = [];
+
+// 1. Add categories configured in notesConfig
+configCategories.forEach((cfgCat) => {
+  const notes = categoryMap.get(cfgCat.name);
+  if (notes && notes.length > 0) {
+    orderedCategories.push({
+      name: cfgCat.name,
+      description: cfgCat.description,
+      notes,
+    });
+    categoryMap.delete(cfgCat.name);
+  }
+});
+
+// 2. Add any remaining categories dynamically
+categoryMap.forEach((notes, catName) => {
+  orderedCategories.push({
+    name: catName,
+    notes,
+  });
+});
 ---
 
 <BaseLayout>
@@ -18,26 +59,19 @@ const sortedNotes = allNotes.sort(
     </div>
   </section>
 
-  <section class="notes-feed">
+  <main class="notes-feed">
     <div class="container notes-feed__container">
-      <div class="notes-grid">
-        {
-          sortedNotes.map((note) => (
-            <NoteCard
-              title={note.data.title}
-              subtitle={note.data.subtitle}
-              description={note.data.description}
-              slug={note.id.replace(/\.(md|mdx)$/, '')}
-              pubDate={note.data.pubDate}
-              tags={note.data.tags}
-              readingTime="10 min read"
-              coverImage={note.data.coverImage}
-            />
-          ))
-        }
-      </div>
+      {
+        orderedCategories.map((cat) => (
+          <CategorySlider
+            title={cat.name}
+            description={cat.description}
+            notes={cat.notes}
+          />
+        ))
+      }
     </div>
-  </section>
+  </main>
 </BaseLayout>
 
 <style lang="scss">
@@ -76,22 +110,6 @@ const sortedNotes = allNotes.sort(
 
     &__container {
       max-width: var(--container-max-width);
-    }
-  }
-
-  // 3 or 4 Column Responsive Grid
-  // Keeps cards wide and horizontal (landscape aspect ratio)
-  .notes-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-
-    @media (min-width: 640px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (min-width: 1024px) {
-      grid-template-columns: repeat(3, 1fr);
     }
   }
 </style>
