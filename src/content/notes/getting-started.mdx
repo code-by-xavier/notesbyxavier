@@ -1,0 +1,54 @@
+---
+title: "Getting Started with NOTES"
+subtitle: "A quick instructional guide to writing and publishing essays"
+description: "Learn how to write essays, format text, use headings for the automatic table of contents, and publish your site with NOTES."
+pubDate: 2026-09-17
+tags: ["Guide", "Writing", "Publishing"]
+readingTime: "3 min read"
+draft: false
+---
+
+Welcome to **NOTES**. This post serves as an instructional example of how essays are structured and rendered.
+
+## Writing Your Thoughts
+
+Every essay in NOTES is written in MDX—a format that combines the simplicity of Markdown with the power of modern web components.
+
+Paragraphs flow naturally with generous line heights and balanced typography:
+
+> "Simplicity is prerequisite for reliability." Writing in a calm, focused environment allows ideas to develop with precision.
+
+## Automatic Table of Contents
+
+Notice the **Contents** sidebar on the left. You do not need to build or maintain this menu manually:
+
+1. Whenever you add a section heading using `## Heading Title`, NOTES indexes it automatically.
+1. Sub-headings created with `### Sub-heading` nest beneath their parent section.
+1. As readers scroll through your essay, the sidebar dynamically highlights the active section in real time.
+
+## Code and Formatting
+
+Technical essays often require code snippets, lists, and reference tables:
+
+```typescript
+export interface Note {
+  title: string;
+  pubDate: Date;
+  tags: string[];
+}
+```
+
+Lists remain clean and easy to scan:
+
+- Fast static generation powered by Astro
+- Zero client runtime overhead
+- Fluid dark and light theme switching
+
+## Replacing This Post
+
+To publish your own work:
+
+1. Open `src/content/notes/` in your repository.
+1. Delete or edit this file (`getting-started.mdx`).
+1. Create a new `.mdx` file for each new essay you write.
+1. Edit `notes.config.ts` to set your name, avatar, bio, and social links.

@@ -21,5 +21,12 @@
     "sass": "^1.83.4",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
-  }
+  },
+  "author": "Xavier Lawrence <XLawrence@clstre.com> (https://notesbyxavier.com)",
+  "homepage": "https://github.com/CLSTRE-ORG/NOTES",
+  "bugs": {
+    "url": "https://github.com/CLSTRE-ORG/NOTES/issues",
+    "email": "support@clstre.com"
+  },
+  "license": "MIT"
 }

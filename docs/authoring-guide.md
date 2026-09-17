@@ -24,7 +24,7 @@ draft: false
 Your essay starts right here. Write naturally using standard paragraphs.
 ```
 
-4. Save the file. Your new note is immediately live on your homepage!
+1. Save the file. Your new note is immediately live on your homepage!
 
 ---
 
@@ -65,9 +65,11 @@ coverImage: "/images/essays/my-photo.jpg"
 ## Draft Mode
 
 If you are still working on an essay and don't want it published to the world yet, simply set:
+
 ```yaml
 draft: true
 ```
+
 NOTES will keep it private until you change it to `draft: false`.
 
 ---

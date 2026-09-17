@@ -35,9 +35,9 @@ export const notesConfig: NotesConfig = {
   ogImage: '/images/og-image.png',
   domain: 'https://www.notesbyxavier.com',
   description: 'Essays, architectural blueprints, and personal reflections by Xavier Lawrence.',
-  repository: 'https://github.com/XPANSION-ORG/NOTES',
+  repository: 'https://github.com/CLSTRE-ORG/NOTES',
   socials: {
-    github: 'https://github.com/XPANSION-ORG/NOTES',
+    github: 'https://github.com/CLSTRE-ORG/NOTES',
     twitter: 'https://x.com/notesbyxavier',
     linkedin: 'https://www.linkedin.com/in/notesbyxavier/',
     email: 'XLawrence@clstre.com',
