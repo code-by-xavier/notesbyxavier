@@ -1,0 +1,87 @@
+---
+import Header from '../components/Header.astro';
+import { notesConfig } from '../../notes.config';
+import '../styles/main.scss';
+
+interface Props {
+  title?: string;
+  description?: string;
+  isEssay?: boolean;
+}
+
+const {
+  title = notesConfig.siteTitle,
+  description = notesConfig.description,
+  isEssay = false,
+} = Astro.props;
+
+const pageTitle = title === notesConfig.siteTitle ? title : `${title} — ${notesConfig.siteTitle}`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={Astro.url.href} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:site_name" content={notesConfig.siteTitle} />
+
+    <!-- RSS -->
+    <link rel="alternate" type="application/rss+xml" title={`${notesConfig.siteTitle} RSS Feed`} href="/rss.xml" />
+
+    <!-- Inline Script to prevent Dark/Light theme flash -->
+    <script is:inline>
+      (function () {
+        const savedTheme = localStorage.getItem('notes-theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme || (systemPrefersDark ? 'dark' : 'dark'); // Default to dark like Dario Amodei
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <Header isEssay={isEssay} />
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__container">
+        <p class="site-footer__copyright">{notesConfig.footer.copyrightText}</p>
+        <p class="site-footer__powered">{notesConfig.footer.poweredByText}</p>
+      </div>
+    </footer>
+
+    <style lang="scss">
+      .site-footer {
+        padding: 3rem 0;
+        margin-top: 5rem;
+        border-top: 1px solid var(--border-color);
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+
+        &__container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.5rem;
+          text-align: center;
+
+          @media (min-width: 640px) {
+            flex-direction: row;
+            justify-content: space-between;
+            text-align: left;
+          }
+        }
+      }
+    </style>
+  </body>
+</html>

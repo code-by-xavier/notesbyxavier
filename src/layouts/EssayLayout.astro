@@ -1,0 +1,173 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import type { HeadingItem } from '../components/TableOfContents.astro';
+import { notesConfig } from '../../notes.config';
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  description: string;
+  pubDate: Date | string;
+  headings: HeadingItem[];
+  readingTime?: string;
+}
+
+const {
+  title,
+  subtitle,
+  description,
+  pubDate,
+  headings = [],
+  readingTime = '10 min read',
+} = Astro.props;
+
+const formattedDate = new Intl.DateTimeFormat('en-US', {
+  month: 'long',
+  year: 'numeric',
+}).format(new Date(pubDate));
+---
+
+<BaseLayout title={title} description={description} isEssay={true}>
+  <div class="essay-layout">
+    <div class="container essay-layout__container">
+      <!-- Left Sidebar: Contents TOC (Dario Amodei Style) -->
+      <TableOfContents headings={headings} />
+
+      <!-- Main Reading Column -->
+      <article class="essay-main">
+        <header class="essay-header">
+          <h1 class="essay-header__title">{title}</h1>
+          {subtitle && <p class="essay-header__subtitle">{subtitle}</p>}
+          <div class="essay-header__meta">
+            <time datetime={new Date(pubDate).toISOString()}>{formattedDate}</time>
+            <span class="essay-header__dot">·</span>
+            <span>{readingTime}</span>
+          </div>
+        </header>
+
+        <div class="prose-editorial essay-content">
+          <slot />
+        </div>
+
+        <!-- Footnote / Author Sign-off -->
+        <footer class="essay-footer">
+          <div class="essay-footer__author">
+            <div class="essay-footer__author-name">{notesConfig.authorName}</div>
+            <p class="essay-footer__author-bio">{notesConfig.authorBio}</p>
+          </div>
+          <div class="essay-footer__actions">
+            <a href="/" class="essay-footer__back-link">← Read all notes</a>
+            <a href="/rss.xml" class="essay-footer__rss-link">RSS Feed</a>
+          </div>
+        </footer>
+      </article>
+    </div>
+  </div>
+</BaseLayout>
+
+<style lang="scss">
+  .essay-layout {
+    padding-top: 2rem;
+
+    &__container {
+      display: flex;
+      justify-content: center;
+      gap: 3.5rem;
+      position: relative;
+    }
+  }
+
+  .essay-main {
+    width: 100%;
+    max-width: var(--reading-max-width);
+    min-width: 0;
+  }
+
+  .essay-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+
+    &__title {
+      font-family: 'Newsreader', Charter, Georgia, serif;
+      font-size: 3rem;
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+      margin-bottom: 0.85rem;
+
+      @media (max-width: 680px) {
+        font-size: 2.25rem;
+      }
+    }
+
+    &__subtitle {
+      font-family: 'Newsreader', Charter, Georgia, serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin-bottom: 1.25rem;
+    }
+
+    &__meta {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    &__dot {
+      opacity: 0.5;
+    }
+  }
+
+  .essay-footer {
+    margin-top: 4.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border-color);
+
+    &__author-name {
+      font-family: 'Newsreader', Charter, Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    &__author-bio {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    &__actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+
+    &__back-link {
+      color: var(--accent-color);
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    &__rss-link {
+      color: var(--text-muted);
+
+      &:hover {
+        color: var(--text-primary);
+      }
+    }
+  }
+</style>

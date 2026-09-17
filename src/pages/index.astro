@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NoteCard from '../components/NoteCard.astro';
+import { getCollection } from 'astro:content';
+import { notesConfig } from '../../notes.config';
+
+const allNotes = await getCollection('notes', ({ data }) => !data.draft);
+const sortedNotes = allNotes.sort(
+  (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+);
+---
+
+<BaseLayout>
+  <section class="home-hero">
+    <div class="reading-container">
+      <h1 class="home-hero__title">{notesConfig.siteTitle}</h1>
+      <p class="home-hero__bio">{notesConfig.authorBio}</p>
+    </div>
+  </section>
+
+  <section class="notes-feed">
+    <div class="reading-container">
+      <div class="notes-feed__list">
+        {sortedNotes.map((note) => (
+          <NoteCard
+            title={note.data.title}
+            subtitle={note.data.subtitle}
+            description={note.data.description}
+            slug={note.id.replace(/\.mdx?$/, '')}
+            pubDate={note.data.pubDate}
+            tags={note.data.tags}
+            readingTime="10 min read"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style lang="scss">
+  .home-hero {
+    padding: 4rem 1.5rem 2.5rem;
+    border-bottom: 1px solid var(--border-color);
+
+    &__title {
+      font-family: 'Newsreader', Charter, Georgia, serif;
+      font-size: 2.75rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+
+    &__bio {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+  }
+
+  .notes-feed {
+    padding: 1.5rem 1.5rem;
+
+    &__list {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+</style>

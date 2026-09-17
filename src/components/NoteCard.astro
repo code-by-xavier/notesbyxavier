@@ -1,0 +1,124 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  description: string;
+  slug: string;
+  pubDate: Date | string;
+  tags?: string[];
+  readingTime?: string;
+}
+
+const {
+  title,
+  subtitle,
+  description,
+  slug,
+  pubDate,
+  tags = [],
+  readingTime = '5 min read',
+} = Astro.props;
+
+const formattedDate = new Intl.DateTimeFormat('en-US', {
+  month: 'long',
+  year: 'numeric',
+}).format(new Date(pubDate));
+---
+
+<article class="note-card">
+  <div class="note-card__meta">
+    <time datetime={new Date(pubDate).toISOString()}>{formattedDate}</time>
+    <span class="note-card__dot">·</span>
+    <span>{readingTime}</span>
+  </div>
+
+  <h2 class="note-card__title">
+    <a href={`/notes/${slug}`}>
+      {title}
+    </a>
+  </h2>
+
+  {subtitle && <p class="note-card__subtitle">{subtitle}</p>}
+  <p class="note-card__description">{description}</p>
+
+  {tags.length > 0 && (
+    <div class="note-card__tags">
+      {tags.map((tag) => (
+        <span class="note-card__tag">#{tag}</span>
+      ))}
+    </div>
+  )}
+</article>
+
+<style lang="scss">
+  .note-card {
+    padding: 2.25rem 0;
+    border-bottom: 1px solid var(--border-color);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &__meta {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      letter-spacing: 0.02em;
+    }
+
+    &__dot {
+      opacity: 0.5;
+    }
+
+    &__title {
+      font-family: 'Newsreader', Charter, Georgia, serif;
+      font-size: 1.85rem;
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: -0.015em;
+      margin-bottom: 0.4rem;
+
+      a {
+        color: var(--text-primary);
+
+        &:hover {
+          color: var(--accent-color);
+        }
+      }
+    }
+
+    &__subtitle {
+      font-family: 'Newsreader', Charter, Georgia, serif;
+      font-size: 1.15rem;
+      font-style: italic;
+      color: var(--text-secondary);
+      margin-bottom: 0.6rem;
+      line-height: 1.4;
+    }
+
+    &__description {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    &__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    &__tag {
+      font-size: 0.75rem;
+      color: var(--tag-text);
+      background-color: var(--tag-bg);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+  }
+</style>

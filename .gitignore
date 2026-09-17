@@ -1,0 +1,23 @@
+# Build & Dependencies
+node_modules/
+dist/
+.astro/
+
+# Environment variables
+.env
+.env.production
+.env.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/

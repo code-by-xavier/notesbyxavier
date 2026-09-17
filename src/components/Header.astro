@@ -1,0 +1,152 @@
+---
+import { notesConfig } from '../../notes.config';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  isEssay?: boolean;
+}
+
+const { isEssay = false } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="site-header__container">
+    <div class="site-header__left">
+      {isEssay ? (
+        <a href="/" class="site-header__back-btn" aria-label="Return to all notes">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </a>
+      ) : (
+        <a href="/" class="site-header__brand-subtle">
+          <span>Notes</span>
+        </a>
+      )}
+    </div>
+
+    <div class="site-header__center">
+      <a href="/" class="site-header__author">
+        {notesConfig.authorName}
+      </a>
+    </div>
+
+    <div class="site-header__right">
+      <nav class="site-header__nav">
+        {notesConfig.navLinks.map((link) => (
+          <a
+            href={link.href}
+            class="site-header__link"
+            target={link.external ? '_blank' : undefined}
+            rel={link.external ? 'noopener noreferrer' : undefined}
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
+      <ThemeToggle />
+    </div>
+  </div>
+</header>
+
+<style lang="scss">
+  .site-header {
+    width: 100%;
+    height: var(--header-height);
+    background-color: var(--bg-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    transition: background-color 0.25s ease;
+
+    &__container {
+      max-width: var(--container-max-width);
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    &__left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    &__back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      color: var(--text-secondary);
+      transition: all 0.15s ease;
+
+      &:hover {
+        color: var(--text-primary);
+        background-color: var(--surface-color);
+      }
+    }
+
+    &__brand-subtle {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+
+      &:hover {
+        color: var(--text-primary);
+      }
+    }
+
+    &__center {
+      flex: 2;
+      text-align: center;
+    }
+
+    &__author {
+      font-family: 'Newsreader', Charter, Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+
+      &:hover {
+        opacity: 0.85;
+      }
+    }
+
+    &__right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 1.25rem;
+    }
+
+    &__nav {
+      display: none;
+      align-items: center;
+      gap: 1.25rem;
+
+      @media (min-width: 768px) {
+        display: flex;
+      }
+    }
+
+    &__link {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+
+      &:hover {
+        color: var(--text-primary);
+      }
+    }
+  }
+</style>

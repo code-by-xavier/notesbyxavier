@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { notesConfig } from '../../notes.config';
+---
+
+<BaseLayout title="About">
+  <div class="reading-container about-page">
+    <h1 class="about-page__title">About</h1>
+
+    <div class="prose-editorial">
+      <p>
+        Welcome to <strong>{notesConfig.siteTitle}</strong>. This publication is an open intellectual journal written by {notesConfig.authorName}, dedicated to deep-dive essays on software engineering, cloud architecture, artificial intelligence, and sovereign technology.
+      </p>
+
+      <h2>Philosophy</h2>
+      <p>
+        Writing clarifies thought. In an age of ephemeral social media feeds and algorithmic noise, this site is deliberately crafted as a calm, high-signal reading sanctuary. Inspired by the long-form essays of Dario Amodei, Paul Graham, and classic essayists, each piece here represents deliberate, distilled perspective.
+      </p>
+
+      <h2>The Platform</h2>
+      <p>
+        This site is powered by <strong>NOTES</strong>, an open-source static publishing engine created under the CLSTRE ecosystem. It is completely static, lightning-fast, and built on Astro with zero runtime client bloat.
+      </p>
+
+      <p>
+        You can view or contribute to the open-source codebase on <a href={notesConfig.repository} target="_blank" rel="noopener noreferrer">GitHub</a>.
+      </p>
+
+      <h2>Connect</h2>
+      <p>
+        Follow ongoing developments on <a href={notesConfig.socials.twitter} target="_blank" rel="noopener noreferrer">X (Twitter)</a> or explore sovereign infrastructure on <a href="https://clstre.com" target="_blank" rel="noopener noreferrer">CLSTRE</a>.
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style lang="scss">
+  .about-page {
+    padding: 4rem 1.5rem;
+
+    &__title {
+      font-family: 'Newsreader', Charter, Georgia, serif;
+      font-size: 3rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+  }
+</style>
