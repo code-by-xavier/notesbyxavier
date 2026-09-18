@@ -1,0 +1,21 @@
+.gcloudignore
+.git
+.gitignore
+
+# Dependencies & Build artifacts
+node_modules/
+dist/
+.astro/
+
+# Logs & Environment
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+.env
+.env.*
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
