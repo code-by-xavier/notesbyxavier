@@ -28,5 +28,6 @@
     "url": "https://github.com/code-by-xavier/notesbyxavier/issues",
     "email": "XLawrence@clstre.com"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "packageManager": "pnpm@10.30.1"
 }
