@@ -64,6 +64,7 @@ export const notesConfig: NotesConfig = {
   },
   navLinks: [
     { label: 'Notes', href: '/' },
+    { label: 'Projects', href: '/projects' },
     { label: 'About', href: '/about' },
     { label: 'RSS', href: '/rss.xml', isRss: true },
     { label: 'CLSTRE ↗', href: 'https://www.clstre.com', external: true },

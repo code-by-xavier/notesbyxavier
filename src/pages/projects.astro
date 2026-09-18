@@ -1,0 +1,446 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { projects } from '../data/projects';
+import { notesConfig } from '../../notes.config';
+---
+
+<BaseLayout
+  title="Projects & Architecture"
+  description="Systems, platforms, and open-source infrastructure designed and built by Xavier Lawrence."
+>
+  <div class="projects-page">
+    <section class="projects-hero">
+      <div class="container">
+        <h1 class="projects-hero__title">Projects & Architecture</h1>
+        <p class="projects-hero__subtitle">
+          Platforms, and open-source software designed and built by {notesConfig.authorName}.
+        </p>
+
+        <div class="projects-hero__philosophy">
+          <span class="philosophy-tag">Architectural Philosophy</span>
+          <p>
+            "Simplicity is my prerequisite for reliability." The architectures below are
+            deliberately built with minimal moving parts, sovereign cloud ownership, and zero
+            unnecessary runtime bloat.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <main class="projects-list">
+      <div class="container">
+        {
+          projects.map((project) => (
+            <article class="project-card">
+              <header class="project-card__header">
+                <div class="project-card__title-meta">
+                  <div class="project-card__badges">
+                    <span
+                      class={`status-badge status-badge--${project.status.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
+                      {project.status}
+                    </span>
+                    <span class="period-badge">{project.period}</span>
+                  </div>
+                  <h2 class="project-card__title">{project.title}</h2>
+                  <p class="project-card__role">{project.role}</p>
+                </div>
+
+                <div class="project-card__actions">
+                  {project.liveUrl && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="project-btn project-btn--primary"
+                    >
+                      <span>Visit Live</span>
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="14"
+                        height="14"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" y1="14" x2="21" y2="3" />
+                      </svg>
+                    </a>
+                  )}
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="project-btn project-btn--secondary"
+                    >
+                      <span>GitHub</span>
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="14"
+                        height="14"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                      </svg>
+                    </a>
+                  )}
+                </div>
+              </header>
+
+              <p class="project-card__overview">{project.overview}</p>
+
+              <div class="project-card__section">
+                <h3 class="section-heading">Tech Stack</h3>
+                <div class="tech-stack-pills">
+                  {project.stack.map((tech) => (
+                    <span class="tech-pill">#{tech}</span>
+                  ))}
+                </div>
+              </div>
+
+              <div class="project-card__section">
+                <h3 class="section-heading">Architecture & System Specs</h3>
+                <div class="specs-grid">
+                  {project.specs.map((spec) => (
+                    <div class="spec-item">
+                      <span class="spec-item__label">{spec.label}</span>
+                      <span class="spec-item__value">{spec.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div class="project-card__why">
+                <div class="why-header">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="16" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                  </svg>
+                  <span class="why-title">Why Keep It Simple?</span>
+                </div>
+                <p class="why-body">{project.whyKeepItSimple}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </main>
+  </div>
+</BaseLayout>
+
+<style lang="scss">
+  .projects-page {
+    padding-bottom: 5rem;
+  }
+
+  .projects-hero {
+    padding: 3.5rem 0 2.5rem;
+    border-bottom: 1px solid var(--border-color);
+
+    &__title {
+      font-family: var(--font-family-headings);
+      font-size: 2.75rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+
+      @media (max-width: 640px) {
+        font-size: 2.15rem;
+      }
+    }
+
+    &__subtitle {
+      font-family: var(--font-family-base);
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 720px;
+      margin-bottom: 1.75rem;
+    }
+
+    &__philosophy {
+      background-color: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      max-width: 780px;
+
+      .philosophy-tag {
+        display: inline-block;
+        font-family: var(--font-family-base);
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--accent-color);
+        margin-bottom: 0.35rem;
+      }
+
+      p {
+        font-family: var(--font-family-serif);
+        font-size: 1rem;
+        font-style: italic;
+        color: var(--text-secondary);
+        line-height: 1.55;
+        margin: 0;
+      }
+    }
+  }
+
+  .projects-list {
+    padding-top: 2.5rem;
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+  }
+
+  .project-card {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 2rem 2.25rem;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:hover {
+      border-color: var(--accent-color);
+      box-shadow: 0 8px 30px -10px rgba(0, 0, 0, 0.12);
+    }
+
+    @media (max-width: 640px) {
+      padding: 1.5rem;
+    }
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1.5rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    &__title-meta {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    &__badges {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .status-badge {
+      font-family: var(--font-family-base);
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+
+      &--production {
+        background-color: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.25);
+      }
+
+      &--open-source,
+      &--active {
+        background-color: rgba(7, 90, 170, 0.12);
+        color: #075aaa;
+        border: 1px solid rgba(7, 90, 170, 0.25);
+      }
+    }
+
+    .period-badge {
+      font-family: var(--font-family-base);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    &__title {
+      font-family: var(--font-family-headings);
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin: 0 0 0.25rem;
+    }
+
+    &__role {
+      font-family: var(--font-family-base);
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .project-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-family-base);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+
+      &--primary {
+        background-color: var(--accent-color);
+        color: #ffffff;
+        border: 1px solid var(--accent-color);
+
+        &:hover {
+          opacity: 0.9;
+          transform: translateY(-1px);
+        }
+      }
+
+      &--secondary {
+        background-color: var(--bg-color);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+
+        &:hover {
+          color: var(--text-primary);
+          border-color: var(--text-secondary);
+        }
+      }
+    }
+
+    &__overview {
+      font-family: var(--font-family-base);
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0 0 1.5rem;
+    }
+
+    &__section {
+      margin-bottom: 1.5rem;
+
+      .section-heading {
+        font-family: var(--font-family-base);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        margin-bottom: 0.65rem;
+      }
+    }
+
+    .tech-stack-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+
+      .tech-pill {
+        font-family: var(--font-family-base);
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--tag-text);
+        background-color: var(--tag-bg);
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+      }
+    }
+
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 0.75rem;
+
+      .spec-item {
+        background-color: var(--bg-color);
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        &__label {
+          font-family: var(--font-family-base);
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+        }
+
+        &__value {
+          font-family: var(--font-family-base);
+          font-size: 0.875rem;
+          color: var(--text-primary);
+          line-height: 1.4;
+        }
+      }
+    }
+
+    &__why {
+      background-color: var(--bg-color);
+      border-left: 3px solid var(--accent-color);
+      border-radius: 0 8px 8px 0;
+      padding: 1rem 1.25rem;
+      margin-top: 1.5rem;
+
+      .why-header {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: var(--accent-color);
+        margin-bottom: 0.35rem;
+
+        .why-title {
+          font-family: var(--font-family-base);
+          font-size: 0.8125rem;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+        }
+      }
+
+      .why-body {
+        font-family: var(--font-family-base);
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.55;
+        margin: 0;
+      }
+    }
+  }
+</style>

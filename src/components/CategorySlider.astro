@@ -201,8 +201,8 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
     &__viewport {
       position: relative;
       overflow: hidden;
-      margin: 0 -0.5rem;
-      padding: 0.5rem;
+      margin: -10px -0.75rem -16px;
+      padding: 10px 0.75rem 16px;
     }
 
     &__track {
@@ -212,7 +212,7 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
       scroll-snap-type: x mandatory;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
-      padding-bottom: 0.5rem;
+      padding: 8px 4px 14px;
 
       &::-webkit-scrollbar {
         display: none;
