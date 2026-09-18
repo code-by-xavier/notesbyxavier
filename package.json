@@ -28,5 +28,6 @@
     "url": "https://github.com/CLSTRE-ORG/Notesby/issues",
     "email": "support@clstre.com"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "packageManager": "pnpm@10.30.1"
 }

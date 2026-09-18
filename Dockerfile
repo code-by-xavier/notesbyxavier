@@ -3,12 +3,12 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Enable Corepack and pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Enable Corepack and pin pnpm 10 (matching lockfile)
+RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 
 # Install dependencies
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 
 # Copy source and build static output
 COPY . .
