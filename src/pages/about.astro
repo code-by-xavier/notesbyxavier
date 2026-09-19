@@ -16,32 +16,33 @@ import { EXTERNAL_LINKS } from '@/links';
 
     <div class="prose-editorial">
       <p>
-        Welcome to <strong>{notesConfig.siteTitle}</strong>. This publication is an open
-        intellectual journal dedicated to deep-dive essays on software engineering, technology, and
-        architectural thought.
+        Welcome to <strong>{notesConfig.siteTitle}</strong>, a personal space for essays, working
+        notes, and considered perspectives.
       </p>
 
       <h2>Philosophy</h2>
       <p>
-        Writing clarifies thought. In an age of ephemeral social media feeds and algorithmic noise,
-        this site is deliberately crafted as a calm, high-signal reading sanctuary. Inspired by
-        classic long-form technical writing and architectural blueprints, each piece here represents
-        deliberate, distilled perspective.
+        Writing helps clarify what we think and why. Most platforms push for quick reactions and
+        endless scrolling, so this site takes a simpler approach: clean typography, no tracking
+        popups, and room to sit with an idea from start to finish.
       </p>
 
       <h2>The Platform</h2>
       <p>
-        This site is powered by <strong>Notesby</strong>, an open-source static publishing engine
-        created under the <strong>CLSTRE</strong> tech ecosystem and designed and developed by{' '}
+        This site runs on <strong>Notesby</strong>, an open-source publishing engine created by{' '}
         <a href={EXTERNAL_LINKS.AUTHOR} target="_blank" rel="noopener noreferrer">
           Xavier Lawrence
-        </a>
-        . It is completely static, lightning-fast, and built on Astro with zero runtime client
-        bloat.
+        </a>{' '}
+        as part of the{' '}
+        <a href={EXTERNAL_LINKS.CLSTRE} target="_blank" rel="noopener noreferrer">
+          CLSTRE
+        </a>{' '}
+        ecosystem. It gives writers full ownership of their content, their data, and their reading
+        experience.
       </p>
 
       <p>
-        You can view or contribute to the open-source codebase on{' '}
+        The source code is open and available on{' '}
         <a
           href={notesConfig.repository || EXTERNAL_LINKS.REPOSITORY}
           target="_blank"
@@ -54,13 +55,10 @@ import { EXTERNAL_LINKS } from '@/links';
 
       <h2>Connect</h2>
       <p>
-        Follow ongoing developments on{' '}
+        You can reach out via <a href={`mailto:${notesConfig.socials.email}`}>email</a> or follow
+        updates on{' '}
         <a href={notesConfig.socials.twitter} target="_blank" rel="noopener noreferrer">
-          X (Twitter)
-        </a>{' '}
-        or explore sovereign infrastructure on{' '}
-        <a href={EXTERNAL_LINKS.CLSTRE} target="_blank" rel="noopener noreferrer">
-          CLSTRE
+          X
         </a>
         .
       </p>

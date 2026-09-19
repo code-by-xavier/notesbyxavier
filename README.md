@@ -32,9 +32,9 @@ Notesby is the first publishing engine engineered natively for **Google Cloud Pl
 
 Every post is a note, but thoughts come in different depths:
 
-- **Field Notes**: Rapid dispatches, benchmarks, and micro-observations (100–300 words). Replaces the impulse to publish thoughts onto closed social platforms like X/Twitter.
-- **Editorial Essays**: Long-form, deep-dive architectural blueprints and research with automated tables of contents and reading times.
-- **Op-Eds**: Focused, sharp perspectives on technology, design, and digital sovereignty.
+- **Field Notes**: Rapid dispatches, field logs, and micro-observations (100–300 words). Replaces the impulse to publish thoughts onto closed social platforms like X/Twitter.
+- **Editorial Essays**: Long-form, deep-dive research, explorations, and monographs with automated tables of contents and reading times.
+- **Op-Eds**: Focused, sharp perspectives, cultural commentary, and critiques on any subject.
 
 ### 3. The "Zen Studio" Editor (For Non-Tech Writers)
 

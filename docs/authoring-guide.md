@@ -33,9 +33,9 @@ Your note starts right here. Write naturally using standard paragraphs.
 
 Notesby supports categorizing your writing into distinct rows on the homepage:
 
-- **`Essays`**: Long-form analytical writing and system blueprints.
-- **`Op-Eds`**: Opinion pieces and commentary on technology and culture.
-- **`Field Notes`**: Rapid dispatches, benchmarks, and engineering logs.
+- **`Essays`**: Long-form analytical writing, deep-dive research, and monographs.
+- **`Op-Eds`**: Opinion pieces, cultural critique, and sharp commentary on current ideas.
+- **`Field Notes`**: Rapid dispatches, field logs, and micro-observations.
 - Or any custom category name you define!
 
 ---

@@ -25,9 +25,19 @@ export const notesConfig = {
 
   // 3. Category Row Sliders (Shown on the homepage)
   categories: [
-    { name: 'Essays', description: 'Deep-dive explorations and system blueprints.' },
-    { name: 'Op-Eds', description: 'Perspectives on technology and the modern web.' },
-    { name: 'Field Notes', description: 'Rapid dispatches and engineering observations.' },
+    {
+      name: 'Essays',
+      description:
+        'Long-form editorial explorations, architectural thought, and in-depth research.',
+    },
+    {
+      name: 'Op-Eds',
+      description: 'Sharp commentary, cultural critique, and focused perspectives.',
+    },
+    {
+      name: 'Field Notes',
+      description: 'Short-form dispatches, micro-essays, and raw observations.',
+    },
   ],
 
   // 4. Social Media Links (leave empty if you don't use one)

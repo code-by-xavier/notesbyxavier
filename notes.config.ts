@@ -43,26 +43,26 @@ export interface NotesConfig {
 export const notesConfig: NotesConfig = {
   siteTitle: 'Notesby',
   authorName: 'Jane Doe',
-  authorBio:
-    'Writer, thinker, and researcher. Publishing long-form perspectives on technology, design, and architecture.',
-  authorAvatar: '/images/avatar-placeholder.svg',
+  authorBio: 'Writer and researcher. Exploring ideas, culture, and long-form writing.',
+  authorAvatar: '/images/avatar.webp',
   favicon: '/favicon.webp',
   ogImage: '/images/og-image.png',
   domain: 'https://example.com',
-  description: 'An open-source, minimalist static publishing engine where every post is a note.',
+  description: 'A personal publication featuring essays, op-eds, and field notes.',
   repository: EXTERNAL_LINKS.REPOSITORY,
+  // Primary Content Categories displayed across sliders and feeds
   categories: [
     {
       name: 'Essays',
-      description: 'Deep-dive explorations, systems design, and architectural blueprints.',
+      description: 'Long-form pieces, in-depth research, and detailed explorations.',
     },
     {
       name: 'Op-Eds',
-      description: 'Perspectives on technology, digital sovereignty, and the modern web.',
+      description: 'Commentary, critiques, and opinion pieces on current topics.',
     },
     {
       name: 'Field Notes',
-      description: 'Rapid dispatches, benchmarks, and engineering observations.',
+      description: 'Brief thoughts, working logs, and everyday observations.',
     },
   ],
   socials: {

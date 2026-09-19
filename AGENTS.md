@@ -24,9 +24,9 @@ Unlike bloated legacy CMSs (WordPress) or newsletter-centric subscription platfo
 
 Every post is a note, but content is structured into three distinct editorial primitives:
 
-1. **Field Notes**: Short-form dispatches, raw observations, micro-essays, and engineering benchmarks (100–300 words). Replaces the impulse to post thoughts to closed platforms like X/Twitter.
-2. **Editorial Essays**: Long-form, deep-dive architectural blueprints and research with rich typography, table of contents, and reading times.
-3. **Op-Eds**: Focused, sharp perspectives on technology, design, and digital sovereignty.
+1. **Field Notes**: Short-form dispatches, raw observations, micro-essays, and field logs (100–300 words). Replaces the impulse to post thoughts to closed platforms like X/Twitter.
+2. **Editorial Essays**: Long-form, deep-dive research, explorations, and monographs with rich typography, table of contents, and reading times.
+3. **Op-Eds**: Focused, sharp perspectives, cultural commentary, and critiques on any subject.
 
 ### Pillar 3: The "Zen Studio" Editor
 
