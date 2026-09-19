@@ -1,60 +1,121 @@
 # Notesby
 
-> An open-source, minimalist static publishing engine where every post is a **note**. Built on [Astro](https://astro.build).
+> **The Sovereign Editorial Engine for Thinkers, Researchers, and Architects.**
+>
+> An open-source publishing platform where every post is a note. Built on [Astro](https://astro.build), [PostgreSQL](https://www.postgresql.org), and [Drizzle ORM](https://orm.drizzle.team), engineered for sovereign deployment on [Google Cloud Platform](https://cloud.google.com).
 
-Designed for writers, thinkers, and essayists who value calm typography, high-signal reading, and category-driven publishing without managing complex databases or servers.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Framework: Astro 5](https://img.shields.io/badge/Framework-Astro_5-orange.svg)](https://astro.build)
+[![Database: PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL_Cloud_SQL-336791.svg)](https://www.postgresql.org)
+[![ORM: Drizzle](https://img.shields.io/badge/ORM-Drizzle_ORM-C5F74F.svg)](https://orm.drizzle.team)
+[![Ecosystem: CLSTRE](https://img.shields.io/badge/Ecosystem-CLSTRE-075aaa.svg)](https://clstre.com)
 
 ---
 
 ## Why Notesby?
 
-- **Every Post is a Note**: Publish long-form essays, op-eds, field logs, or rapid dispatches with unified simplicity.
-- **Categorized Row Sliders**: Organize notes by category (**Essays**, **Op-Eds**, **Field Notes**) with smooth horizontal sliding tracks on the homepage.
-- **Distraction-Free Reading**: High-contrast editorial serif typography with comfortable line-height and optimal reading column width.
-- **Automatic Table of Contents**: Dynamic left-hand sidebar that indexes headings and tracks reading progress.
-- **Instant Dark and Light Modes**: Fast theme toggle that respects user preference with zero screen flicker.
-- **Single-File Setup (`notes.config.ts`)**: Customize your name, bio, site title, avatar, categories, and social links in one simple file.
-- **Zero-Maintenance Static Output**: Compiles into pure HTML and CSS with sub-second page loads.
+The modern web is overwhelmed by bloated content management systems (WordPress) and walled-garden subscription platforms (Substack, Medium). **Notesby is the antidote.**
+
+Notesby provides a sovereign, high-contrast, distraction-free home for your intellectual property with four distinct pillars:
+
+### 1. The Native GCP "Sovereign Cloud" Moat
+
+Notesby is the first publishing engine engineered natively for **Google Cloud Platform (GCP)**:
+
+- **Cloud Run**: Blazing-fast containerized compute that automatically scales to zero when idle.
+- **Cloud SQL (`db-f1-micro`)**: Enterprise-grade PostgreSQL holding 50,000+ essays with sub-2ms query times.
+- **Google Cloud Storage (GCS)**: Ultra-cheap, durable media hosting for pennies a month.
+- **Zero Redis**: Engineered with efficient indexing and edge caching, eliminating redundant database servers and high memorystore costs.
+- **Predictable Cost**: Full sovereign ownership on Google enterprise infrastructure for a modest ~$10–$15/month.
+
+### 2. The "Notes vs. Essays" Editorial Hierarchy
+
+Every post is a note, but thoughts come in different depths:
+
+- **Field Notes**: Rapid dispatches, benchmarks, and micro-observations (100–300 words). Replaces the impulse to publish thoughts onto closed social platforms like X/Twitter.
+- **Editorial Essays**: Long-form, deep-dive architectural blueprints and research with automated tables of contents and reading times.
+- **Op-Eds**: Focused, sharp perspectives on technology, design, and digital sovereignty.
+
+### 3. The "Zen Studio" Editor (For Non-Tech Writers)
+
+- In-browser, distraction-free writing environment (feels like *iA Writer meets Notion*).
+- Clean canvas with intuitive slash commands (`/h2`, `/quote`, `/code`, `/image`).
+- Live auto-saving drafts and one-click instant publishing.
+- True-to-life typography preview: writing in the studio looks identical to the live publication.
+
+### 4. Distraction-Free Reader Experience
+
+- **Zero bloat**: No cookie popups, no newsletter gatewalls, no tracking scripts.
+- **Editorial typography**: High-contrast typography with smooth dark/light mode switching (`#075aaa` brand accents).
+- **Syndication**: Automated clean RSS feed and reading progress tracking.
 
 ---
 
-## Quick Start (For Developers)
+## Getting Started
+
+### Path A: Developers & DevOps (CLI & Docker)
 
 ```bash
-# 1. Install dependencies
+# 1. Clone repository
+git clone https://github.com/CLSTRE-ORG/Notesby.git
+cd Notesby
+
+# 2. Install dependencies
 pnpm install
 
-# 2. Start local writing server (port 4330)
+# 3. Start local writing server (port 4330)
 pnpm dev
 
-# 3. Build for production
+# 4. Validate & build for production
+pnpm validate
 pnpm build
 ```
 
----
+### Path B: 1-Click Launch & Download (The Open Source Creator Model)
 
-## Documentation for Writers and Creators
+Similar to downloading open-source creative suites like **Inkscape**:
 
-Everything you need to launch and customize your publication:
-
-- **[Authoring Guide](docs/authoring-guide.md)** — Writing notes, setting categories, and formatting text.
-- **[Customization Guide](docs/configuration.md)** — Setting your publication name, avatar, categories, and social links.
-- **[Deployment Guide](docs/deployment.md)** — Publishing to Cloudflare Pages, Vercel, or Google Cloud Run.
-- **[Upstream Sync Guide](docs/upstream-sync.md)** — Safely importing updates from the master repository without touching your live content.
+1. Click **Deploy Notesby** on [clstre.com](https://clstre.com) or download the turnkey setup script.
+2. Enter your GCP Project ID and custom domain.
+3. Open your live publication and complete the **Welcome Onboarding Wizard** (`/setup`) to configure your author bio, avatar, and secure admin credentials.
+4. Step immediately into the **Zen Studio** and write your first note.
 
 ---
 
-## Author and Community
+## Documentation
 
-Notesby is an open-source initiative created under the **CLSTRE** tech ecosystem.
+- **[Architecture & AI Agent Guide](AGENTS.md)** — Architectural decisions, tech stack specifications, and agent rules.
+- **[Authoring Guide](docs/authoring-guide.md)** — Writing notes, formatting essays, and setting categories.
+- **[Customization Guide](docs/configuration.md)** — Personalizing your brand, bio, and social links in `notes.config.ts`.
+- **[Deployment Guide](docs/deployment.md)** — Google Cloud Run & Cloud SQL production deployment instructions.
+- **[Upstream Sync Guide](docs/upstream-sync.md)** — Safely pulling updates from `CLSTRE-ORG/Notesby` without merge conflicts.
 
-- **Brand**: [CLSTRE](https://clstre.com)
-- **Author & Lead Developer**: [Xavier Lawrence](https://notesbyxavier.com) ([XLawrence@clstre.com](mailto:XLawrence@clstre.com))
-- **Support Contact**: [support@clstre.com](mailto:support@clstre.com)
-- **Showcase Instance**: [notesbyxavier.com](https://notesbyxavier.com)
+---
+
+## Tech Stack Overview
+
+| Layer | Technology |
+| :--- | :--- |
+| **Framework** | [Astro 5](https://astro.build) (Hybrid SSR with `@astrojs/node`) |
+| **Database** | [PostgreSQL](https://www.postgresql.org) on Google Cloud SQL (`db-f1-micro`) |
+| **ORM** | [Drizzle ORM](https://orm.drizzle.team) |
+| **Styles** | Vanilla CSS & SCSS Custom Properties (`#075aaa` brand blue) |
+| **Container** | Docker Alpine running on [Google Cloud Run](https://cloud.google.com/run) |
+| **Assets** | Google Cloud Storage (GCS) |
+
+---
+
+## Brand & Community
+
+Notesby is an open-source initiative created under the **CLSTRE** technology ecosystem.
+
+- **Ecosystem**: [CLSTRE](https://clstre.com)
+- **Author & Lead Architect**: [Xavier Lawrence](https://notesbyxavier.com) ([XLawrence@clstre.com](mailto:XLawrence@clstre.com))
+- **Support & Issues**: [GitHub Issues](https://github.com/CLSTRE-ORG/Notesby/issues) | [support@clstre.com](mailto:support@clstre.com)
+- **Reference Publication**: [notesbyxavier.com](https://notesbyxavier.com)
 
 ---
 
 ## License
 
-Open source under the [MIT License](LICENSE). Built for the open web.
+Open source under the [MIT License](LICENSE). Built for sovereign thinkers and the open web.
