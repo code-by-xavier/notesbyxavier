@@ -1,3 +1,10 @@
+// File: src/styles/main.scss
+// ============================================================
+// Notesby — Global Styles & CSS Custom Properties
+// ============================================================
+
+@use 'abstracts' as *;
+
 :root {
   // Theme Variables - Light Mode (Warm editorial paper)
   --bg-color: #fbfbfa;
@@ -90,19 +97,11 @@ a {
 
 // Container helpers
 .container {
-  width: 100%;
-  max-width: var(--container-max-width);
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  @include container;
 }
 
 .reading-container {
-  width: 100%;
-  max-width: var(--reading-max-width);
-  margin-left: auto;
-  margin-right: auto;
+  @include reading-container;
 }
 
 // Typography: Editorial Prose

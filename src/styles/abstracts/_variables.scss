@@ -1,0 +1,218 @@
+// File: src/styles/abstracts/_variables.scss
+// ============================================================
+// Notesby — Design System Variables & Tokens
+// Single source of truth for design tokens, colors, typography,
+// breakpoints, layout constants, and animation timings.
+// ============================================================
+
+// ==========================================================================
+// 1. COLORS (BRAND & ACCENT)
+// ==========================================================================
+$primary-color: #0f172a !default;
+$primary-accent: #075aaa !default; // CLSTRE Signature Blue
+$primary-accent-light: rgba(7, 90, 170, 0.15) !default;
+$secondary-accent: #38bdf8 !default; // Sky Blue accent
+$accent-hover: #0369a1 !default;
+
+// ==========================================================================
+// 2. COLORS (NEUTRALS)
+// ==========================================================================
+$black: #000000 !default;
+$white: #ffffff !default;
+$charcoal: #1c1917 !default;
+$charcoal-light: rgba(28, 25, 23, 0.04) !default;
+$dark-grey: #333333 !default;
+$grey: #686b6f !default;
+$light-grey: #e5e7eb !default;
+$light-light-grey: #f7f7f7 !default;
+$border-color: #e7e7e5 !default;
+$border-subtle: #f0f0ee !default;
+
+$extra-light-grey: rgba(233, 233, 233, 0.11) !default;
+$contrast-grey: #f4f4f5 !default;
+$off-white: #fbfbfa !default;
+$secondary-neutral: #f5f5f7 !default;
+$clear: rgba(216, 216, 216, 0.13) !default;
+$fields: #e2ecfc !default;
+
+// ==========================================================================
+// 3. COLORS (SEMANTIC & STATUS)
+// ==========================================================================
+$success-accent: #10b981 !default; // Vibrant Emerald
+$success-accent-light: rgba(16, 185, 129, 0.1) !default;
+$success-color: $success-accent !default;
+$success-color-light: $success-accent-light !default;
+
+$error-color: #ef4444 !default;
+$error-color-light: rgba(239, 68, 68, 0.1) !default;
+$error-color-dark: #991b1b !default;
+$error-accent: #ef4444 !default; // Vibrant Red
+$error-accent-light: rgba(239, 68, 68, 0.1) !default;
+$error-accent-dark: #991b1b !default;
+
+$last-mod-accent: #ac0000 !default;
+$yellow: #fff386 !default;
+$yellow-light: rgba(241, 218, 15, 0.34) !default;
+$info-box: #f0f4f9 !default;
+$info-box-text: #374151 !default;
+$info-accent: #0ea5e9 !default;
+$info-accent-light: rgba(14, 165, 233, 0.1) !default;
+$warning-accent: #f59e0b !default;
+$warning-accent-light: rgba(245, 158, 11, 0.1) !default;
+$purple-accent: #8b5cf6 !default;
+$purple-accent-light: rgba(139, 92, 246, 0.1) !default;
+
+// ==========================================================================
+// 4. COLORS (UI SPECIFIC)
+// ==========================================================================
+$overlay-accent: rgba(0, 0, 0, 0.7) !default;
+$dark-overlay-accent: rgba(0, 0, 0, 0.8) !default;
+$cookie-consent-accent: #2c3e50 !default;
+$main-background-color: #fbfbfa !default;
+$cookie-accent: #2c3e50 !default;
+$input-placeholder-accent: $grey !default;
+
+// ==========================================================================
+// 5. TYPOGRAPHY (FAMILIES & WEIGHTS)
+// ==========================================================================
+$font-family-base: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif !default;
+$font-family-headings: 'Newsreader', Charter, Georgia, serif !default;
+$font-family-serif: 'Newsreader', Charter, Georgia, serif !default;
+$font-family-mono: 'JetBrains Mono', monospace !default;
+$font-family-poppins: 'Poppins', sans-serif !default;
+
+$placeholder-content-font-size: 1.25rem !default;
+
+$font-weight-headings: 600 !default;
+$font-weight-normal: 400 !default;
+$font-weight-semibold: 600 !default;
+$font-weight-bold: 700 !default;
+$section-heading-font-weight: 600 !default;
+
+// ==========================================================================
+// 6. TYPOGRAPHY (SIZES & LINE HEIGHTS)
+// ==========================================================================
+$font-size-base: 1rem !default;
+$font-size-base-under: 0.9rem !default;
+$font-size-sm: 0.875rem !default;
+$font-size-helper-text: 0.75rem !default;
+$line-height-base: 1.55 !default;
+$font-size-lg: 17px !default;
+$font-size-xl: 1.25rem !default;
+$font-size-2xl: 1.5rem !default;
+$font-size-secondary: 0.75rem !default;
+
+$h1-font-size: 2.85rem !default;
+$h1-font-size-storefront-mobile: 2.5rem !default;
+$h1-font-size-lg: 3.8rem !default;
+$h1-line-height: 1.15 !default;
+$h1-letter-spacing: -0.02em !default;
+
+$h2-font-size: 2.25rem !default;
+$h2-font-size-lg: 2.75rem !default;
+$h2-line-height: 1.2 !default;
+
+$h3-font-size: 1.35rem !default;
+$h3-font-size-secondary: 1.25rem !default;
+$h3-font-size-lg: 1.75rem !default;
+$h3-line-height: 1.3 !default;
+
+$h4-font-size: 1.1rem !default;
+$h4-line-height: 1.35 !default;
+
+// ==========================================================================
+// 7. TRANSITIONS & ANIMATIONS
+// ==========================================================================
+$transition-base: 200ms ease-in-out !default;
+$transition-speed: 0.3s !default;
+$transition-timing: ease-in-out !default;
+
+$duration-fast: 150ms !default;
+$duration-normal: 300ms !default;
+$duration-slow: 500ms !default;
+
+$transition-fast: $duration-fast $transition-timing !default;
+$transition-normal: $duration-normal $transition-timing !default;
+$transition-slow: $duration-slow $transition-timing !default;
+
+$smooth-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94) !default;
+$se-transition-main: 0.9s !default;
+$se-easing-cards: cubic-bezier(0.645, 0.045, 0.355, 1) !default;
+
+$hamburger-animation-speed: $duration-normal !default;
+$scroll-transition-speed: $duration-normal !default;
+
+// ==========================================================================
+// 8. Z-INDEX LAYERS
+// ==========================================================================
+$z-index-layers: (
+  'content-overlay': 100,
+  'header': 1000,
+  'modal-backdrop': 2000,
+  'modal-content': 2001,
+) !default;
+
+// ==========================================================================
+// 9. BREAKPOINTS & CONTAINERS
+// ==========================================================================
+$breakpoints: (
+  xs: 320px,
+  phone-lg: 480px,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px,
+) !default;
+
+$container-max-widths: (
+  xs: 360px,
+  phone-lg: 470px,
+  sm: 540px,
+  md: 740px,
+  lg: 920px,
+  xl: 1100px,
+  xxl: 1340px,
+) !default;
+
+// ==========================================================================
+// 10. LAYOUT & UI CONSTANTS
+// ==========================================================================
+$spacing-unit: 1rem !default;
+
+// Standard Border Radii
+$border-radius-sm: 4px !default;
+$border-radius-md: 8px !default;
+$border-radius-lg: 12px !default;
+$border-radius-xl: 25px !default;
+$border-radius-full: 50% !default;
+
+// Dimensions
+$header-height-desktop: 68px !default;
+$nav-width-desktop: 250px !default;
+$nav-width-tablet: 80px !default;
+$container-max-width: 1280px !default;
+$reading-max-width: 760px !default;
+
+// UI Elements
+$scroll-btn-size: 50px !default;
+$scroll-btn-offset: 20px !default;
+$scroll-btn-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !default;
+
+// Global Button Radius Variable
+$button-border-radius: 8px !default;
+
+// ==========================================================================
+// 11. SHADOWS
+// ==========================================================================
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !default;
+$shadow-md: var(
+  --shadow-md,
+  0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06)
+) !default;
+$shadow-lg: var(
+  --shadow-lg,
+  0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  0 4px 6px -2px rgba(0, 0, 0, 0.05)
+) !default;

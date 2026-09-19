@@ -1,0 +1,9 @@
+// File: src/styles/abstracts/_index.scss
+// ============================================================
+// Notesby — Abstracts Barrel
+// Forward variables and mixins so components can import via:
+// @use '../styles/abstracts' as *;
+// ============================================================
+
+@forward 'variables';
+@forward 'mixins';

@@ -1,0 +1,280 @@
+// File: src/styles/abstracts/_mixins.scss
+// ============================================================
+// Notesby — Design System Mixins
+// Reusable mixins for responsive media queries, typography,
+// buttons, section shells, headers, and accessibility helpers.
+// ============================================================
+
+@use 'sass:map';
+@use 'sass:color';
+@use 'variables' as *;
+
+// ==========================================================================
+// 1. MEDIA QUERIES
+// ==========================================================================
+@mixin media-breakpoint-up($name) {
+  @if map.has-key($breakpoints, $name) {
+    @media (min-width: map.get($breakpoints, $name)) {
+      @content;
+    }
+  }
+}
+
+@mixin media-breakpoint-down($name) {
+  @if map.has-key($breakpoints, $name) {
+    $value: map.get($breakpoints, $name) - 0.02px;
+    @media (max-width: $value) {
+      @content;
+    }
+  }
+}
+
+// ==========================================================================
+// 2. LAYOUT MIXINS
+// ==========================================================================
+@mixin container {
+  max-width: var(--container-max-width, #{$container-max-width});
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@mixin reading-container {
+  max-width: var(--reading-max-width, #{$reading-max-width});
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@mixin section-shell {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--surface-color, #{$white});
+  color: var(--text-primary, #{$charcoal});
+}
+
+// ==========================================================================
+// 3. COMPONENT MIXINS
+// ==========================================================================
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--ui-button-radius, #{$button-border-radius});
+  border: 1px solid transparent;
+  line-height: normal;
+  vertical-align: middle;
+  cursor: pointer;
+  font-family: var(--font-family-base, #{$font-family-base});
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  text-align: center;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    transform 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out,
+    filter 0.2s ease-in-out;
+
+  p {
+    margin: 0;
+    padding: 0;
+    line-height: inherit;
+  }
+  > * {
+    margin-bottom: 0;
+  }
+}
+
+@mixin button-variant(
+  $background,
+  $text-color,
+  $border-color: transparent,
+  $hover-background: null,
+  $hover-text-color: null,
+  $hover-border-color: null
+) {
+  background-color: var(--btn-bg, #{$background});
+  color: var(--btn-text, #{$text-color});
+  border-color: var(--btn-border, #{$border-color});
+
+  &:hover {
+    @if $hover-background == null {
+      background-color: var(--btn-hover-bg, var(--btn-bg, #{$background}));
+      filter: brightness(0.92);
+    } @else {
+      background-color: var(--btn-hover-bg, #{$hover-background});
+    }
+
+    @if $hover-text-color != null {
+      color: var(--btn-hover-text, #{$hover-text-color});
+    } @else {
+      color: var(--btn-hover-text, var(--btn-text, #{$text-color}));
+    }
+
+    @if $hover-border-color != null {
+      border-color: var(--btn-hover-border, #{$hover-border-color});
+    } @else {
+      border-color: var(--btn-hover-border, var(--btn-border, #{$border-color}));
+    }
+
+    text-decoration: none;
+  }
+
+  &:active {
+    filter: brightness(0.85);
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    filter: grayscale(1);
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// ==========================================================================
+// 4. TYPOGRAPHY MIXINS
+// ==========================================================================
+@mixin page-heading-style {
+  font-family: var(--font-family-headings, #{$font-family-headings});
+  font-size: var(--h1-size, #{$h1-font-size});
+  font-weight: var(--font-weight-headings, #{$font-weight-headings});
+  line-height: var(--h1-line-height, #{$h1-line-height});
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  letter-spacing: $h1-letter-spacing;
+  color: var(--text-primary, #{$charcoal});
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @include media-breakpoint-up(lg) {
+    font-size: var(--h1-size-lg, #{$h1-font-size-lg});
+    letter-spacing: -0.03em;
+  }
+}
+
+@mixin page-paragraph-style {
+  font-family: var(--font-family-base, #{$font-family-base});
+  font-size: var(--font-size-base, #{$font-size-base});
+  line-height: var(--line-height-base, #{$line-height-base});
+  font-weight: var(--font-weight-normal, #{$font-weight-normal});
+  margin-top: 0;
+  margin-bottom: 1em;
+  color: var(--text-secondary, #{$grey});
+  letter-spacing: -0.01em;
+}
+
+@mixin h2-heading-style {
+  font-family: var(--font-family-headings, #{$font-family-headings});
+  font-size: var(--h2-size, #{$h2-font-size});
+  font-weight: var(--font-weight-headings, #{$font-weight-headings});
+  line-height: var(--h2-line-height, #{$h2-line-height});
+  color: var(--text-primary, #{$charcoal});
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @include media-breakpoint-up(lg) {
+    font-size: var(--h2-size-lg, #{$h2-font-size-lg});
+  }
+}
+
+@mixin h3-heading-style {
+  font-family: var(--font-family-headings, #{$font-family-headings});
+  font-size: var(--h3-size, #{$h3-font-size});
+  font-weight: var(--font-weight-headings, #{$font-weight-headings});
+  line-height: var(--h3-line-height, #{$h3-line-height});
+  color: var(--text-primary, #{$charcoal});
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+
+  @include media-breakpoint-up(lg) {
+    font-size: var(--h3-size-lg, #{$h3-font-size-lg});
+  }
+}
+
+@mixin h4-heading-style {
+  font-family: var(--font-family-headings, #{$font-family-headings});
+  font-size: var(--h4-size, #{$h4-font-size});
+  font-weight: var(--font-weight-headings, #{$font-weight-headings});
+  line-height: var(--h4-line-height, #{$h4-line-height});
+  color: var(--text-primary, #{$charcoal});
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+// Reusable Section Header + Subheading Combination Mixin
+@mixin section-header-combo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1.5rem;
+
+  .section-title {
+    @include h2-heading-style;
+  }
+
+  .section-subtitle {
+    @include page-paragraph-style;
+    margin-bottom: 0;
+  }
+}
+
+// ==========================================================================
+// 5. ACCESSIBILITY & UTILITY MIXINS
+// ==========================================================================
+@mixin visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin custom-scrollbar(
+  $size: 6px,
+  $thumb-color: var(--border-color, #e7e7e5),
+  $hover-color: var(--accent-color, #075aaa),
+  $radius: 3px
+) {
+  &::-webkit-scrollbar {
+    width: $size;
+    height: $size;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: $radius;
+
+    &:hover {
+      background: $hover-color;
+    }
+  }
+}
