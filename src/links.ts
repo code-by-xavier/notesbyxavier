@@ -10,6 +10,8 @@ export const ROUTES = {
   // Public Reader Pages
   HOME: '/',
   ABOUT: '/about',
+  TERMS: '/terms',
+  PRIVACY: '/privacy',
   RSS: '/rss.xml',
   NOTE: (slug: string) => `/notes/${slug}/`,
 

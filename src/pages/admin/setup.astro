@@ -3,9 +3,16 @@
 // ============================================================
 // Notesby — Publication Onboarding Setup Wizard
 // First-run setup screen to claim the publication and create the admin.
+// Utilizes reusable UI form primitives with seamless canvas aesthetics.
 // ============================================================
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import FormField from '@/components/ui/FormField.astro';
+import Input from '@/components/ui/Input.astro';
+import Button from '@/components/ui/Button.astro';
+import FormError from '@/components/ui/FormError.astro';
+import HelperText from '@/components/ui/HelperText.astro';
+import LegalNotice from '@/components/ui/LegalNotice.astro';
 import { isSetupCompleted } from '@/lib/auth';
 import { ROUTES } from '@/links';
 
@@ -20,7 +27,7 @@ if (alreadySetup) {
 <BaseLayout title="Setup Your Publication — Notesby" hideNav={true} hideFooter={true}>
   <div class="auth-wrapper">
     <div class="auth-card">
-      <div class="auth-card__header">
+      <header class="auth-card__header">
         <a href={ROUTES.HOME} class="auth-brand" aria-label="Notesby Home">
           <span class="auth-brand__mark">N</span>
           <span class="auth-brand__name">Notesby</span>
@@ -29,94 +36,100 @@ if (alreadySetup) {
         <p class="auth-card__subtitle">
           Configure your master administrator account and publication identity.
         </p>
-      </div>
+      </header>
 
       <form id="setup-form" class="auth-form" novalidate>
-        <div id="error-message" class="auth-alert auth-alert--error" style="display: none;"></div>
+        <FormError id="error-message" />
 
-        <div class="auth-form__group">
-          <label for="siteTitle" class="auth-label">
-            Publication Title
-          </label>
-          <input
+        <FormField
+          label="Publication Title"
+          forId="siteTitle"
+          required={true}
+          helperText="The title displayed across your publication header and RSS feeds."
+        >
+          <Input
             type="text"
             id="siteTitle"
             name="siteTitle"
-            class="auth-input"
             placeholder="e.g. Xavier's Notes"
-            required
+            required={true}
             autocomplete="organization"
           />
-        </div>
+        </FormField>
 
-        <div class="auth-form__group">
-          <label for="authorName" class="auth-label">
-            Your Full Name
-          </label>
-          <input
+        <FormField
+          label="Your Full Name"
+          forId="authorName"
+          required={true}
+          helperText="Displayed on essay bylines and author profile."
+        >
+          <Input
             type="text"
             id="authorName"
             name="authorName"
-            class="auth-input"
             placeholder="e.g. Xavier Lawrence"
-            required
+            required={true}
             autocomplete="name"
           />
-        </div>
+        </FormField>
 
-        <div class="auth-form__group">
-          <label for="email" class="auth-label">
-            Admin Email Address
-          </label>
-          <input
+        <FormField
+          label="Admin Email Address"
+          forId="email"
+          required={true}
+          helperText="Your sovereign master credential used for logging into Studio."
+        >
+          <Input
             type="email"
             id="email"
             name="email"
-            class="auth-input"
             placeholder="you@example.com"
-            required
+            required={true}
             autocomplete="email"
           />
-        </div>
+        </FormField>
 
-        <div class="auth-form__group">
-          <label for="password" class="auth-label">
-            Master Password
-          </label>
-          <input
+        <FormField
+          label="Master Password"
+          forId="password"
+          required={true}
+          helperText="At least 8 characters. Hashed with bcrypt before storage."
+        >
+          <Input
             type="password"
             id="password"
             name="password"
-            class="auth-input"
             placeholder="At least 8 characters"
-            required
-            minlength="8"
+            required={true}
+            minlength={8}
             autocomplete="new-password"
           />
-        </div>
+        </FormField>
 
-        <div class="auth-form__group">
-          <label for="confirmPassword" class="auth-label">
-            Confirm Password
-          </label>
-          <input
+        <FormField label="Confirm Password" forId="confirmPassword" required={true}>
+          <Input
             type="password"
             id="confirmPassword"
             name="confirmPassword"
-            class="auth-input"
             placeholder="Repeat your password"
-            required
-            minlength="8"
+            required={true}
+            minlength={8}
             autocomplete="new-password"
           />
-        </div>
+        </FormField>
 
-        <button type="submit" id="submit-btn" class="auth-btn">
-          <span class="auth-btn__text">Complete Setup & Launch</span>
-          <span class="auth-btn__spinner" style="display: none;">
-            Initializing...
-          </span>
-        </button>
+        <Button
+          type="submit"
+          id="submit-btn"
+          variant="primary"
+          size="md"
+          block={true}
+          loadingText="Initializing..."
+        >
+          Complete Setup & Launch
+        </Button>
+
+        <LegalNotice actionText="completing setup" />
       </form>
     </div>
   </div>
@@ -126,18 +139,22 @@ if (alreadySetup) {
   const form = document.getElementById('setup-form') as HTMLFormElement | null;
   const errorBox = document.getElementById('error-message') as HTMLDivElement | null;
   const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement | null;
-  const btnText = submitBtn?.querySelector('.auth-btn__text') as HTMLElement | null;
-  const btnSpinner = submitBtn?.querySelector('.auth-btn__spinner') as HTMLElement | null;
+  const btnText = submitBtn?.querySelector('.ui-button__text') as HTMLElement | null;
+  const btnSpinner = submitBtn?.querySelector('.ui-button__spinner') as HTMLElement | null;
 
   function showError(msg: string) {
     if (!errorBox) return;
-    errorBox.textContent = msg;
-    errorBox.style.display = 'block';
+    const msgEl = errorBox.querySelector('.ui-form-error__message');
+    if (msgEl) {
+      msgEl.textContent = msg;
+    } else {
+      errorBox.textContent = msg;
+    }
+    errorBox.style.display = 'flex';
   }
 
   function hideError() {
     if (!errorBox) return;
-    errorBox.textContent = '';
     errorBox.style.display = 'none';
   }
 
@@ -145,7 +162,7 @@ if (alreadySetup) {
     if (!submitBtn || !btnText || !btnSpinner) return;
     submitBtn.disabled = loading;
     btnText.style.display = loading ? 'none' : 'inline';
-    btnSpinner.style.display = loading ? 'inline' : 'none';
+    btnSpinner.style.display = loading ? 'inline-flex' : 'none';
   }
 
   form?.addEventListener('submit', async (e) => {
@@ -199,24 +216,22 @@ if (alreadySetup) {
 </script>
 
 <style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
   .auth-wrapper {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-lg, #{ui.$spacing-lg}) var(--spacing-sm, #{ui.$spacing-sm});
+    padding: var(--spacing-2xl, #{ui.$spacing-2xl}) var(--spacing-md, #{ui.$spacing-md});
     background-color: var(--bg-color, #{ui.$bg-light});
   }
 
+  // Seamless form canvas without background card, border, or shadow
   .auth-card {
     width: 100%;
     max-width: 460px;
-    background-color: var(--surface-color, #{ui.$surface-light});
-    border: var(--border-width-base, #{ui.$border-width-base}) solid
-      var(--border-color, #{ui.$border-light});
-    border-radius: var(--border-radius-lg, #{ui.$border-radius-lg});
-    padding: var(--spacing-xl, #{ui.$spacing-xl}) var(--spacing-lg, #{ui.$spacing-lg});
-    box-shadow: var(--shadow-md, #{ui.$shadow-md});
+    padding: var(--spacing-sm, #{ui.$spacing-sm}) 0;
 
     &__header {
       text-align: center;
@@ -253,7 +268,7 @@ if (alreadySetup) {
       height: 32px;
       border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
       background-color: var(--accent-color, #{ui.$primary-accent});
-      color: var(--white, #{ui.$surface-light});
+      color: #ffffff;
       font-size: var(--font-size-sm, #{ui.$font-size-sm});
       font-family: var(--font-family-mono, #{ui.$font-family-mono});
       font-weight: ui.$font-weight-bold;
@@ -269,81 +284,5 @@ if (alreadySetup) {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md, #{ui.$spacing-md});
-
-    &__group {
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-2xs, #{ui.$spacing-2xs});
-    }
-  }
-
-  .auth-label {
-    font-family: var(--font-family-base, #{ui.$font-family-base});
-    font-size: var(--font-size-sm, #{ui.$font-size-sm});
-    font-weight: ui.$font-weight-medium;
-    color: var(--text-primary, #{ui.$text-primary-light});
-  }
-
-  .auth-input {
-    width: 100%;
-    height: 44px;
-    padding: 0 var(--spacing-sm, #{ui.$spacing-sm});
-    font-family: var(--font-family-base, #{ui.$font-family-base});
-    font-size: var(--font-size-sm, #{ui.$font-size-sm});
-    color: var(--text-primary, #{ui.$text-primary-light});
-    background-color: var(--bg-color, #{ui.$bg-light});
-    border: var(--border-width-base, #{ui.$border-width-base}) solid
-      var(--border-color, #{ui.$border-light});
-    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
-    transition:
-      border-color ui.$transition-fast,
-      box-shadow ui.$transition-fast;
-
-    &:focus {
-      outline: none;
-      border-color: var(--accent-color, #{ui.$primary-accent});
-      box-shadow: 0 0 0 3px rgba(7, 90, 170, 0.15);
-    }
-  }
-
-  .auth-btn {
-    @include ui.flex-center;
-    width: 100%;
-    height: 46px;
-    margin-top: var(--spacing-xs, #{ui.$spacing-xs});
-    font-family: var(--font-family-base, #{ui.$font-family-base});
-    font-size: var(--font-size-sm, #{ui.$font-size-sm});
-    font-weight: ui.$font-weight-semibold;
-    color: var(--white, #{ui.$surface-light});
-    background-color: var(--accent-color, #{ui.$primary-accent});
-    border: none;
-    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
-    cursor: pointer;
-    transition:
-      background-color ui.$transition-fast,
-      transform ui.$transition-fast;
-
-    &:hover:not(:disabled) {
-      background-color: var(--accent-hover, #{ui.$primary-accent-hover});
-      transform: translateY(-1px);
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
-
-  .auth-alert {
-    padding: var(--spacing-sm, #{ui.$spacing-sm});
-    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
-    font-size: var(--font-size-sm, #{ui.$font-size-sm});
-    line-height: var(--line-height-normal, #{ui.$line-height-normal});
-
-    &--error {
-      background-color: rgba(239, 68, 68, 0.1);
-      border: var(--border-width-base, #{ui.$border-width-base}) solid rgba(239, 68, 68, 0.3);
-      color: #ef4444;
-    }
   }
 </style>

@@ -1,0 +1,107 @@
+---
+// File: src/components/ui/Textarea.astro
+// ============================================================
+// Notesby — Reusable Accessible Textarea Primitive
+// Zero client JavaScript, lightweight, type-safe, and styled
+// with the CLSTRE design system tokens.
+// ============================================================
+
+interface Props {
+  id?: string;
+  name: string;
+  value?: string;
+  placeholder?: string;
+  rows?: number;
+  required?: boolean;
+  disabled?: boolean;
+  readonly?: boolean;
+  minlength?: number;
+  maxlength?: number;
+  hasError?: boolean;
+  class?: string;
+  ariaDescribedby?: string;
+  [key: string]: any;
+}
+
+const {
+  id,
+  name,
+  value,
+  placeholder,
+  rows = 4,
+  required = false,
+  disabled = false,
+  readonly = false,
+  minlength,
+  maxlength,
+  hasError = false,
+  class: className = '',
+  ariaDescribedby,
+  ...rest
+} = Astro.props;
+---
+
+<textarea
+  id={id || name}
+  name={name}
+  rows={rows}
+  placeholder={placeholder}
+  required={required}
+  disabled={disabled}
+  readonly={readonly}
+  minlength={minlength}
+  maxlength={maxlength}
+  aria-invalid={hasError ? 'true' : undefined}
+  aria-describedby={ariaDescribedby}
+  class:list={['ui-textarea', { 'ui-textarea--error': hasError }, className]}
+  {...rest}
+>{value || <slot />}</textarea>
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  .ui-textarea {
+    width: 100%;
+    padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    color: var(--text-primary, #{ui.$text-primary-light});
+    background-color: var(--surface-color, #{ui.$surface-light});
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+    border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+    line-height: var(--line-height-base, #{ui.$line-height-base});
+    resize: vertical;
+    transition:
+      border-color ui.$transition-fast,
+      box-shadow ui.$transition-fast,
+      background-color ui.$transition-fast;
+
+    &::placeholder {
+      color: var(--text-muted, #{ui.$text-muted-light});
+      opacity: 0.8;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--accent-color, #{ui.$primary-accent});
+      box-shadow: 0 0 0 3px rgba(7, 90, 170, 0.14);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background-color: var(--bg-color, #{ui.$bg-light});
+    }
+
+    &--error,
+    &[aria-invalid='true'] {
+      border-color: var(--error-color, #{ui.$error-color});
+
+      &:focus {
+        border-color: var(--error-color, #{ui.$error-color});
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+      }
+    }
+  }
+</style>

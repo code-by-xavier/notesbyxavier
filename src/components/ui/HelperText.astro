@@ -1,0 +1,144 @@
+---
+// File: src/components/ui/HelperText.astro
+// ============================================================
+// Notesby — Reusable Portal Guidance & Field Helper Text
+// Provides contextual instructions, field hints, and portal navigation tips.
+// ============================================================
+
+interface Props {
+  variant?: 'default' | 'info' | 'warning' | 'muted' | 'tip';
+  id?: string;
+  icon?: boolean;
+  class?: string;
+  [key: string]: any;
+}
+
+const { variant = 'default', id, icon = false, class: className = '', ...rest } = Astro.props;
+---
+
+<p
+  id={id}
+  class:list={[
+    'ui-helper-text',
+    `ui-helper-text--${variant}`,
+    { 'ui-helper-text--with-icon': icon },
+    className,
+  ]}
+  {...rest}
+>
+  {icon && variant === 'info' && (
+    <svg
+      class="ui-helper-text__icon"
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="16" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12.01" y2="8" />
+    </svg>
+  )}
+  {icon && variant === 'tip' && (
+    <svg
+      class="ui-helper-text__icon"
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M12 2v1" />
+      <path d="M12 21v1" />
+      <path d="M4.93 4.93l.7.7" />
+      <path d="M18.36 18.36l.7.7" />
+      <path d="M2 12h1" />
+      <path d="M21 12h1" />
+      <path d="M4.93 19.07l.7-.7" />
+      <path d="M18.36 5.64l.7-.7" />
+      <circle cx="12" cy="12" r="4" />
+    </svg>
+  )}
+  {icon && variant === 'warning' && (
+    <svg
+      class="ui-helper-text__icon"
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+      <line x1="12" y1="9" x2="12" y2="13" />
+      <line x1="12" y1="17" x2="12.01" y2="17" />
+    </svg>
+  )}
+  <span class="ui-helper-text__content">
+    <slot />
+  </span>
+</p>
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  .ui-helper-text {
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    line-height: var(--line-height-normal, 1.45);
+    margin: 0;
+    color: var(--text-secondary, #{ui.$text-secondary-light});
+
+    &--with-icon {
+      display: inline-flex;
+      align-items: flex-start;
+      gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+    }
+
+    &__icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    &__content {
+      flex: 1;
+    }
+
+    &--muted {
+      color: var(--text-muted, #{ui.$text-muted-light});
+    }
+
+    &--info {
+      color: var(--accent-color, #{ui.$primary-accent});
+
+      .ui-helper-text__icon {
+        stroke: var(--accent-color, #{ui.$primary-accent});
+      }
+    }
+
+    &--tip {
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+
+      .ui-helper-text__icon {
+        stroke: var(--accent-color, #{ui.$primary-accent});
+      }
+    }
+
+    &--warning {
+      color: var(--warning-color, #{ui.$warning-color});
+
+      .ui-helper-text__icon {
+        stroke: var(--warning-color, #{ui.$warning-color});
+      }
+    }
+  }
+</style>

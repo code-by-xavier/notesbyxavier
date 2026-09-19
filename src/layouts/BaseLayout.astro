@@ -8,6 +8,7 @@
 import Header from '@/components/Header.astro';
 import SEO from '@/components/SEO.astro';
 import { notesConfig } from '@config';
+import { ROUTES } from '@/links';
 import '@/styles/main.scss';
 
 interface Props {
@@ -66,6 +67,17 @@ const {
       <footer class="site-footer">
         <div class="container site-footer__container">
           <p class="site-footer__copyright">{notesConfig.footer.copyrightText}</p>
+          <div class="site-footer__legal">
+            <a href={ROUTES.TERMS} class="site-footer__link">
+              Terms
+            </a>
+            <span class="site-footer__dot" aria-hidden="true">
+              &bull;
+            </span>
+            <a href={ROUTES.PRIVACY} class="site-footer__link">
+              Privacy
+            </a>
+          </div>
           <p class="site-footer__powered">{notesConfig.footer.poweredByText}</p>
         </div>
       </footer>
@@ -93,6 +105,26 @@ const {
             align-items: center;
             text-align: left;
           }
+        }
+
+        &__legal {
+          display: inline-flex;
+          align-items: center;
+          gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+        }
+
+        &__link {
+          color: var(--text-muted, #{ui.$text-muted-light});
+          text-decoration: none;
+          transition: color ui.$transition-fast;
+
+          &:hover {
+            color: var(--accent-color, #{ui.$primary-accent});
+          }
+        }
+
+        &__dot {
+          opacity: 0.5;
         }
       }
     </style>
