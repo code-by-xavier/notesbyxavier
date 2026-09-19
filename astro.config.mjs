@@ -7,6 +7,7 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import node from '@astrojs/node';
 import { fileURLToPath } from 'node:url';
 
 const srcDir = fileURLToPath(new URL('./src', import.meta.url));
@@ -15,6 +16,9 @@ const configPath = fileURLToPath(new URL('./notes.config.ts', import.meta.url));
 export default defineConfig({
   site: 'https://example.com',
   output: 'static',
+  adapter: node({
+    mode: 'standalone',
+  }),
   integrations: [mdx(), sitemap()],
   markdown: {
     shikiConfig: {

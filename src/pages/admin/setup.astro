@@ -1,0 +1,349 @@
+---
+// File: src/pages/admin/setup.astro
+// ============================================================
+// Notesby — Publication Onboarding Setup Wizard
+// First-run setup screen to claim the publication and create the admin.
+// ============================================================
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { isSetupCompleted } from '@/lib/auth';
+import { ROUTES } from '@/links';
+
+export const prerender = false;
+
+const alreadySetup = await isSetupCompleted();
+if (alreadySetup) {
+  return Astro.redirect(ROUTES.ADMIN.LOGIN);
+}
+---
+
+<BaseLayout title="Setup Your Publication — Notesby" hideNav={true} hideFooter={true}>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-card__header">
+        <a href={ROUTES.HOME} class="auth-brand" aria-label="Notesby Home">
+          <span class="auth-brand__mark">N</span>
+          <span class="auth-brand__name">Notesby</span>
+        </a>
+        <h1 class="auth-card__title">Claim Your Publication</h1>
+        <p class="auth-card__subtitle">
+          Configure your master administrator account and publication identity.
+        </p>
+      </div>
+
+      <form id="setup-form" class="auth-form" novalidate>
+        <div id="error-message" class="auth-alert auth-alert--error" style="display: none;"></div>
+
+        <div class="auth-form__group">
+          <label for="siteTitle" class="auth-label">
+            Publication Title
+          </label>
+          <input
+            type="text"
+            id="siteTitle"
+            name="siteTitle"
+            class="auth-input"
+            placeholder="e.g. Xavier's Notes"
+            required
+            autocomplete="organization"
+          />
+        </div>
+
+        <div class="auth-form__group">
+          <label for="authorName" class="auth-label">
+            Your Full Name
+          </label>
+          <input
+            type="text"
+            id="authorName"
+            name="authorName"
+            class="auth-input"
+            placeholder="e.g. Xavier Lawrence"
+            required
+            autocomplete="name"
+          />
+        </div>
+
+        <div class="auth-form__group">
+          <label for="email" class="auth-label">
+            Admin Email Address
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="auth-input"
+            placeholder="you@example.com"
+            required
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="auth-form__group">
+          <label for="password" class="auth-label">
+            Master Password
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="auth-input"
+            placeholder="At least 8 characters"
+            required
+            minlength="8"
+            autocomplete="new-password"
+          />
+        </div>
+
+        <div class="auth-form__group">
+          <label for="confirmPassword" class="auth-label">
+            Confirm Password
+          </label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            class="auth-input"
+            placeholder="Repeat your password"
+            required
+            minlength="8"
+            autocomplete="new-password"
+          />
+        </div>
+
+        <button type="submit" id="submit-btn" class="auth-btn">
+          <span class="auth-btn__text">Complete Setup & Launch</span>
+          <span class="auth-btn__spinner" style="display: none;">
+            Initializing...
+          </span>
+        </button>
+      </form>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('setup-form') as HTMLFormElement | null;
+  const errorBox = document.getElementById('error-message') as HTMLDivElement | null;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement | null;
+  const btnText = submitBtn?.querySelector('.auth-btn__text') as HTMLElement | null;
+  const btnSpinner = submitBtn?.querySelector('.auth-btn__spinner') as HTMLElement | null;
+
+  function showError(msg: string) {
+    if (!errorBox) return;
+    errorBox.textContent = msg;
+    errorBox.style.display = 'block';
+  }
+
+  function hideError() {
+    if (!errorBox) return;
+    errorBox.textContent = '';
+    errorBox.style.display = 'none';
+  }
+
+  function setLoading(loading: boolean) {
+    if (!submitBtn || !btnText || !btnSpinner) return;
+    submitBtn.disabled = loading;
+    btnText.style.display = loading ? 'none' : 'inline';
+    btnSpinner.style.display = loading ? 'inline' : 'none';
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError();
+
+    const siteTitle = (document.getElementById('siteTitle') as HTMLInputElement)?.value.trim();
+    const authorName = (document.getElementById('authorName') as HTMLInputElement)?.value.trim();
+    const email = (document.getElementById('email') as HTMLInputElement)?.value.trim();
+    const password = (document.getElementById('password') as HTMLInputElement)?.value;
+    const confirmPassword = (document.getElementById('confirmPassword') as HTMLInputElement)?.value;
+
+    if (!siteTitle || !authorName || !email || !password) {
+      showError('Please fill out all required fields.');
+      return;
+    }
+
+    if (password.length < 8) {
+      showError('Password must be at least 8 characters.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showError('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ siteTitle, authorName, email, password }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        showError(result.error || 'Failed to complete setup.');
+        setLoading(false);
+        return;
+      }
+
+      window.location.href = result.redirect || '/admin';
+    } catch (err: any) {
+      showError('A network error occurred. Please try again.');
+      setLoading(false);
+    }
+  });
+</script>
+
+<style lang="scss">
+  .auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg, #{ui.$spacing-lg}) var(--spacing-sm, #{ui.$spacing-sm});
+    background-color: var(--bg-color, #{ui.$bg-light});
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 460px;
+    background-color: var(--surface-color, #{ui.$surface-light});
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+    border-radius: var(--border-radius-lg, #{ui.$border-radius-lg});
+    padding: var(--spacing-xl, #{ui.$spacing-xl}) var(--spacing-lg, #{ui.$spacing-lg});
+    box-shadow: var(--shadow-md, #{ui.$shadow-md});
+
+    &__header {
+      text-align: center;
+      margin-bottom: var(--spacing-lg, #{ui.$spacing-lg});
+    }
+
+    &__title {
+      @include ui.h2-heading-style;
+      margin-top: var(--spacing-sm, #{ui.$spacing-sm});
+      margin-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
+    }
+
+    &__subtitle {
+      @include ui.description-text;
+      margin: 0 auto;
+      max-width: 90%;
+    }
+  }
+
+  .auth-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs, #{ui.$spacing-xs});
+    text-decoration: none;
+    color: var(--text-primary, #{ui.$text-primary-light});
+    font-weight: ui.$font-weight-bold;
+    font-size: var(--font-size-lg, #{ui.$font-size-lg});
+
+    &__mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      background-color: var(--accent-color, #{ui.$primary-accent});
+      color: var(--white, #{ui.$surface-light});
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-family: var(--font-family-mono, #{ui.$font-family-mono});
+      font-weight: ui.$font-weight-bold;
+    }
+
+    &__name {
+      font-family: var(--font-family-serif, #{ui.$font-family-serif});
+      font-size: var(--font-size-xl, #{ui.$font-size-xl});
+    }
+  }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md, #{ui.$spacing-md});
+
+    &__group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+    }
+  }
+
+  .auth-label {
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    font-weight: ui.$font-weight-medium;
+    color: var(--text-primary, #{ui.$text-primary-light});
+  }
+
+  .auth-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 var(--spacing-sm, #{ui.$spacing-sm});
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    color: var(--text-primary, #{ui.$text-primary-light});
+    background-color: var(--bg-color, #{ui.$bg-light});
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    transition:
+      border-color ui.$transition-fast,
+      box-shadow ui.$transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: var(--accent-color, #{ui.$primary-accent});
+      box-shadow: 0 0 0 3px rgba(7, 90, 170, 0.15);
+    }
+  }
+
+  .auth-btn {
+    @include ui.flex-center;
+    width: 100%;
+    height: 46px;
+    margin-top: var(--spacing-xs, #{ui.$spacing-xs});
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    font-weight: ui.$font-weight-semibold;
+    color: var(--white, #{ui.$surface-light});
+    background-color: var(--accent-color, #{ui.$primary-accent});
+    border: none;
+    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    cursor: pointer;
+    transition:
+      background-color ui.$transition-fast,
+      transform ui.$transition-fast;
+
+    &:hover:not(:disabled) {
+      background-color: var(--accent-hover, #{ui.$primary-accent-hover});
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .auth-alert {
+    padding: var(--spacing-sm, #{ui.$spacing-sm});
+    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    line-height: var(--line-height-normal, #{ui.$line-height-normal});
+
+    &--error {
+      background-color: rgba(239, 68, 68, 0.1);
+      border: var(--border-width-base, #{ui.$border-width-base}) solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+  }
+</style>

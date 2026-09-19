@@ -67,6 +67,10 @@
   }
 }
 
+@mixin h1-heading-style {
+  @include page-heading-style;
+}
+
 @mixin page-paragraph-style {
   font-family: var(--font-family-base, #{v.$font-family-base});
   font-size: var(--font-size-base, #{v.$font-size-base});

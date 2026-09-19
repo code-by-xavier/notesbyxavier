@@ -17,9 +17,20 @@ interface Props {
   pubDate?: Date | string;
   updatedDate?: Date | string;
   image?: string;
+  hideNav?: boolean;
+  hideFooter?: boolean;
 }
 
-const { title, description, isEssay = false, pubDate, updatedDate, image } = Astro.props;
+const {
+  title,
+  description,
+  isEssay = false,
+  pubDate,
+  updatedDate,
+  image,
+  hideNav = false,
+  hideFooter = false,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -45,18 +56,20 @@ const { title, description, isEssay = false, pubDate, updatedDate, image } = Ast
     </script>
   </head>
   <body>
-    <Header isEssay={isEssay} />
+    {!hideNav && <Header isEssay={isEssay} />}
 
     <main>
       <slot />
     </main>
 
-    <footer class="site-footer">
-      <div class="container site-footer__container">
-        <p class="site-footer__copyright">{notesConfig.footer.copyrightText}</p>
-        <p class="site-footer__powered">{notesConfig.footer.poweredByText}</p>
-      </div>
-    </footer>
+    {!hideFooter && (
+      <footer class="site-footer">
+        <div class="container site-footer__container">
+          <p class="site-footer__copyright">{notesConfig.footer.copyrightText}</p>
+          <p class="site-footer__powered">{notesConfig.footer.poweredByText}</p>
+        </div>
+      </footer>
+    )}
 
     <style lang="scss">
       .site-footer {

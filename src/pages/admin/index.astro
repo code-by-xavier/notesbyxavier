@@ -1,0 +1,335 @@
+---
+// File: src/pages/admin/index.astro
+// ============================================================
+// Notesby — Admin Portal & Writing Sanctuary
+// Authenticated dashboard displaying author profile and studio launcher.
+// ============================================================
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { ROUTES } from '@/links';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect(ROUTES.ADMIN.LOGIN);
+}
+---
+
+<BaseLayout title="Studio Portal — Notesby" hideNav={true} hideFooter={true}>
+  <div class="portal-layout">
+    <!-- Top Minimal Navigation Bar -->
+    <header class="portal-nav">
+      <div class="portal-nav__container">
+        <a href={ROUTES.HOME} class="portal-brand" aria-label="Go to Live Publication">
+          <span class="portal-brand__mark">N</span>
+          <span class="portal-brand__name">Notesby Studio</span>
+        </a>
+
+        <div class="portal-nav__actions">
+          <a href={ROUTES.HOME} class="portal-nav__link" target="_blank">
+            View Live Site ↗
+          </a>
+          <a href={ROUTES.API.LOGOUT} class="portal-nav__btn-logout">
+            Sign Out
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Canvas -->
+    <main class="portal-main">
+      <div class="portal-container">
+        <!-- Welcome Hero -->
+        <section class="portal-hero">
+          <div class="portal-hero__badge">AUTHENTICATED PUBLISHER</div>
+          <h1 class="portal-hero__title">Welcome back, {user.name}</h1>
+          <p class="portal-hero__subtitle">
+            Your sovereign cloud publication is active and connected to PostgreSQL.
+          </p>
+        </section>
+
+        <!-- Studio Quick Actions Grid -->
+        <div class="portal-grid">
+          <!-- Card 1: Zen Studio -->
+          <div class="portal-card portal-card--primary">
+            <div class="portal-card__header">
+              <span class="portal-card__icon">✍️</span>
+              <h2 class="portal-card__title">Zen Studio</h2>
+            </div>
+            <p class="portal-card__text">
+              Distraction-free Markdown & MDX editor with live typography preview and slash
+              commands.
+            </p>
+            <div class="portal-card__footer">
+              <span class="portal-card__status">Editor Ready</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Account & Settings -->
+          <div class="portal-card">
+            <div class="portal-card__header">
+              <span class="portal-card__icon">⚙️</span>
+              <h2 class="portal-card__title">Publisher Profile</h2>
+            </div>
+            <div class="portal-card__details">
+              <div class="portal-detail-row">
+                <span class="portal-detail-label">Name</span>
+                <span class="portal-detail-val">{user.name}</span>
+              </div>
+              <div class="portal-detail-row">
+                <span class="portal-detail-label">Email</span>
+                <span class="portal-detail-val">{user.email}</span>
+              </div>
+              <div class="portal-detail-row">
+                <span class="portal-detail-label">Role</span>
+                <span class="portal-detail-val portal-detail-val--badge">{user.role}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Cloud Architecture -->
+          <div class="portal-card">
+            <div class="portal-card__header">
+              <span class="portal-card__icon">☁️</span>
+              <h2 class="portal-card__title">Sovereign Cloud Engine</h2>
+            </div>
+            <p class="portal-card__text">
+              Database: PostgreSQL via Drizzle ORM. Reader pages statically edge-cached on Google
+              Cloud CDN.
+            </p>
+            <div class="portal-card__footer">
+              <span class="portal-status-dot"></span>
+              <span class="portal-status-label">Database Connected</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</BaseLayout>
+
+<style lang="scss">
+  .portal-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-color, #{ui.$bg-light});
+  }
+
+  .portal-nav {
+    height: 64px;
+    border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-subtle, #{ui.$border-subtle-light});
+    background-color: var(--surface-color, #{ui.$surface-light});
+
+    &__container {
+      @include ui.container;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md, #{ui.$spacing-md});
+    }
+
+    &__link {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-weight: ui.$font-weight-medium;
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      text-decoration: none;
+      transition: color ui.$transition-fast;
+
+      &:hover {
+        color: var(--accent-color, #{ui.$primary-accent});
+      }
+    }
+
+    &__btn-logout {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-weight: ui.$font-weight-semibold;
+      color: var(--text-primary, #{ui.$text-primary-light});
+      background-color: var(--bg-color, #{ui.$bg-light});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      padding: var(--spacing-2xs, #{ui.$spacing-2xs}) var(--spacing-sm, #{ui.$spacing-sm});
+      text-decoration: none;
+      transition: all ui.$transition-fast;
+
+      &:hover {
+        border-color: var(--accent-color, #{ui.$primary-accent});
+        color: var(--accent-color, #{ui.$primary-accent});
+      }
+    }
+  }
+
+  .portal-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs, #{ui.$spacing-xs});
+    text-decoration: none;
+    color: var(--text-primary, #{ui.$text-primary-light});
+
+    &__mark {
+      @include ui.flex-center;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      background-color: var(--accent-color, #{ui.$primary-accent});
+      color: var(--white, #{ui.$surface-light});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-family: var(--font-family-mono, #{ui.$font-family-mono});
+      font-weight: ui.$font-weight-bold;
+    }
+
+    &__name {
+      font-family: var(--font-family-serif, #{ui.$font-family-serif});
+      font-size: var(--font-size-lg, #{ui.$font-size-lg});
+      font-weight: ui.$font-weight-semibold;
+    }
+  }
+
+  .portal-main {
+    flex: 1;
+    padding: var(--spacing-2xl, #{ui.$spacing-2xl}) 0;
+  }
+
+  .portal-container {
+    @include ui.container;
+  }
+
+  .portal-hero {
+    margin-bottom: var(--spacing-xl, #{ui.$spacing-xl});
+
+    &__badge {
+      display: inline-block;
+      @include ui.badge-pill-style;
+      color: var(--accent-color, #{ui.$primary-accent});
+      border-color: var(--accent-color, #{ui.$primary-accent});
+      background-color: rgba(7, 90, 170, 0.08);
+      margin-bottom: var(--spacing-xs, #{ui.$spacing-xs});
+    }
+
+    &__title {
+      @include ui.h1-heading-style;
+      margin-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
+    }
+
+    &__subtitle {
+      @include ui.description-text;
+      font-size: var(--font-size-base, #{ui.$font-size-base});
+    }
+  }
+
+  .portal-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg, #{ui.$spacing-lg});
+
+    @include ui.media-breakpoint-up(md) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .portal-card {
+    @include ui.card-surface-style;
+    padding: var(--spacing-lg, #{ui.$spacing-lg});
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    &--primary {
+      border-color: var(--accent-color, #{ui.$primary-accent});
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs, #{ui.$spacing-xs});
+      margin-bottom: var(--spacing-sm, #{ui.$spacing-sm});
+    }
+
+    &__icon {
+      font-size: var(--font-size-xl, #{ui.$font-size-xl});
+    }
+
+    &__title {
+      @include ui.h3-heading-style;
+      margin: 0;
+    }
+
+    &__text {
+      @include ui.description-text;
+      line-height: var(--line-height-normal, #{ui.$line-height-normal});
+      margin-bottom: var(--spacing-md, #{ui.$spacing-md});
+    }
+
+    &__details {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs, #{ui.$spacing-xs});
+      margin-bottom: var(--spacing-md, #{ui.$spacing-md});
+    }
+
+    &__footer {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs, #{ui.$spacing-xs});
+      padding-top: var(--spacing-sm, #{ui.$spacing-sm});
+      border-top: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-subtle, #{ui.$border-subtle-light});
+    }
+
+    &__status {
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-weight: ui.$font-weight-semibold;
+      color: var(--accent-color, #{ui.$primary-accent});
+    }
+  }
+
+  .portal-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    padding-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
+    border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-subtle, #{ui.$border-subtle-light});
+  }
+
+  .portal-detail-label {
+    color: var(--text-muted, #{ui.$text-muted-light});
+  }
+
+  .portal-detail-val {
+    font-weight: ui.$font-weight-medium;
+    color: var(--text-primary, #{ui.$text-primary-light});
+
+    &--badge {
+      text-transform: uppercase;
+      letter-spacing: var(--letter-spacing-meta, #{ui.$letter-spacing-meta});
+      color: var(--accent-color, #{ui.$primary-accent});
+    }
+  }
+
+  .portal-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #10b981;
+    display: inline-block;
+  }
+
+  .portal-status-label {
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    font-weight: ui.$font-weight-medium;
+    color: #10b981;
+  }
+</style>

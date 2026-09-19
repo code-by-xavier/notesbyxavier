@@ -1,0 +1,29 @@
+# File: docker-compose.yml
+# ============================================================
+# Notesby — Local Infrastructure Services
+# Spins up PostgreSQL 16 Alpine container for local development.
+# Note: Redis is strictly avoided per Notesby architecture.
+# ============================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: notesby_db
+    restart: unless-stopped
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-notesby}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-notesby}
+      POSTGRES_DB: ${POSTGRES_DB:-notesby}
+    volumes:
+      - notesby_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-notesby} -d ${POSTGRES_DB:-notesby}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  notesby_pgdata:
+    name: notesby_pgdata
