@@ -12,13 +12,13 @@ Writing a new piece in Notesby is as simple as creating a text file. Every post 
 
 ```mdx
 ---
-title: "The Simplicity of Calm Publishing"
-subtitle: "Why distraction-free writing produces clearer thinking"
-description: "A short summary of this note that will appear on Google and social media previews."
+title: 'The Simplicity of Calm Publishing'
+subtitle: 'Why distraction-free writing produces clearer thinking'
+description: 'A short summary of this note that will appear on Google and social media previews.'
 pubDate: 2026-09-17
-category: "Essays"
-tags: ["Writing", "Philosophy"]
-readingTime: "5 min read"
+category: 'Essays'
+tags: ['Writing', 'Philosophy']
+readingTime: '5 min read'
 draft: false
 ---
 
@@ -42,16 +42,16 @@ Notesby supports categorizing your writing into distinct rows on the homepage:
 
 ## Writing Cheatsheet
 
-| What you want to do | How to write it | What it looks like |
-| :--- | :--- | :--- |
-| **Section Heading** | `## My Section Title` | Creates an elegant section title and **automatically adds it to your sticky Table of Contents** on the left! |
-| **Sub-heading** | `### A Smaller Point` | Creates a nested sub-heading in your text and table of contents. |
-| **Bold Text** | `**very important**` | **very important** |
-| **Italic Text** | `*thoughtful reflection*` | *thoughtful reflection* |
-| **Quotes** | `> Simplicity is prerequisite for reliability.` | Displays an editorial quote block with generous margins. |
-| **Bullet List** | `- First point`<br/>`- Second point` | Clean bullet list with comfortable spacing. |
-| **Numbered List** | `1. Step one`<br/>`2. Step two` | Numbered list. |
-| **Links** | `[Read more](https://example.com)` | [Read more](https://example.com) |
+| What you want to do | How to write it                                 | What it looks like                                                                                           |
+| :------------------ | :---------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| **Section Heading** | `## My Section Title`                           | Creates an elegant section title and **automatically adds it to your sticky Table of Contents** on the left! |
+| **Sub-heading**     | `### A Smaller Point`                           | Creates a nested sub-heading in your text and table of contents.                                             |
+| **Bold Text**       | `**very important**`                            | **very important**                                                                                           |
+| **Italic Text**     | `*thoughtful reflection*`                       | _thoughtful reflection_                                                                                      |
+| **Quotes**          | `> Simplicity is prerequisite for reliability.` | Displays an editorial quote block with generous margins.                                                     |
+| **Bullet List**     | `- First point`<br/>`- Second point`            | Clean bullet list with comfortable spacing.                                                                  |
+| **Numbered List**   | `1. Step one`<br/>`2. Step two`                 | Numbered list.                                                                                               |
+| **Links**           | `[Read more](https://example.com)`              | [Read more](https://example.com)                                                                             |
 
 ---
 
@@ -69,7 +69,7 @@ Notesby supports categorizing your writing into distinct rows on the homepage:
 If you want an image to display at the very top of your note, add `coverImage` to your information block:
 
 ```yaml
-coverImage: "/images/essays/my-photo.jpg"
+coverImage: '/images/essays/my-photo.jpg'
 ```
 
 ---

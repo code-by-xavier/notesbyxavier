@@ -1,6 +1,6 @@
 # Notesby — AI Agent & Developer Architecture Guide
 
-> **Core Philosophy**: *"Simplicity is my prerequisite for reliability."*
+> **Core Philosophy**: _"Simplicity is my prerequisite for reliability."_
 >
 > **Brand**: CLSTRE Ecosystem ([clstre.com](https://clstre.com))
 >
@@ -47,15 +47,15 @@ Every post is a note, but content is structured into three distinct editorial pr
 
 Any AI developer working on Notesby must adhere to the following architectural decisions:
 
-| Layer | Technology | Decision & Rationale |
-| :--- | :--- | :--- |
-| **Framework** | **Astro 5** | Hybrid SSR with `@astrojs/node`. Reader pages are statically pre-rendered & edge-cached; admin & APIs run dynamically. |
-| **Styling** | **Vanilla CSS & SCSS** | Clean CSS custom properties, no heavy utility frameworks (Tailwind avoided). Brand blue: `#075aaa`. |
-| **Database** | **PostgreSQL (Cloud SQL `db-f1-micro`)** | Open-source relational standard. Capacity: 50,000–100,000+ articles without upgrading. |
-| **ORM** | **Drizzle ORM** | Type-safe, zero runtime overhead, compiles to raw SQL, instantaneous container boot. |
-| **Media / Assets** | **Google Cloud Storage (GCS)** | Images and media are stored in GCS buckets, keeping the database light. |
-| **Compute / Host** | **Google Cloud Run** | Docker container, port 8080, memory 256Mi–512Mi, scales to zero when dormant. |
-| **Cache / Queue** | **NO REDIS** | Redis is strictly avoided to prevent cost (~$40/mo) and architectural bloat. Indexed DB reads take <2ms; Astro handles page caching. |
+| Layer              | Technology                               | Decision & Rationale                                                                                                                 |
+| :----------------- | :--------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| **Framework**      | **Astro 5**                              | Hybrid SSR with `@astrojs/node`. Reader pages are statically pre-rendered & edge-cached; admin & APIs run dynamically.               |
+| **Styling**        | **Vanilla CSS & SCSS**                   | Clean CSS custom properties, no heavy utility frameworks (Tailwind avoided). Brand blue: `#075aaa`.                                  |
+| **Database**       | **PostgreSQL (Cloud SQL `db-f1-micro`)** | Open-source relational standard. Capacity: 50,000–100,000+ articles without upgrading.                                               |
+| **ORM**            | **Drizzle ORM**                          | Type-safe, zero runtime overhead, compiles to raw SQL, instantaneous container boot.                                                 |
+| **Media / Assets** | **Google Cloud Storage (GCS)**           | Images and media are stored in GCS buckets, keeping the database light.                                                              |
+| **Compute / Host** | **Google Cloud Run**                     | Docker container, port 8080, memory 256Mi–512Mi, scales to zero when dormant.                                                        |
+| **Cache / Queue**  | **NO REDIS**                             | Redis is strictly avoided to prevent cost (~$40/mo) and architectural bloat. Indexed DB reads take <2ms; Astro handles page caching. |
 
 ---
 

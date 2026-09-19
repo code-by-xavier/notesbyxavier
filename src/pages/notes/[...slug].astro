@@ -1,6 +1,12 @@
 ---
+// File: src/pages/notes/[...slug].astro
+// ============================================================
+// Notesby — Dynamic Note & Essay Page Route
+// Renders individual essays, op-eds, or field notes by slug.
+// ============================================================
+
 import { getCollection, render } from 'astro:content';
-import EssayLayout from '../../layouts/EssayLayout.astro';
+import EssayLayout from '@/layouts/EssayLayout.astro';
 
 export async function getStaticPaths() {
   const notes = await getCollection('notes');

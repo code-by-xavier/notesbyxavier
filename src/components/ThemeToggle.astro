@@ -1,4 +1,9 @@
 ---
+// File: src/components/ThemeToggle.astro
+// ============================================================
+// Notesby — Theme Toggle Component
+// Accessible toggle switch for switching between dark and light themes.
+// ============================================================
 ---
 
 <button
@@ -18,47 +23,47 @@
     background: none;
     border: none;
     cursor: pointer;
-    padding: 6px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    padding: var(--toggle-padding, #{ui.$toggle-padding});
+    @include ui.flex-center;
     outline: none;
     color: inherit;
 
     &__track {
-      width: 44px;
-      height: 24px;
-      background-color: var(--border-color);
-      border-radius: 9999px;
+      width: var(--toggle-track-width, #{ui.$toggle-track-width});
+      height: var(--toggle-track-height, #{ui.$toggle-track-height});
+      background-color: var(--border-color, #{ui.$border-light});
+      border-radius: var(--border-radius-full, #{ui.$border-radius-full});
       position: relative;
-      transition: background-color 0.25s ease;
+      transition: background-color ui.$transition-base;
       display: flex;
       align-items: center;
-      padding: 2px;
+      padding: var(--spacing-3xs, #{ui.$spacing-3xs});
     }
 
     &__thumb {
-      width: 20px;
-      height: 20px;
-      background-color: var(--surface-color);
-      border-radius: 50%;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s ease;
+      width: var(--toggle-thumb-size, #{ui.$toggle-thumb-size});
+      height: var(--toggle-thumb-size, #{ui.$toggle-thumb-size});
+      background-color: var(--surface-color, #{ui.$surface-light});
+      border-radius: var(--border-radius-full, #{ui.$border-radius-full});
+      box-shadow: ui.$shadow-sm;
+      transition:
+        transform ui.$transition-base,
+        background-color ui.$transition-base;
       transform: translateX(0);
     }
 
     &:hover &__track {
-      background-color: var(--text-muted);
+      background-color: var(--text-muted, #{ui.$text-muted-light});
     }
   }
 
   [data-theme='dark'] .theme-toggle__track {
-    background-color: #38bdf8;
+    background-color: var(--accent-color, #{ui.$secondary-accent});
   }
 
   [data-theme='dark'] .theme-toggle__thumb {
-    transform: translateX(20px);
-    background-color: #161616;
+    transform: translateX(var(--toggle-thumb-size, #{ui.$toggle-thumb-size}));
+    background-color: var(--white, #{ui.$bg-dark});
   }
 </style>
 
@@ -70,7 +75,7 @@
     toggle.addEventListener('click', () => {
       const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      
+
       document.documentElement.setAttribute('data-theme', newTheme);
       localStorage.setItem('notes-theme', newTheme);
     });

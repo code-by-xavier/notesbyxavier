@@ -2,27 +2,26 @@
 // ============================================================
 // Notesby — Design System Mixins
 // Reusable mixins for responsive media queries, typography,
-// buttons, section shells, headers, and accessibility helpers.
+// descriptions, metadata rows, pills, buttons, and layout helpers.
 // ============================================================
 
 @use 'sass:map';
-@use 'sass:color';
-@use 'variables' as *;
+@use 'variables' as v;
 
 // ==========================================================================
 // 1. MEDIA QUERIES
 // ==========================================================================
 @mixin media-breakpoint-up($name) {
-  @if map.has-key($breakpoints, $name) {
-    @media (min-width: map.get($breakpoints, $name)) {
+  @if map.has-key(v.$breakpoints, $name) {
+    @media (min-width: map.get(v.$breakpoints, $name)) {
       @content;
     }
   }
 }
 
 @mixin media-breakpoint-down($name) {
-  @if map.has-key($breakpoints, $name) {
-    $value: map.get($breakpoints, $name) - 0.02px;
+  @if map.has-key(v.$breakpoints, $name) {
+    $value: map.get(v.$breakpoints, $name) - 0.02px;
     @media (max-width: $value) {
       @content;
     }
@@ -33,63 +32,270 @@
 // 2. LAYOUT MIXINS
 // ==========================================================================
 @mixin container {
-  max-width: var(--container-max-width, #{$container-max-width});
   width: 100%;
+  max-width: var(--container-max-width, #{v.$container-max-width});
   margin-left: auto;
   margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: var(--spacing-lg, #{v.$spacing-lg});
+  padding-right: var(--spacing-lg, #{v.$spacing-lg});
 }
 
 @mixin reading-container {
-  max-width: var(--reading-max-width, #{$reading-max-width});
   width: 100%;
+  max-width: var(--reading-max-width, #{v.$reading-max-width});
   margin-left: auto;
   margin-right: auto;
 }
 
-@mixin section-shell {
-  position: relative;
-  width: 100%;
+// ==========================================================================
+// 3. TYPOGRAPHY MIXINS
+// ==========================================================================
+@mixin page-heading-style {
+  font-family: var(--font-family-headings, #{v.$font-family-headings});
+  font-size: var(--h1-size, #{v.$h1-font-size});
+  font-weight: var(--font-weight-headings, #{v.$font-weight-semibold});
+  line-height: var(--h1-line-height, #{v.$h1-line-height});
+  letter-spacing: var(--h1-letter-spacing, #{v.$h1-letter-spacing});
+  color: var(--text-primary, #{v.$text-primary-light});
+  margin-top: var(--spacing-lg, #{v.$spacing-lg});
+  margin-bottom: var(--spacing-unit, #{v.$spacing-unit});
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @include media-breakpoint-up(lg) {
+    font-size: var(--h1-size-lg, #{v.$h1-font-size-lg});
+  }
+}
+
+@mixin page-paragraph-style {
+  font-family: var(--font-family-base, #{v.$font-family-base});
+  font-size: var(--font-size-base, #{v.$font-size-base});
+  line-height: var(--line-height-base, #{v.$line-height-base});
+  font-weight: var(--font-weight-normal, #{v.$font-weight-normal});
+  color: var(--text-secondary, #{v.$text-secondary-light});
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+@mixin h2-heading-style {
+  font-family: var(--font-family-headings, #{v.$font-family-headings});
+  font-size: var(--h2-size, #{v.$h2-font-size});
+  font-weight: var(--font-weight-headings, #{v.$font-weight-semibold});
+  line-height: var(--h2-line-height, #{v.$h2-line-height});
+  letter-spacing: var(--letter-spacing-heading-sm, #{v.$letter-spacing-heading-sm});
+  color: var(--text-primary, #{v.$text-primary-light});
+  margin-top: 0;
+  margin-bottom: var(--spacing-2xs-plus, #{v.$spacing-2xs-plus});
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @include media-breakpoint-up(lg) {
+    font-size: var(--h2-size-lg, #{v.$h2-font-size-lg});
+  }
+}
+
+@mixin h3-heading-style {
+  font-family: var(--font-family-headings, #{v.$font-family-headings});
+  font-size: var(--h3-size, #{v.$h3-font-size});
+  font-weight: var(--font-weight-headings, #{v.$font-weight-semibold});
+  line-height: var(--h3-line-height, #{v.$h3-line-height});
+  letter-spacing: var(--letter-spacing-tight, #{v.$letter-spacing-tight});
+  color: var(--text-primary, #{v.$text-primary-light});
+  margin-top: 0;
+  margin-bottom: var(--spacing-xs, #{v.$spacing-xs});
+
+  @include media-breakpoint-up(lg) {
+    font-size: var(--h3-size-lg, #{v.$h3-font-size-lg});
+  }
+}
+
+// Reusable Description / Subtext Style
+@mixin description-text($clamp: null) {
+  font-family: var(--font-family-base, #{v.$font-family-base});
+  font-size: var(--font-size-sm, #{v.$font-size-sm});
+  color: var(--text-secondary, #{v.$text-secondary-light});
+  line-height: var(--line-height-base, #{v.$line-height-base});
+  margin: 0;
+
+  @if $clamp != null {
+    display: -webkit-box;
+    -webkit-line-clamp: $clamp;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// Reusable Editorial Subtitle / Lead Serif
+@mixin subtitle-serif-style($size: subhead, $clamp: null) {
+  font-family: var(--font-family-serif, #{v.$font-family-serif});
+  font-style: italic;
+  color: var(--text-secondary, #{v.$text-secondary-light});
+
+  @if $size == xl {
+    font-size: var(--font-size-xl, #{v.$font-size-xl});
+    line-height: var(--line-height-prose, #{v.$line-height-prose});
+  } @else {
+    font-size: var(--font-size-subhead, #{v.$font-size-subhead});
+    line-height: 1.35;
+  }
+
+  @if $clamp != null {
+    display: -webkit-box;
+    -webkit-line-clamp: $clamp;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// Reusable Metadata Text & Row
+@mixin meta-text-style($size: xs) {
+  font-family: var(--font-family-base, #{v.$font-family-base});
+  font-weight: var(--font-weight-medium, #{v.$font-weight-medium});
+  color: var(--text-muted, #{v.$text-muted-light});
+  letter-spacing: var(--letter-spacing-meta, #{v.$letter-spacing-meta});
+
+  @if $size == sm {
+    font-size: var(--font-size-sm, #{v.$font-size-sm});
+  } @else {
+    font-size: var(--font-size-xs, #{v.$font-size-xs});
+  }
+}
+
+@mixin meta-row-style($size: xs, $gap: 2xs-plus) {
+  @include meta-text-style($size);
+  display: flex;
+  align-items: center;
+
+  @if $gap == xs {
+    gap: var(--spacing-xs, #{v.$spacing-xs});
+  } @else {
+    gap: var(--spacing-2xs-plus, #{v.$spacing-2xs-plus});
+  }
+}
+
+// Reusable Badge / Count Pill
+@mixin badge-pill-style {
+  font-family: var(--font-family-base, #{v.$font-family-base});
+  font-size: var(--font-size-xs, #{v.$font-size-xs});
+  font-weight: var(--font-weight-medium, #{v.$font-weight-medium});
+  padding: var(--badge-padding-y, #{v.$badge-padding-y})
+    var(--badge-padding-x, #{v.$badge-padding-x});
+  border-radius: var(--border-radius-full, #{v.$border-radius-full});
+  background-color: var(--surface-color, #{v.$surface-light});
+  border: var(--border-width-base, #{v.$border-width-base}) solid
+    var(--border-color, #{v.$border-light});
+  color: var(--text-secondary, #{v.$text-secondary-light});
+  letter-spacing: var(--letter-spacing-meta, #{v.$letter-spacing-meta});
+}
+
+// Reusable Tag Pill
+@mixin tag-pill-style {
+  font-family: var(--font-family-base, #{v.$font-family-base});
+  font-size: var(--font-size-3xs, #{v.$font-size-3xs});
+  font-weight: var(--font-weight-medium, #{v.$font-weight-medium});
+  color: var(--tag-text, #{v.$tag-text-light});
+  background-color: var(--tag-bg, #{v.$tag-bg-light});
+  padding: var(--tag-padding-y, #{v.$tag-padding-y}) var(--tag-padding-x, #{v.$tag-padding-x});
+  border-radius: var(--border-radius-sm, #{v.$border-radius-sm});
+  white-space: nowrap;
+}
+
+// Reusable Nav & Action Link Style
+@mixin nav-link-style {
+  font-family: var(--font-family-base, #{v.$font-family-base});
+  font-size: var(--font-size-sm, #{v.$font-size-sm});
+  font-weight: var(--font-weight-medium, #{v.$font-weight-medium});
+  color: var(--text-secondary, #{v.$text-secondary-light});
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs-plus, #{v.$spacing-2xs-plus});
+  transition: color v.$transition-fast;
+
+  &:hover {
+    color: var(--text-primary, #{v.$text-primary-light});
+  }
+}
+
+// Reusable Card Surface with Elevation Hover
+@mixin card-surface-style {
+  background-color: var(--surface-color, #{v.$surface-light});
+  border: var(--border-width-base, #{v.$border-width-base}) solid
+    var(--border-color, #{v.$border-light});
+  border-radius: var(--border-radius-lg, #{v.$border-radius-lg});
+  transition:
+    transform v.$transition-base,
+    border-color v.$transition-base,
+    box-shadow v.$transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-color, #{v.$primary-accent});
+    box-shadow: var(--shadow-hover, #{v.$shadow-hover});
+  }
+}
+
+// Section Title + Subtitle combo
+@mixin section-header-combo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs-plus, #{v.$spacing-2xs-plus});
+  margin-bottom: var(--spacing-md-plus, #{v.$spacing-md-plus});
+  padding-bottom: var(--spacing-sm, #{v.$spacing-sm});
+  border-bottom: var(--border-width-base, #{v.$border-width-base}) solid
+    var(--border-subtle, #{v.$border-subtle-light});
+
+  .section-title {
+    @include h2-heading-style;
+  }
+
+  .section-subtitle {
+    @include description-text;
+  }
+}
+
+// Line clamping utility
+@mixin line-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  background-color: var(--surface-color, #{$white});
-  color: var(--text-primary, #{$charcoal});
 }
 
 // ==========================================================================
-// 3. COMPONENT MIXINS
+// 4. BUTTON MIXINS
 // ==========================================================================
 @mixin button-base {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1.25rem;
-  border-radius: var(--ui-button-radius, #{$button-border-radius});
-  border: 1px solid transparent;
+  gap: var(--spacing-xs, #{v.$spacing-xs});
+  padding: var(--mobile-link-padding-y, #{v.$mobile-link-padding-y})
+    var(--spacing-md-plus, #{v.$spacing-md-plus});
+  border-radius: var(--ui-button-radius, #{v.$border-radius-md});
+  border: var(--border-width-base, #{v.$border-width-base}) solid transparent;
   line-height: normal;
   vertical-align: middle;
   cursor: pointer;
-  font-family: var(--font-family-base, #{$font-family-base});
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-family: var(--font-family-base, #{v.$font-family-base});
+  font-size: var(--font-size-sm, #{v.$font-size-sm});
+  font-weight: v.$font-weight-medium;
   text-decoration: none;
   text-align: center;
   transition:
-    background-color 0.2s ease-in-out,
-    color 0.2s ease-in-out,
-    border-color 0.2s ease-in-out,
-    transform 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out,
-    filter 0.2s ease-in-out;
+    background-color v.$transition-fast,
+    color v.$transition-fast,
+    border-color v.$transition-fast,
+    transform v.$transition-fast,
+    box-shadow v.$transition-fast;
 
-  p {
-    margin: 0;
-    padding: 0;
-    line-height: inherit;
+  &:active {
+    transform: translateY(1px);
   }
-  > * {
-    margin-bottom: 0;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
   }
 }
 
@@ -98,143 +304,27 @@
   $text-color,
   $border-color: transparent,
   $hover-background: null,
-  $hover-text-color: null,
-  $hover-border-color: null
+  $hover-text-color: null
 ) {
   background-color: var(--btn-bg, #{$background});
   color: var(--btn-text, #{$text-color});
   border-color: var(--btn-border, #{$border-color});
 
-  &:hover {
-    @if $hover-background == null {
-      background-color: var(--btn-hover-bg, var(--btn-bg, #{$background}));
-      filter: brightness(0.92);
-    } @else {
+  &:hover:not(:disabled) {
+    @if $hover-background != null {
       background-color: var(--btn-hover-bg, #{$hover-background});
+    } @else {
+      filter: brightness(0.92);
     }
 
     @if $hover-text-color != null {
       color: var(--btn-hover-text, #{$hover-text-color});
-    } @else {
-      color: var(--btn-hover-text, var(--btn-text, #{$text-color}));
     }
-
-    @if $hover-border-color != null {
-      border-color: var(--btn-hover-border, #{$hover-border-color});
-    } @else {
-      border-color: var(--btn-hover-border, var(--btn-border, #{$border-color}));
-    }
-
-    text-decoration: none;
-  }
-
-  &:active {
-    filter: brightness(0.85);
-    transform: translateY(1px);
-  }
-
-  &:disabled {
-    filter: grayscale(1);
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
   }
 }
 
 // ==========================================================================
-// 4. TYPOGRAPHY MIXINS
-// ==========================================================================
-@mixin page-heading-style {
-  font-family: var(--font-family-headings, #{$font-family-headings});
-  font-size: var(--h1-size, #{$h1-font-size});
-  font-weight: var(--font-weight-headings, #{$font-weight-headings});
-  line-height: var(--h1-line-height, #{$h1-line-height});
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-  letter-spacing: $h1-letter-spacing;
-  color: var(--text-primary, #{$charcoal});
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @include media-breakpoint-up(lg) {
-    font-size: var(--h1-size-lg, #{$h1-font-size-lg});
-    letter-spacing: -0.03em;
-  }
-}
-
-@mixin page-paragraph-style {
-  font-family: var(--font-family-base, #{$font-family-base});
-  font-size: var(--font-size-base, #{$font-size-base});
-  line-height: var(--line-height-base, #{$line-height-base});
-  font-weight: var(--font-weight-normal, #{$font-weight-normal});
-  margin-top: 0;
-  margin-bottom: 1em;
-  color: var(--text-secondary, #{$grey});
-  letter-spacing: -0.01em;
-}
-
-@mixin h2-heading-style {
-  font-family: var(--font-family-headings, #{$font-family-headings});
-  font-size: var(--h2-size, #{$h2-font-size});
-  font-weight: var(--font-weight-headings, #{$font-weight-headings});
-  line-height: var(--h2-line-height, #{$h2-line-height});
-  color: var(--text-primary, #{$charcoal});
-  margin-top: 0;
-  margin-bottom: 0.35rem;
-  letter-spacing: -0.02em;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @include media-breakpoint-up(lg) {
-    font-size: var(--h2-size-lg, #{$h2-font-size-lg});
-  }
-}
-
-@mixin h3-heading-style {
-  font-family: var(--font-family-headings, #{$font-family-headings});
-  font-size: var(--h3-size, #{$h3-font-size});
-  font-weight: var(--font-weight-headings, #{$font-weight-headings});
-  line-height: var(--h3-line-height, #{$h3-line-height});
-  color: var(--text-primary, #{$charcoal});
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.01em;
-
-  @include media-breakpoint-up(lg) {
-    font-size: var(--h3-size-lg, #{$h3-font-size-lg});
-  }
-}
-
-@mixin h4-heading-style {
-  font-family: var(--font-family-headings, #{$font-family-headings});
-  font-size: var(--h4-size, #{$h4-font-size});
-  font-weight: var(--font-weight-headings, #{$font-weight-headings});
-  line-height: var(--h4-line-height, #{$h4-line-height});
-  color: var(--text-primary, #{$charcoal});
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.01em;
-}
-
-// Reusable Section Header + Subheading Combination Mixin
-@mixin section-header-combo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  margin-bottom: 1.5rem;
-
-  .section-title {
-    @include h2-heading-style;
-  }
-
-  .section-subtitle {
-    @include page-paragraph-style;
-    margin-bottom: 0;
-  }
-}
-
-// ==========================================================================
-// 5. ACCESSIBILITY & UTILITY MIXINS
+// 5. UTILITY MIXINS
 // ==========================================================================
 @mixin visually-hidden {
   position: absolute !important;
@@ -255,10 +345,10 @@
 }
 
 @mixin custom-scrollbar(
-  $size: 6px,
-  $thumb-color: var(--border-color, #e7e7e5),
-  $hover-color: var(--accent-color, #075aaa),
-  $radius: 3px
+  $size: var(--scrollbar-size, #{v.$scrollbar-size}),
+  $thumb-color: var(--border-color, #{v.$border-light}),
+  $hover-color: var(--accent-color, #{v.$primary-accent}),
+  $radius: var(--border-radius-xs, #{v.$border-radius-xs})
 ) {
   &::-webkit-scrollbar {
     width: $size;

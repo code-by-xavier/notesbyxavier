@@ -4,10 +4,10 @@
 // Notesby — Home Page
 // ============================================================
 
-import BaseLayout from '../layouts/BaseLayout.astro';
-import CategorySlider from '../components/CategorySlider.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CategorySlider from '@/components/CategorySlider.astro';
 import { getCollection } from 'astro:content';
-import { notesConfig } from '../../notes.config';
+import { notesConfig } from '@config';
 
 const allNotes = await getCollection('notes', ({ data }) => !data.draft);
 const sortedNotes = allNotes.sort(
@@ -67,59 +67,57 @@ categoryMap.forEach((notes, catName) => {
 
 <BaseLayout>
   <section class="home-hero">
-    <div class="container home-hero__container">
+    <div class="home-hero__container">
       <h1 class="home-hero__title">{notesConfig.siteTitle}</h1>
       <p class="home-hero__bio">{notesConfig.authorBio}</p>
     </div>
   </section>
 
   <main class="notes-feed">
-    <div class="container notes-feed__container">
-      {
-        orderedCategories.map((cat) => (
-          <CategorySlider title={cat.name} description={cat.description} notes={cat.notes} />
-        ))
-      }
+    <div class="notes-feed__container">
+      {orderedCategories.map((cat) => (
+        <CategorySlider title={cat.name} description={cat.description} notes={cat.notes} />
+      ))}
     </div>
   </main>
 </BaseLayout>
 
 <style lang="scss">
   .home-hero {
-    padding: 3.5rem 0 2.25rem;
-    border-bottom: 1px solid var(--border-color);
+    padding: var(--hero-padding-top, #{ui.$hero-padding-top}) 0
+      var(--hero-padding-bottom, #{ui.$hero-padding-bottom});
+    border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
 
     &__container {
-      max-width: var(--container-max-width);
+      @include ui.container;
     }
 
     &__title {
-      font-family: var(--font-family-headings);
-      font-size: 2.75rem;
-      font-weight: 600;
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-      margin-bottom: 0.5rem;
+      @include ui.page-heading-style;
+      margin-top: 0;
+      margin-bottom: var(--spacing-xs, #{ui.$spacing-xs});
 
-      @media (max-width: 640px) {
-        font-size: 2.15rem;
+      @include ui.media-breakpoint-down(sm) {
+        font-size: var(--font-size-5xl, #{ui.$font-size-5xl});
       }
     }
 
     &__bio {
-      font-family: var(--font-family-base);
-      font-size: 1.05rem;
-      color: var(--text-secondary);
-      line-height: 1.55;
-      max-width: 720px;
+      @include ui.page-paragraph-style;
+      font-size: var(--font-size-md, #{ui.$font-size-md});
+      line-height: var(--line-height-base, #{ui.$line-height-base});
+      max-width: var(--hero-bio-max-width, #{ui.$hero-bio-max-width});
+      margin-bottom: 0;
     }
   }
 
   .notes-feed {
-    padding: 2.5rem 0 4.5rem;
+    padding: var(--feed-padding-top, #{ui.$feed-padding-top}) 0
+      var(--feed-padding-bottom, #{ui.$feed-padding-bottom});
 
     &__container {
-      max-width: var(--container-max-width);
+      @include ui.container;
     }
   }
 </style>

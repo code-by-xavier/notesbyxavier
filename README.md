@@ -38,7 +38,7 @@ Every post is a note, but thoughts come in different depths:
 
 ### 3. The "Zen Studio" Editor (For Non-Tech Writers)
 
-- In-browser, distraction-free writing environment (feels like *iA Writer meets Notion*).
+- In-browser, distraction-free writing environment (feels like _iA Writer meets Notion_).
 - Clean canvas with intuitive slash commands (`/h2`, `/quote`, `/code`, `/image`).
 - Live auto-saving drafts and one-click instant publishing.
 - True-to-life typography preview: writing in the studio looks identical to the live publication.
@@ -94,14 +94,14 @@ Similar to downloading open-source creative suites like **Inkscape**:
 
 ## Tech Stack Overview
 
-| Layer | Technology |
-| :--- | :--- |
-| **Framework** | [Astro 5](https://astro.build) (Hybrid SSR with `@astrojs/node`) |
-| **Database** | [PostgreSQL](https://www.postgresql.org) on Google Cloud SQL (`db-f1-micro`) |
-| **ORM** | [Drizzle ORM](https://orm.drizzle.team) |
-| **Styles** | Vanilla CSS & SCSS Custom Properties (`#075aaa` brand blue) |
-| **Container** | Docker Alpine running on [Google Cloud Run](https://cloud.google.com/run) |
-| **Assets** | Google Cloud Storage (GCS) |
+| Layer         | Technology                                                                   |
+| :------------ | :--------------------------------------------------------------------------- |
+| **Framework** | [Astro 5](https://astro.build) (Hybrid SSR with `@astrojs/node`)             |
+| **Database**  | [PostgreSQL](https://www.postgresql.org) on Google Cloud SQL (`db-f1-micro`) |
+| **ORM**       | [Drizzle ORM](https://orm.drizzle.team)                                      |
+| **Styles**    | Vanilla CSS & SCSS Custom Properties (`#075aaa` brand blue)                  |
+| **Container** | Docker Alpine running on [Google Cloud Run](https://cloud.google.com/run)    |
+| **Assets**    | Google Cloud Storage (GCS)                                                   |
 
 ---
 

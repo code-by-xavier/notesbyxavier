@@ -1,5 +1,12 @@
 ---
-import NoteCard from './NoteCard.astro';
+// File: src/components/CategorySlider.astro
+// ============================================================
+// Notesby — Category Slider Component
+// Displays notes categorized in responsive horizontal sliders.
+// ============================================================
+
+import NoteCard from '@/components/NoteCard.astro';
+import Icon from '@/components/Icon.astro';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -17,9 +24,9 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
     <div class="category-slider__info">
       <div class="category-slider__title-row">
         <h2 class="category-slider__title">{title}</h2>
-        <span class="category-slider__count"
-          >{notes.length} {notes.length === 1 ? 'note' : 'notes'}</span
-        >
+        <span class="category-slider__count">
+          {notes.length} {notes.length === 1 ? 'note' : 'notes'}
+        </span>
       </div>
       {description && <p class="category-slider__description">{description}</p>}
     </div>
@@ -32,60 +39,37 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
         aria-label={`Scroll ${title} left`}
         disabled
       >
-        <svg
-          viewBox="0 0 24 24"
-          width="16"
-          height="16"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
+        <Icon name="chevron-left" size={16} />
       </button>
+
       <button
         type="button"
         class="slider-btn slider-btn--next"
         data-slider-next
         aria-label={`Scroll ${title} right`}
       >
-        <svg
-          viewBox="0 0 24 24"
-          width="16"
-          height="16"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
+        <Icon name="chevron-right" size={16} />
       </button>
     </div>
   </div>
 
   <div class="category-slider__viewport">
     <div class="category-slider__track" data-slider-track>
-      {
-        notes.map((note) => (
-          <div class="category-slider__item">
-            <NoteCard
-              title={note.data.title}
-              subtitle={note.data.subtitle}
-              description={note.data.description}
-              slug={note.id.replace(/\.(md|mdx)$/, '')}
-              pubDate={note.data.pubDate}
-              tags={note.data.tags}
-              category={note.data.category}
-              readingTime="5 min read"
-              coverImage={note.data.coverImage}
-            />
-          </div>
-        ))
-      }
+      {notes.map((note) => (
+        <div class="category-slider__item">
+          <NoteCard
+            title={note.data.title}
+            subtitle={note.data.subtitle}
+            description={note.data.description}
+            slug={note.id.replace(/\.(md|mdx)$/, '')}
+            pubDate={note.data.pubDate}
+            tags={note.data.tags}
+            category={note.data.category}
+            readingTime="5 min read"
+            coverImage={note.data.coverImage}
+          />
+        </div>
+      ))}
     </div>
   </div>
 </section>
@@ -108,14 +92,22 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
         nextBtn.disabled = atEnd;
       };
 
+      const getScrollDistance = () => {
+        const firstItem = track.querySelector<HTMLElement>('.category-slider__item');
+        if (!firstItem) return 360;
+        const itemWidth = firstItem.offsetWidth;
+        const gap = parseFloat(window.getComputedStyle(track).gap) || 24;
+        return itemWidth + gap;
+      };
+
       prevBtn.addEventListener('click', () => {
-        const cardWidth = track.firstElementChild?.clientWidth || 360;
-        track.scrollBy({ left: -(cardWidth + 24), behavior: 'smooth' });
+        const distance = getScrollDistance();
+        track.scrollBy({ left: -distance, behavior: 'smooth' });
       });
 
       nextBtn.addEventListener('click', () => {
-        const cardWidth = track.firstElementChild?.clientWidth || 360;
-        track.scrollBy({ left: cardWidth + 24, behavior: 'smooth' });
+        const distance = getScrollDistance();
+        track.scrollBy({ left: distance, behavior: 'smooth' });
       });
 
       track.addEventListener('scroll', updateButtons, { passive: true });
@@ -131,20 +123,21 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
 
 <style lang="scss">
   .category-slider {
-    margin-bottom: 3.5rem;
+    margin-bottom: var(--page-section-gap, #{ui.$page-section-gap});
 
     &:last-child {
-      margin-bottom: 1.5rem;
+      margin-bottom: var(--spacing-lg, #{ui.$spacing-lg});
     }
 
     &__header {
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
-      gap: 1rem;
-      margin-bottom: 1.25rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--border-subtle);
+      gap: var(--spacing-unit, #{ui.$spacing-unit});
+      margin-bottom: var(--spacing-md-plus, #{ui.$spacing-md-plus});
+      padding-bottom: var(--spacing-sm, #{ui.$spacing-sm});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-subtle, #{ui.$border-subtle-light});
     }
 
     &__info {
@@ -155,63 +148,46 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
     &__title-row {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 0.35rem;
+      gap: var(--spacing-sm, #{ui.$spacing-sm});
+      margin-bottom: var(--spacing-2xs-plus, #{ui.$spacing-2xs-plus});
     }
 
     &__title {
-      font-family: var(--font-family-headings);
-      font-size: 1.55rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
+      @include ui.h2-heading-style;
       margin: 0;
     }
 
     &__count {
-      font-family: var(--font-family-base);
-      font-size: 0.75rem;
-      font-weight: 500;
-      padding: 0.15rem 0.55rem;
-      border-radius: 9999px;
-      background-color: var(--surface-color);
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      letter-spacing: 0.02em;
+      @include ui.badge-pill-style;
     }
 
     &__description {
-      font-family: var(--font-family-base);
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      line-height: 1.4;
-      margin: 0;
+      @include ui.description-text;
     }
 
     &__controls {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--spacing-xs, #{ui.$spacing-xs});
       flex-shrink: 0;
     }
 
     .slider-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 1px solid var(--border-color);
-      background-color: var(--surface-color);
-      color: var(--text-primary);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      @include ui.flex-center;
+      width: var(--slider-btn-size, #{ui.$slider-btn-size});
+      height: var(--slider-btn-size, #{ui.$slider-btn-size});
+      border-radius: var(--border-radius-full, #{ui.$border-radius-full});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      background-color: var(--surface-color, #{ui.$surface-light});
+      color: var(--text-primary, #{ui.$text-primary-light});
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all ui.$transition-fast;
 
       &:hover:not(:disabled) {
-        border-color: var(--accent-color);
-        background-color: var(--accent-color);
-        color: #ffffff;
+        border-color: var(--accent-color, #{ui.$primary-accent});
+        background-color: var(--accent-color, #{ui.$primary-accent});
+        color: var(--white, #{ui.$surface-light});
       }
 
       &:disabled {
@@ -223,18 +199,19 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
     &__viewport {
       position: relative;
       overflow: hidden;
-      margin: 0 -0.5rem;
-      padding: 0.5rem;
+      margin: 0 calc(-1 * var(--spacing-xs, #{ui.$spacing-xs}));
+      padding: var(--spacing-xs, #{ui.$spacing-xs});
     }
 
     &__track {
       display: flex;
-      gap: 1.5rem;
+      gap: var(--spacing-lg, #{ui.$spacing-lg});
       overflow-x: auto;
-      scroll-snap-type: x mandatory;
+      scroll-snap-type: x proximity;
+      scroll-behavior: smooth;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
-      padding-bottom: 0.5rem;
+      padding-bottom: var(--spacing-xs, #{ui.$spacing-xs});
 
       &::-webkit-scrollbar {
         display: none;
@@ -242,12 +219,12 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
     }
 
     &__item {
-      flex: 0 0 380px;
+      flex: 0 0 var(--slider-item-min-width, #{ui.$slider-item-min-width});
       scroll-snap-align: start;
       max-width: 85vw;
       display: flex;
 
-      @media (max-width: 640px) {
+      @include ui.media-breakpoint-down(sm) {
         flex: 0 0 85vw;
       }
     }
