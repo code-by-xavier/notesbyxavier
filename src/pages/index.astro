@@ -1,4 +1,9 @@
 ---
+// File: src/pages/index.astro
+// ============================================================
+// Notesby — Home Page
+// ============================================================
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CategorySlider from '../components/CategorySlider.astro';
 import { getCollection } from 'astro:content';
@@ -22,9 +27,18 @@ sortedNotes.forEach((note) => {
 
 // Build ordered category list
 const configCategories = notesConfig.categories || [
-  { name: 'Essays', description: 'Deep-dive explorations, systems design, and architectural blueprints.' },
-  { name: 'Op-Eds', description: 'Perspectives on technology, digital sovereignty, and the modern web.' },
-  { name: 'Field Notes', description: 'Rapid dispatches, benchmarks, and engineering observations.' },
+  {
+    name: 'Essays',
+    description: 'Deep-dive explorations, systems design, and architectural blueprints.',
+  },
+  {
+    name: 'Op-Eds',
+    description: 'Perspectives on technology, digital sovereignty, and the modern web.',
+  },
+  {
+    name: 'Field Notes',
+    description: 'Rapid dispatches, benchmarks, and engineering observations.',
+  },
 ];
 
 const orderedCategories: { name: string; description?: string; notes: typeof sortedNotes }[] = [];
@@ -63,11 +77,7 @@ categoryMap.forEach((notes, catName) => {
     <div class="container notes-feed__container">
       {
         orderedCategories.map((cat) => (
-          <CategorySlider
-            title={cat.name}
-            description={cat.description}
-            notes={cat.notes}
-          />
+          <CategorySlider title={cat.name} description={cat.description} notes={cat.notes} />
         ))
       }
     </div>

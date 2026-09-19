@@ -17,7 +17,9 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
     <div class="category-slider__info">
       <div class="category-slider__title-row">
         <h2 class="category-slider__title">{title}</h2>
-        <span class="category-slider__count">{notes.length} {notes.length === 1 ? 'note' : 'notes'}</span>
+        <span class="category-slider__count"
+          >{notes.length} {notes.length === 1 ? 'note' : 'notes'}</span
+        >
       </div>
       {description && <p class="category-slider__description">{description}</p>}
     </div>
@@ -30,7 +32,16 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
         aria-label={`Scroll ${title} left`}
         disabled
       >
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg
+          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <polyline points="15 18 9 12 15 6"></polyline>
         </svg>
       </button>
@@ -40,7 +51,16 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
         data-slider-next
         aria-label={`Scroll ${title} right`}
       >
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg
+          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <polyline points="9 18 15 12 9 6"></polyline>
         </svg>
       </button>
@@ -49,21 +69,23 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
 
   <div class="category-slider__viewport">
     <div class="category-slider__track" data-slider-track>
-      {notes.map((note) => (
-        <div class="category-slider__item">
-          <NoteCard
-            title={note.data.title}
-            subtitle={note.data.subtitle}
-            description={note.data.description}
-            slug={note.id.replace(/\.(md|mdx)$/, '')}
-            pubDate={note.data.pubDate}
-            tags={note.data.tags}
-            category={note.data.category}
-            readingTime="5 min read"
-            coverImage={note.data.coverImage}
-          />
-        </div>
-      ))}
+      {
+        notes.map((note) => (
+          <div class="category-slider__item">
+            <NoteCard
+              title={note.data.title}
+              subtitle={note.data.subtitle}
+              description={note.data.description}
+              slug={note.id.replace(/\.(md|mdx)$/, '')}
+              pubDate={note.data.pubDate}
+              tags={note.data.tags}
+              category={note.data.category}
+              readingTime="5 min read"
+              coverImage={note.data.coverImage}
+            />
+          </div>
+        ))
+      }
     </div>
   </div>
 </section>

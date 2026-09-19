@@ -1,3 +1,8 @@
+// File: scrips/validate.ts
+// ============================================================
+// Validate Notesby configuration and content.
+// ============================================================
+
 import fs from 'fs';
 import path from 'path';
 import { notesConfig } from '../notes.config';
@@ -24,7 +29,7 @@ if (!fs.existsSync(notesDir)) {
 } else {
   const files = fs.readdirSync(notesDir).filter((f) => f.endsWith('.md') || f.endsWith('.mdx'));
   console.log(`  Found ${files.length} essay files (.md / .mdx).`);
-  
+
   files.forEach((file) => {
     const content = fs.readFileSync(path.join(notesDir, file), 'utf8');
     if (!content.startsWith('---')) {
