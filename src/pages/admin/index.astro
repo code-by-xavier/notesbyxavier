@@ -6,6 +6,7 @@
 // ============================================================
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
 import { ROUTES } from '@/links';
 
 export const prerender = false;
@@ -27,8 +28,9 @@ if (!user) {
         </a>
 
         <div class="portal-nav__actions">
-          <a href={ROUTES.HOME} class="portal-nav__link" target="_blank">
-            View Live Site ↗
+          <a href={ROUTES.HOME} class="portal-nav__link" target="_blank" rel="noopener noreferrer">
+            <span>View Live Site</span>
+            <Icon name="external-link" size={14} />
           </a>
           <a href={ROUTES.API.LOGOUT} class="portal-nav__btn-logout">
             Sign Out
@@ -54,7 +56,9 @@ if (!user) {
           <!-- Card 1: Zen Studio -->
           <div class="portal-card portal-card--primary">
             <div class="portal-card__header">
-              <span class="portal-card__icon">✍️</span>
+              <span class="portal-card__icon">
+                <Icon name="pen" size={18} />
+              </span>
               <h2 class="portal-card__title">Zen Studio</h2>
             </div>
             <p class="portal-card__text">
@@ -69,7 +73,9 @@ if (!user) {
           <!-- Card 2: Account & Settings -->
           <div class="portal-card">
             <div class="portal-card__header">
-              <span class="portal-card__icon">⚙️</span>
+              <span class="portal-card__icon">
+                <Icon name="settings" size={18} />
+              </span>
               <h2 class="portal-card__title">Publisher Profile</h2>
             </div>
             <div class="portal-card__details">
@@ -91,7 +97,9 @@ if (!user) {
           <!-- Card 3: Cloud Architecture -->
           <div class="portal-card">
             <div class="portal-card__header">
-              <span class="portal-card__icon">☁️</span>
+              <span class="portal-card__icon">
+                <Icon name="cloud" size={18} />
+              </span>
               <h2 class="portal-card__title">Sovereign Cloud Engine</h2>
             </div>
             <p class="portal-card__text">
@@ -143,6 +151,9 @@ if (!user) {
       font-weight: ui.$font-weight-medium;
       color: var(--text-secondary, #{ui.$text-secondary-light});
       text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
       transition: color ui.$transition-fast;
 
       &:hover {
@@ -252,12 +263,25 @@ if (!user) {
     &__header {
       display: flex;
       align-items: center;
-      gap: var(--spacing-xs, #{ui.$spacing-xs});
+      gap: var(--spacing-sm, #{ui.$spacing-sm});
       margin-bottom: var(--spacing-sm, #{ui.$spacing-sm});
     }
 
     &__icon {
-      font-size: var(--font-size-xl, #{ui.$font-size-xl});
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+      background-color: var(--tag-bg, #{ui.$tag-bg-light});
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      flex-shrink: 0;
+    }
+
+    &--primary &__icon {
+      background-color: rgba(7, 90, 170, 0.1);
+      color: var(--accent-color, #{ui.$primary-accent});
     }
 
     &__title {
