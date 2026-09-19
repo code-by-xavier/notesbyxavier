@@ -162,7 +162,7 @@
   --code-bg: #{$code-bg-dark};
   --tag-bg: #{$tag-bg-dark};
   --tag-text: #{$tag-text-dark};
-  --shadow-hover: rgba(56, 189, 248, 0.15);
+  --shadow-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(56, 189, 248, 0.25);
 }
 
 *,

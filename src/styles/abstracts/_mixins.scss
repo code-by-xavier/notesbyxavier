@@ -218,6 +218,7 @@
 
 // Reusable Card Surface with Elevation Hover
 @mixin card-surface-style {
+  position: relative;
   background-color: var(--surface-color, #{v.$surface-light});
   border: var(--border-width-base, #{v.$border-width-base}) solid
     var(--border-color, #{v.$border-light});
@@ -228,6 +229,7 @@
     box-shadow v.$transition-base;
 
   &:hover {
+    z-index: 2;
     transform: translateY(-2px);
     border-color: var(--accent-color, #{v.$primary-accent});
     box-shadow: var(--shadow-hover, #{v.$shadow-hover});

@@ -12,6 +12,7 @@ interface Props {
   name: IconName;
   size?: number;
   class?: string;
+  color?: string;
   strokeWidth?: number;
   'aria-hidden'?: boolean | 'true' | 'false';
   'aria-label'?: string;
@@ -21,15 +22,19 @@ const {
   name,
   size = 20,
   class: className = '',
+  color,
   strokeWidth = 2,
   'aria-hidden': ariaHidden = true,
   'aria-label': ariaLabel,
 } = Astro.props;
+
+const style = color ? `color: ${color};` : undefined;
 ---
 
 {name === 'arrow-left' && (
   <svg
     class={className}
+    style={style}
     xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}
@@ -50,6 +55,7 @@ const {
 {name === 'chevron-left' && (
   <svg
     class={className}
+    style={style}
     xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}
@@ -69,6 +75,7 @@ const {
 {name === 'chevron-right' && (
   <svg
     class={className}
+    style={style}
     xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}
@@ -88,6 +95,7 @@ const {
 {name === 'rss' && (
   <svg
     class={className}
+    style={style}
     xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}

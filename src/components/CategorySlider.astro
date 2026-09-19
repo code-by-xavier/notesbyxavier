@@ -199,8 +199,9 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
     &__viewport {
       position: relative;
       overflow: hidden;
-      margin: 0 calc(-1 * var(--spacing-xs, #{ui.$spacing-xs}));
-      padding: var(--spacing-xs, #{ui.$spacing-xs});
+      margin: calc(-1 * var(--spacing-sm, #{ui.$spacing-sm}))
+        calc(-1 * var(--spacing-sm, #{ui.$spacing-sm}));
+      padding: var(--spacing-sm, #{ui.$spacing-sm});
     }
 
     &__track {
@@ -211,7 +212,10 @@ const sliderId = `slider-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
       scroll-behavior: smooth;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
-      padding-bottom: var(--spacing-xs, #{ui.$spacing-xs});
+      padding-top: var(--spacing-xs, #{ui.$spacing-xs});
+      padding-bottom: var(--spacing-md, #{ui.$spacing-md});
+      padding-left: var(--spacing-2xs, #{ui.$spacing-2xs});
+      padding-right: var(--spacing-2xs, #{ui.$spacing-2xs});
 
       &::-webkit-scrollbar {
         display: none;

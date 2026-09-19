@@ -75,7 +75,9 @@ const initials = notesConfig.authorName
             target={link.external ? '_blank' : undefined}
             rel={link.external ? 'noopener noreferrer' : undefined}
           >
-            {link.isRss && <Icon name="rss" size={13} class="rss-icon" />}
+            {link.isRss && (
+              <Icon name="rss" size={13} class="rss-icon" color="var(--rss-accent, #f97316)" />
+            )}
             <span>{link.label}</span>
           </a>
         ))}
@@ -226,13 +228,15 @@ const initials = notesConfig.authorName
       @include ui.nav-link-style;
 
       &--rss {
+        :global(.rss-icon),
         .rss-icon {
-          color: var(--rss-accent, #{ui.$rss-accent});
+          color: var(--rss-accent, #{ui.$rss-accent}) !important;
           transition: color ui.$transition-fast;
         }
 
+        &:hover :global(.rss-icon),
         &:hover .rss-icon {
-          color: var(--rss-accent-hover, #{ui.$rss-accent-hover});
+          color: var(--rss-accent-hover, #{ui.$rss-accent-hover}) !important;
         }
       }
     }
