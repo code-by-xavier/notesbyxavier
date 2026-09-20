@@ -51,7 +51,7 @@ let schemaInitialized = false;
 export async function ensureSchema() {
   if (schemaInitialized) return;
   try {
-    await client`
+    await client.unsafe(`
       CREATE TABLE IF NOT EXISTS users (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         name varchar(255) NOT NULL,
@@ -118,7 +118,7 @@ export async function ensureSchema() {
         created_at timestamp DEFAULT now() NOT NULL,
         updated_at timestamp DEFAULT now() NOT NULL
       );
-    `;
+    `);
     schemaInitialized = true;
   } catch (err) {
     console.error('[Database] Failed to ensure schema:', err);
