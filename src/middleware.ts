@@ -71,9 +71,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   // Guard protected API routes (e.g. /api/notes, /api/upload, /api/settings)
+  // Note: /api/upload allows unauthenticated uploads during initial setup wizard
+  const isSetupDoneForApi = await isSetupCompleted();
   if (
     pathname.startsWith('/api/notes') ||
-    pathname.startsWith('/api/upload') ||
+    (pathname.startsWith('/api/upload') && isSetupDoneForApi) ||
     pathname.startsWith('/api/settings')
   ) {
     const sessionToken = cookies.get(SESSION_COOKIE_NAME)?.value;

@@ -31,7 +31,16 @@ if (alreadySetup) {
     <div class="setup-shell">
       <!-- Brand wordmark -->
       <a href={ROUTES.HOME} class="setup-brand" aria-label="Notesby Home">
-        <img src="/images/notesby-logo-dark.png" alt="Notesby" class="setup-brand__logo" />
+        <img
+          src="/images/notesby-logo-black.svg"
+          alt="Notesby"
+          class="setup-brand__logo setup-brand__logo--light"
+        />
+        <img
+          src="/images/notesby-logo-white.svg"
+          alt="Notesby"
+          class="setup-brand__logo setup-brand__logo--dark"
+        />
         <span class="setup-brand__name">Notesby</span>
       </a>
 
@@ -1059,27 +1068,34 @@ if (alreadySetup) {
     const file = avatarFileInput.files?.[0];
     if (!file) return;
 
+    // Instant local preview
+    const localPreview = URL.createObjectURL(file);
+    const img = $<HTMLImageElement>('avatar-img');
+    const placeholder = $('avatar-placeholder');
+    if (img) {
+      img.src = localPreview;
+      img.style.display = 'block';
+    }
+    if (placeholder) placeholder.style.display = 'none';
+
     const statusEl = $('avatar-upload-status');
     if (statusEl) statusEl.style.display = 'flex';
 
     const formData = new FormData();
+    formData.append('image', file);
     formData.append('file', file);
 
     try {
       const res = await fetch('/api/upload', { method: 'POST', body: formData });
       const json = await res.json();
-      if (json.success && json.url) {
+      if (res.ok && json.success && json.url) {
         data.avatarUrl = json.url;
-        const img = $<HTMLImageElement>('avatar-img');
-        const placeholder = $('avatar-placeholder');
-        if (img) {
-          img.src = json.url;
-          img.style.display = 'block';
-        }
-        if (placeholder) placeholder.style.display = 'none';
+        if (img) img.src = json.url;
+      } else {
+        alert(json.error || 'Failed to upload photo. Please verify image size and format.');
       }
-    } catch (_) {
-      // Silent fail — avatar is optional
+    } catch (err: any) {
+      alert('Upload failed: ' + (err?.message || 'Network error occurred.'));
     } finally {
       if (statusEl) statusEl.style.display = 'none';
     }
@@ -1238,6 +1254,19 @@ if (alreadySetup) {
       height: 28px;
       border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
       object-fit: contain;
+
+      &--dark {
+        display: none;
+      }
+
+      :global([data-theme='dark']) & {
+        &--light {
+          display: none;
+        }
+        &--dark {
+          display: block;
+        }
+      }
     }
 
     &__name {
@@ -1252,11 +1281,13 @@ if (alreadySetup) {
   // Stepper
   // ─────────────────────────────────────────────────────────────
   .stepper {
+    margin-bottom: var(--spacing-md, #{ui.$spacing-md});
+
     &__list {
       display: flex;
       justify-content: space-between;
       list-style: none;
-      margin: 0 0 var(--spacing-xs, #{ui.$spacing-xs});
+      margin: 0;
       padding: 0;
     }
 
@@ -1264,7 +1295,7 @@ if (alreadySetup) {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 10px;
       flex: 1;
 
       &--active .stepper__dot {
@@ -1329,7 +1360,7 @@ if (alreadySetup) {
       background: var(--border-color, #{ui.$border-light});
       border-radius: ui.$border-radius-full;
       overflow: hidden;
-      margin-top: var(--spacing-xs, #{ui.$spacing-xs});
+      margin-top: var(--spacing-sm, #{ui.$spacing-sm});
     }
 
     &__fill {

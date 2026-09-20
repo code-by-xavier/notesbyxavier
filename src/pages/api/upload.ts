@@ -9,6 +9,7 @@
 import type { APIRoute } from 'astro';
 import crypto from 'node:crypto';
 import { uploadMedia } from '@/lib/storage';
+import { isSetupCompleted } from '@/lib/auth';
 
 export const prerender = false;
 
@@ -124,8 +125,11 @@ function detectImageFormat(
 }
 
 export const POST: APIRoute = async ({ request, locals }) => {
+  const setupDone = await isSetupCompleted();
   const user = locals.user;
-  if (!user) {
+
+  // Once setup is completed, uploads strictly require an authenticated admin session
+  if (setupDone && !user) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },
@@ -134,7 +138,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   try {
     const formData = await request.formData();
-    const file = formData.get('image') as File | null;
+    const file = (formData.get('image') || formData.get('file')) as File | null;
 
     if (!file || !(file instanceof File) || file.size === 0) {
       return new Response(JSON.stringify({ error: 'No image file uploaded' }), {

@@ -51,7 +51,7 @@ export const notesConfig: NotesConfig = {
   siteLogo: '/images/notesby-logo-black.svg',
   siteLogoDark: '/images/notesby-logo-white.svg',
   favicon: '/favicon.webp',
-  appleTouchIcon: '/images/notesby-logo-dark.png',
+  appleTouchIcon: '/favicon.webp',
   ogImage: '/images/og-image.png',
   domain: 'https://example.com',
   description: 'A personal publication featuring essays, op-eds, and field notes.',
