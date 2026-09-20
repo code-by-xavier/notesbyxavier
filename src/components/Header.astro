@@ -350,20 +350,20 @@ const currentPath = Astro.url.pathname;
         border-color: var(--accent-color, #{ui.$primary-accent});
       }
 
-      .menu-icon--close {
-        display: none;
+      :global(.menu-icon--close) {
+        display: none !important;
       }
 
       &.is-open {
         background-color: var(--surface-color, #{ui.$surface-light});
         color: var(--text-primary, #{ui.$text-primary-light});
 
-        .menu-icon--open {
-          display: none;
+        :global(.menu-icon--open) {
+          display: none !important;
         }
 
-        .menu-icon--close {
-          display: block;
+        :global(.menu-icon--close) {
+          display: block !important;
         }
       }
 
