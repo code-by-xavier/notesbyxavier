@@ -1,21 +1,29 @@
 ---
 title: 'Getting Started with Notesby'
-subtitle: 'A quick instructional guide to writing and publishing essays'
-description: 'Learn how to write essays, format text, use headings for the automatic table of contents, and publish your site with Notesby.'
+subtitle: 'A quick instructional guide to writing notes and publishing categories'
+description: 'Learn how to write notes, organize them into categories, use headings for the table of contents, and publish your site with Notesby.'
 pubDate: 2026-09-17
 category: 'Essays'
 tags: ['Guide', 'Writing', 'Publishing']
 readingTime: '3 min read'
-draft: true
+draft: false
 ---
 
-Welcome to **Notesby**. This post serves as an instructional example of how essays are structured and rendered.
+Welcome to **Notesby**. In Notesby, every post you publish is called a **note**—just like messages on social platforms, but crafted for calm, high-signal long-form reading.
+
+## Note Categories
+
+Every note belongs to a category defined in its frontmatter:
+
+```yaml
+category: 'Essays' # or "Op-Eds", "Field Notes", or any custom category
+```
+
+On your homepage, each category displays as an interactive horizontal slider row. Readers can slide through your notes smoothly across both desktop and mobile devices.
 
 ## Writing Your Thoughts
 
-Every essay in Notesby is written in MDX—a format that combines the simplicity of Markdown with the power of modern web components.
-
-Paragraphs flow naturally with generous line heights and balanced typography:
+Every note in Notesby is written in MDX—combining the clarity of Markdown with the power of web components:
 
 > "Simplicity is prerequisite for reliability." Writing in a calm, focused environment allows ideas to develop with precision.
 
@@ -25,31 +33,25 @@ Notice the **Contents** sidebar on the left. You do not need to build or maintai
 
 1. Whenever you add a section heading using `## Heading Title`, Notesby indexes it automatically.
 1. Sub-headings created with `### Sub-heading` nest beneath their parent section.
-1. As readers scroll through your essay, the sidebar dynamically highlights the active section in real time.
+1. As readers scroll through your note, the sidebar dynamically highlights the active section in real time.
 
-## Code and Formatting
+## Customizing Categories
 
-Technical essays often require code snippets, lists, and reference tables:
+You can customize the categories shown on your homepage inside [`notes.config.ts`](../../notes.config.ts):
 
 ```typescript
-export interface Note {
-  title: string;
-  pubDate: Date;
-  tags: string[];
-}
+categories: [
+  {
+    name: 'Essays',
+    description: 'Long-form editorial explorations, architectural thought, and in-depth research.',
+  },
+  {
+    name: 'Op-Eds',
+    description: 'Sharp commentary, cultural critique, and focused perspectives.',
+  },
+  {
+    name: 'Field Notes',
+    description: 'Short-form dispatches, micro-essays, and raw observations.',
+  },
+];
 ```
-
-Lists remain clean and easy to scan:
-
-- Fast static generation powered by Astro
-- Zero client runtime overhead
-- Fluid dark and light theme switching
-
-## Replacing This Post
-
-To publish your own work:
-
-1. Open `src/content/notes/` in your repository.
-1. Delete or edit this file (`getting-started.mdx`).
-1. Create a new `.mdx` file for each new essay you write.
-1. Edit `notes.config.ts` to set your name, avatar, bio, and social links.

@@ -44,38 +44,38 @@ export interface NotesConfig {
 }
 
 export const notesConfig: NotesConfig = {
-  siteTitle: 'Notes by Xavier',
-  authorName: 'Xavier Lawrence',
-  authorBio:
-    'Founder & Cloud Architect. Writing about software engineering, autonomous systems, and sovereign infrastructure.',
-  authorAvatar: '/images/xavier-avatar.webp',
+  siteTitle: 'Notesby',
+  authorName: 'Jane Doe',
+  authorBio: 'Writer and researcher. Exploring ideas, culture, and long-form writing.',
+  authorAvatar: '/images/avatar.webp',
   siteLogo: '/images/notesby-logo-black.svg',
   siteLogoDark: '/images/notesby-logo-white.svg',
-  favicon: '/images/xavier-avatar.webp',
+  favicon: '/favicon.webp',
   appleTouchIcon: '/images/notesby-logo-dark.png',
   ogImage: '/images/og-image.png',
-  domain: 'https://www.notesbyxavier.com',
-  description: 'Essays, architectural blueprints, and personal reflections by Xavier Lawrence.',
-  repository: 'https://github.com/code-by-xavier/notesbyxavier',
+  domain: 'https://example.com',
+  description: 'A personal publication featuring essays, op-eds, and field notes.',
+  repository: EXTERNAL_LINKS.REPOSITORY,
+  // Primary Content Categories displayed across sliders and feeds
   categories: [
     {
       name: 'Essays',
-      description: 'Deep-dive explorations, systems design, and architectural blueprints.',
+      description: 'Long-form pieces, in-depth research, and detailed explorations.',
     },
     {
       name: 'Op-Eds',
-      description: 'Perspectives on technology, digital sovereignty, and the modern web.',
+      description: 'Commentary, critiques, and opinion pieces on current topics.',
     },
     {
       name: 'Field Notes',
-      description: 'Rapid dispatches, benchmarks, and engineering observations.',
+      description: 'Brief thoughts, working logs, and everyday observations.',
     },
   ],
   socials: {
-    github: 'https://github.com/code-by-xavier/notesbyxavier',
-    twitter: 'https://x.com/notesbyxavier',
-    linkedin: 'https://www.linkedin.com/in/notesbyxavier/',
-    email: 'XLawrence@clstre.com',
+    github: EXTERNAL_LINKS.REPOSITORY,
+    twitter: 'https://x.com',
+    linkedin: 'https://linkedin.com',
+    email: 'hello@example.com',
   },
   navLinks: [
     { label: 'Notes', href: ROUTES.HOME },
@@ -85,7 +85,7 @@ export const notesConfig: NotesConfig = {
     { label: 'CLSTRE ↗', href: EXTERNAL_LINKS.CLSTRE, external: true },
   ],
   footer: {
-    copyrightText: `© ${new Date().getFullYear()} notesbyxavier.com. All rights reserved.`,
+    copyrightText: `© ${new Date().getFullYear()} Jane Doe. All rights reserved.`,
     poweredByText: 'Built with Notesby — an open-source static publishing engine by CLSTRE.',
   },
 };
