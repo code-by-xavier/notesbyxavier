@@ -56,9 +56,9 @@ steps:
         echo ""
 
 substitutions:
-  _SERVICE_NAME: 'notesby'
+  _SERVICE_NAME: 'notesbyxavier'
   _REGION: 'us-central1'
-  _DB_INSTANCE: 'notesby-db'
+  _DB_INSTANCE: 'notesbyxavier-db'
 
 images:
   - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest'

@@ -7,7 +7,7 @@
 // ============================================================
 
 import type { APIRoute } from 'astro';
-import { db } from '@/db';
+import { db, ensureSchema } from '@/db';
 import { siteSettings } from '@/db/schema';
 import { isSetupCompleted } from '@/lib/auth';
 import { storage } from '@/lib/storage';
@@ -23,6 +23,7 @@ export const GET: APIRoute = async () => {
 
   // --- Database Connectivity Check ---
   try {
+    await ensureSchema();
     await db.select({ id: siteSettings.id }).from(siteSettings).limit(1);
     dbOk = true;
     alreadySetup = await isSetupCompleted();
