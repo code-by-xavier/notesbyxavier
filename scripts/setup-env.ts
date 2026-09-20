@@ -118,6 +118,19 @@ function hydrate(): void {
 
   fs.writeFileSync(targetPath, finalLines.join('\n') + '\n');
   console.log('✅ Generated .env from .env.template and .env.local');
+
+  // If local GCS emulator is running, ensure default bucket exists
+  const emulatorHost = overrides.STORAGE_EMULATOR_HOST;
+  const bucketName = overrides.GCS_BUCKET_NAME;
+  if (emulatorHost && emulatorHost.includes('127.0.0.1')) {
+    fetch(`${emulatorHost}/storage/v1/b`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: bucketName }),
+    }).catch(() => {
+      // Emulator might not be up yet, safe to ignore
+    });
+  }
 }
 
 try {
