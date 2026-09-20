@@ -1,4 +1,10 @@
 ---
+// File: src/components/TableOfContents.astro
+// ============================================================
+// Notesby — Table of Contents Component
+// Sticky sidebar tracking headings and scroll progress in essays.
+// ============================================================
+
 export interface HeadingItem {
   depth: number;
   slug: string;
@@ -36,23 +42,26 @@ const filteredHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
   .toc {
     display: none;
 
-    @media (min-width: 1024px) {
+    @include ui.media-breakpoint-up(lg) {
       display: block;
-      width: var(--sidebar-width);
+      width: var(--sidebar-width, #{ui.$sidebar-width});
       flex-shrink: 0;
       position: sticky;
-      top: calc(var(--header-height) + 2rem);
-      max-height: calc(100vh - var(--header-height) - 4rem);
+      top: calc(var(--header-height, #{ui.$header-height}) + var(--spacing-xl, #{ui.$spacing-xl}));
+      max-height: calc(
+        100vh - var(--header-height, #{ui.$header-height}) - var(--spacing-5xl, #{ui.$spacing-5xl})
+      );
       overflow-y: auto;
-      padding-right: 2rem;
+      padding-right: var(--spacing-xl, #{ui.$spacing-xl});
+      @include ui.custom-scrollbar;
     }
 
     &__title {
-      font-family: 'Newsreader', Charter, Georgia, serif;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 1.25rem;
+      font-family: var(--font-family-headings, #{ui.$font-family-headings});
+      font-size: var(--h3-size, #{ui.$h3-font-size});
+      font-weight: ui.$font-weight-semibold;
+      color: var(--text-primary, #{ui.$text-primary-light});
+      margin-bottom: var(--spacing-md-plus, #{ui.$spacing-md-plus});
     }
 
     &__list {
@@ -61,36 +70,39 @@ const filteredHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 0.65rem;
+      gap: var(--spacing-sm, #{ui.$spacing-sm});
     }
 
     &__item {
       &--depth-3 {
-        padding-left: 1rem;
-        font-size: 0.875rem;
+        padding-left: var(--spacing-unit, #{ui.$spacing-unit});
+        font-size: var(--font-size-sm, #{ui.$font-size-sm});
       }
     }
 
     &__link {
-      font-size: 0.9375rem;
-      color: var(--text-muted);
-      line-height: 1.4;
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-nav, #{ui.$font-size-nav});
+      color: var(--text-muted, #{ui.$text-muted-light});
+      line-height: var(--line-height-base, #{ui.$line-height-base});
       display: block;
-      transition: color 0.15s ease, transform 0.15s ease;
+      transition:
+        color ui.$transition-fast,
+        transform ui.$transition-fast;
 
       &:hover {
-        color: var(--text-primary);
+        color: var(--text-primary, #{ui.$text-primary-light});
       }
 
       &.is-active {
-        color: var(--text-primary);
-        font-weight: 500;
+        color: var(--text-primary, #{ui.$text-primary-light});
+        font-weight: ui.$font-weight-medium;
       }
     }
 
     &__number {
       opacity: 0.7;
-      margin-right: 0.2rem;
+      margin-right: var(--spacing-3xs, #{ui.$spacing-3xs});
     }
   }
 </style>

@@ -1,0 +1,65 @@
+---
+// File: src/components/settings/ReadingExperienceSection.astro
+// ============================================================
+// Notesby — Reading & Post Experience Section
+// Configures post-page bottom sign-offs, reader call-to-actions,
+// and the about page philosophy prose.
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+import type { ResolvedSiteSettings } from '@/lib/settings';
+
+interface Props {
+  settings: ResolvedSiteSettings;
+}
+
+const { settings } = Astro.props;
+---
+
+<section class="settings-card">
+  <div class="settings-card__header">
+    <div class="settings-card__icon-wrap">
+      <Icon name="book-open" size={18} />
+    </div>
+    <div>
+      <h2 class="settings-card__title">Reading & Post Experience</h2>
+      <p class="settings-card__desc">
+        Sign-offs, call-to-actions, and philosophy text displayed to readers.
+      </p>
+    </div>
+  </div>
+
+  <div class="settings-card__body">
+    <div class="form-group">
+      <label for="postBottomCopy" class="form-label">
+        Post Page Bottom Sign-off / CTA Copy
+      </label>
+      <textarea
+        id="postBottomCopy"
+        name="postBottomCopy"
+        class="form-textarea"
+        rows="3"
+        placeholder="Thank you for reading. If this piece resonated, follow the RSS feed or reach out with your thoughts."
+      >{settings.postBottomCopy}</textarea>
+      <p class="form-help">
+        Appears directly at the conclusion of each essay/note above the navigation actions.
+      </p>
+    </div>
+
+    <div class="form-group">
+      <label for="aboutText" class="form-label">
+        About Page Philosophy / Introduction
+      </label>
+      <textarea
+        id="aboutText"
+        name="aboutText"
+        class="form-textarea"
+        rows="4"
+        placeholder="Markdown supported..."
+      >{settings.aboutText}</textarea>
+      <p class="form-help">
+        Custom introduction rendered on your public <code>/about</code> page.
+      </p>
+    </div>
+  </div>
+</section>

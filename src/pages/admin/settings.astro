@@ -1,0 +1,83 @@
+---
+// File: src/pages/admin/settings.astro
+// ============================================================
+// Notesby — Sovereign Publication Configuration Portal
+// Allows publication owners to manage author identity, branding,
+// PWA icons, legal terms, and reader experience directly from the UI.
+// Assembled cleanly from modular section components in src/components/settings/
+// ============================================================
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getSiteSettings } from '@/lib/settings';
+import { ROUTES } from '@/links';
+import SettingsNav from '@/components/settings/SettingsNav.astro';
+import IdentityBrandingSection from '@/components/settings/IdentityBrandingSection.astro';
+import PwaIconsSection from '@/components/settings/PwaIconsSection.astro';
+import ReadingExperienceSection from '@/components/settings/ReadingExperienceSection.astro';
+import LegalComplianceSection from '@/components/settings/LegalComplianceSection.astro';
+import SeoSocialSection from '@/components/settings/SeoSocialSection.astro';
+import SettingsSaveBar from '@/components/settings/SettingsSaveBar.astro';
+import PortalToast from '@/components/PortalToast.astro';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect(ROUTES.ADMIN.LOGIN);
+}
+
+const settings = await getSiteSettings();
+---
+
+<BaseLayout title="Publication Settings — Notesby Studio" hideNav={true} hideFooter={true}>
+  <PortalToast />
+  <div class="settings-layout">
+    <!-- Top Minimal Navigation Bar -->
+    <SettingsNav />
+
+    <!-- Main Content Canvas -->
+    <main class="settings-main">
+      <div class="settings-container">
+        <!-- Hero Header -->
+        <div class="settings-hero">
+          <div class="settings-hero__badge">SOVEREIGN CONFIGURATION</div>
+          <h1 class="settings-hero__title">Publication Settings</h1>
+          <p class="settings-hero__subtitle">
+            Configure your publication identity, media branding, PWA icons, legal terms, and reader
+            experience without editing code.
+          </p>
+        </div>
+
+        <!-- Settings Form -->
+        <form id="settings-form" class="settings-form">
+          <!-- 1. Identity & Header Branding -->
+          <IdentityBrandingSection settings={settings} />
+
+          <!-- 2. PWA & Web App Icons -->
+          <PwaIconsSection settings={settings} />
+
+          <!-- 3. Reading & Post Experience -->
+          <ReadingExperienceSection settings={settings} />
+
+          <!-- 4. Legal, Copyright & Policies -->
+          <LegalComplianceSection settings={settings} />
+
+          <!-- 5. SEO & Social Profiles -->
+          <SeoSocialSection settings={settings} />
+
+          <!-- Sticky Bottom Save Bar -->
+          <SettingsSaveBar />
+        </form>
+      </div>
+    </main>
+  </div>
+</BaseLayout>
+
+<script>
+  import { initSettingsClient } from '@/components/settings/settings-client';
+  initSettingsClient();
+</script>
+
+<style is:global lang="scss">
+  @use '@/styles/components/settings';
+</style>

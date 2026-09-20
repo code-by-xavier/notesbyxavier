@@ -1,0 +1,51 @@
+---
+// File: src/components/settings/SettingsNav.astro
+// ============================================================
+// Notesby — Settings Portal Navigation Bar
+// Top navigation bar for the sovereign settings portal.
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+import { ROUTES } from '@/links';
+import { getSiteSettings } from '@/lib/settings';
+
+const settings = await getSiteSettings();
+---
+
+<header class="portal-nav">
+  <div class="portal-nav__container">
+    <a href={ROUTES.ADMIN.ROOT} class="portal-brand" aria-label="Go to Dashboard">
+      {settings.customLogo ? (
+        <img src={settings.customLogo} alt={settings.siteTitle} class="portal-brand__logo" />
+      ) : (
+        <>
+          <img
+            src={settings.siteLogo}
+            alt="Notesby"
+            class="portal-brand__logo portal-brand__logo--light"
+          />
+          <img
+            src={settings.siteLogoDark}
+            alt="Notesby"
+            class="portal-brand__logo portal-brand__logo--dark"
+          />
+        </>
+      )}
+      <span class="portal-brand__name">Studio</span>
+    </a>
+
+    <div class="portal-nav__actions">
+      <a href={ROUTES.ADMIN.ROOT} class="portal-nav__link">
+        <Icon name="arrow-left" size={14} />
+        <span>Dashboard</span>
+      </a>
+      <a href={ROUTES.HOME} class="portal-nav__link" target="_blank" rel="noopener noreferrer">
+        <span>View Live Site</span>
+        <Icon name="external-link" size={14} />
+      </a>
+      <a href={ROUTES.API.LOGOUT} class="portal-nav__btn-logout">
+        Sign Out
+      </a>
+    </div>
+  </div>
+</header>

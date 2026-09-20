@@ -1,48 +1,83 @@
 ---
-import { notesConfig } from '../../notes.config';
-import ThemeToggle from './ThemeToggle.astro';
+// File: src/components/Header.astro
+// ============================================================
+// Notesby — Header Component
+// Responsive navigation, author branding, avatar, RSS syndication,
+// mobile drawer, and accessible theme toggle.
+// ============================================================
+
+import ThemeToggle from '@/components/ThemeToggle.astro';
+import Icon from '@/components/Icon.astro';
+import { notesConfig } from '@config';
+import { getSiteSettings } from '@/lib/settings';
+import { ROUTES } from '@/links';
 
 interface Props {
   isEssay?: boolean;
 }
 
 const { isEssay = false } = Astro.props;
-const avatarUrl = notesConfig.authorAvatar;
-const initials = notesConfig.authorName
+const settings = await getSiteSettings();
+const avatarUrl = settings.authorAvatar;
+const siteLogo = settings.siteLogo;
+const siteLogoDark = settings.siteLogoDark;
+const authorName = settings.authorName;
+const initials = authorName
   .split(' ')
   .map((n) => n[0])
   .join('')
-  .toUpperCase();
+  .toUpperCase()
+  .slice(0, 2);
 const currentPath = Astro.url.pathname;
 ---
 
 <header class="site-header" id="site-header">
   <div class="site-header__container">
-    <!-- Left: Optional Back Arrow + Profile Avatar (Circle) + Name directly attached -->
+    <!-- Left: Author Brand / Return link -->
     <div class="site-header__left">
-      <a href="/" class="site-header__brand" aria-label={`${notesConfig.authorName} - Home`}>
+      <a href={ROUTES.HOME} class="site-header__brand" aria-label="Go to Home">
         {isEssay && (
           <span class="site-header__back-arrow" title="Back to all notes">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
+            <Icon name="arrow-left" size={16} />
           </span>
         )}
-        <div class="site-header__avatar">
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={notesConfig.authorName}
-              class="avatar-img"
-              onerror="this.style.display='none'; if (this.nextElementSibling) this.nextElementSibling.style.display='flex';"
-            />
-            <span class="avatar-fallback" style="display: none;">{initials}</span>
+        <div
+          class:list={['site-header__avatar', { 'site-header__avatar--logo': Boolean(siteLogo) }]}
+        >
+          {siteLogo ? (
+            siteLogo === siteLogoDark ? (
+              <img src={siteLogo} alt={settings.siteTitle} class="avatar-img avatar-img--logo" />
+            ) : (
+              <>
+                <img
+                  src={siteLogo}
+                  alt={settings.siteTitle}
+                  class="avatar-img avatar-img--logo avatar-img--logo-light"
+                />
+                <img
+                  src={siteLogoDark}
+                  alt={settings.siteTitle}
+                  class="avatar-img avatar-img--logo avatar-img--logo-dark"
+                />
+              </>
+            )
+          ) : avatarUrl ? (
+            <>
+              <img
+                src={avatarUrl}
+                alt={authorName}
+                class="avatar-img"
+                onerror="this.style.display='none'; if (this.nextElementSibling) this.nextElementSibling.style.display='flex';"
+              />
+              <span class="avatar-fallback" style="display: none;">
+                {initials}
+              </span>
+            </>
           ) : (
             <span class="avatar-fallback">{initials}</span>
           )}
         </div>
-        <span class="site-header__name">{notesConfig.authorName}</span>
+        <span class="site-header__name">{authorName}</span>
       </a>
     </div>
 
@@ -67,11 +102,7 @@ const currentPath = Astro.url.pathname;
               rel={link.external ? 'noopener noreferrer' : undefined}
             >
               {link.isRss && (
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rss-icon">
-                  <path d="M4 11a9 9 0 0 1 9 9"></path>
-                  <path d="M4 4a16 16 0 0 1 16 16"></path>
-                  <circle cx="5" cy="19" r="1"></circle>
-                </svg>
+                <Icon name="rss" size={13} class="rss-icon" color="var(--rss-accent, #f97316)" />
               )}
               <span>{link.label}</span>
             </a>
@@ -120,11 +151,7 @@ const currentPath = Astro.url.pathname;
           >
             <span class="drawer-label">{link.label}</span>
             {link.isRss && (
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rss-icon">
-                <path d="M4 11a9 9 0 0 1 9 9"></path>
-                <path d="M4 4a16 16 0 0 1 16 16"></path>
-                <circle cx="5" cy="19" r="1"></circle>
-              </svg>
+              <Icon name="rss" size={13} class="rss-icon" color="var(--rss-accent, #f97316)" />
             )}
             {link.external && (
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="external-icon">
@@ -141,21 +168,22 @@ const currentPath = Astro.url.pathname;
 </header>
 
 <style lang="scss">
+  @use '../styles/abstracts' as ui;
+
   .site-header {
     width: 100%;
-    height: var(--header-height);
-    background-color: var(--bg-color);
+    height: var(--header-height, #{ui.$header-height});
+    background-color: var(--bg-color, #{ui.$bg-light});
     position: sticky;
     top: 0;
     z-index: 100;
-    transition: background-color 0.25s ease;
-    border-bottom: 1px solid var(--border-subtle);
+    transition: background-color ui.$transition-base;
+    border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-subtle, #{ui.$border-subtle-light});
 
     &__container {
-      max-width: var(--container-max-width);
+      @include ui.container;
       height: 100%;
-      margin: 0 auto;
-      padding: 0 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -170,9 +198,9 @@ const currentPath = Astro.url.pathname;
     &__brand {
       display: inline-flex;
       align-items: center;
-      gap: 0.65rem;
+      gap: var(--mobile-link-padding-x, #{ui.$mobile-link-padding-x});
       text-decoration: none;
-      transition: opacity 0.15s ease;
+      transition: opacity ui.$transition-fast;
 
       &:hover {
         opacity: 0.85;
@@ -183,51 +211,90 @@ const currentPath = Astro.url.pathname;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      color: var(--text-muted);
-      margin-right: -0.15rem;
-      transition: transform 0.15s ease, color 0.15s ease;
+      color: var(--text-muted, #{ui.$text-muted-light});
+      margin-right: calc(-1 * var(--spacing-3xs, #{ui.$spacing-3xs}));
+      transition:
+        transform ui.$transition-fast,
+        color ui.$transition-fast;
 
       .site-header__brand:hover & {
-        transform: translateX(-2px);
-        color: var(--text-primary);
+        transform: translateX(calc(-1 * var(--border-radius-xs, #{ui.$border-radius-xs})));
+        color: var(--text-primary, #{ui.$text-primary-light});
       }
     }
 
     &__avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
+      @include ui.flex-center;
+      width: var(--avatar-size, #{ui.$avatar-size});
+      height: var(--avatar-size, #{ui.$avatar-size});
+      border-radius: var(--border-radius-full, #{ui.$border-radius-full});
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: var(--surface-color);
-      border: 1.5px solid var(--border-color);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      background-color: var(--surface-color, #{ui.$surface-light});
+      border: var(--border-width-bold, #{ui.$border-width-bold}) solid
+        var(--border-color, #{ui.$border-light});
+      box-shadow: ui.$shadow-sm;
       flex-shrink: 0;
+
+      &--logo {
+        width: auto;
+        height: 28px;
+        min-width: 28px;
+        border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+        border: none;
+        background-color: transparent;
+        box-shadow: none;
+        overflow: visible;
+
+        .avatar-img {
+          width: auto;
+          height: 100%;
+          max-height: 28px;
+          max-width: 150px;
+          object-fit: contain;
+          padding: 0;
+        }
+      }
 
       .avatar-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         display: block;
+
+        &--logo {
+          object-fit: contain;
+          padding: 0;
+        }
+
+        &--logo-dark {
+          display: none;
+        }
+      }
+
+      :global([data-theme='dark']) & {
+        .avatar-img--logo-light {
+          display: none;
+        }
+        .avatar-img--logo-dark {
+          display: block;
+        }
       }
 
       .avatar-fallback {
-        font-family: var(--font-family-base);
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--text-secondary);
-        letter-spacing: 0.02em;
+        font-family: var(--font-family-base, #{ui.$font-family-base});
+        font-size: var(--font-size-xs, #{ui.$font-size-xs});
+        font-weight: ui.$font-weight-semibold;
+        color: var(--text-secondary, #{ui.$text-secondary-light});
+        letter-spacing: var(--letter-spacing-meta, #{ui.$letter-spacing-meta});
       }
     }
 
     &__name {
-      font-family: var(--font-family-base);
-      font-size: 0.9375rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      color: var(--text-primary);
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-nav, #{ui.$font-size-nav});
+      font-weight: ui.$font-weight-semibold;
+      letter-spacing: var(--letter-spacing-tight, #{ui.$letter-spacing-tight});
+      color: var(--text-primary, #{ui.$text-primary-light});
       white-space: nowrap;
     }
 
@@ -239,35 +306,22 @@ const currentPath = Astro.url.pathname;
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 0.85rem;
+      gap: var(--spacing-unit, #{ui.$spacing-unit});
       flex-shrink: 0;
     }
 
-    // Desktop Nav
     &__nav {
       display: none;
       align-items: center;
-      gap: 1.25rem;
+      gap: var(--spacing-md-plus, #{ui.$spacing-md-plus});
 
-      @media (min-width: 640px) {
+      @include ui.media-breakpoint-up(sm) {
         display: flex;
       }
     }
 
     &__link {
-      font-family: var(--font-family-base);
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      text-decoration: none;
-      transition: color 0.15s ease;
-
-      &:hover {
-        color: var(--text-primary);
-      }
+      @include ui.nav-link-style;
 
       &--active {
         color: var(--accent-color);
@@ -275,8 +329,15 @@ const currentPath = Astro.url.pathname;
       }
 
       &--rss {
+        :global(.rss-icon),
         .rss-icon {
-          color: #f97316;
+          color: var(--rss-accent, #{ui.$rss-accent}) !important;
+          transition: color ui.$transition-fast;
+        }
+
+        &:hover :global(.rss-icon),
+        &:hover .rss-icon {
+          color: var(--rss-accent-hover, #{ui.$rss-accent-hover}) !important;
         }
       }
     }
@@ -287,16 +348,16 @@ const currentPath = Astro.url.pathname;
       align-items: center;
       justify-content: center;
       background: none;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
+      border: var(--border-width-base, #{ui.$border-width-base}) solid var(--border-color, #{ui.$border-light});
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
       padding: 6px;
-      color: var(--text-secondary);
+      color: var(--text-secondary, #{ui.$text-secondary-light});
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all ui.$transition-fast;
 
       &:hover {
-        color: var(--text-primary);
-        border-color: var(--accent-color);
+        color: var(--text-primary, #{ui.$text-primary-light});
+        border-color: var(--accent-color, #{ui.$primary-accent});
       }
 
       .menu-icon--close {
@@ -304,8 +365,8 @@ const currentPath = Astro.url.pathname;
       }
 
       &.is-open {
-        background-color: var(--surface-color);
-        color: var(--text-primary);
+        background-color: var(--surface-color, #{ui.$surface-light});
+        color: var(--text-primary, #{ui.$text-primary-light});
 
         .menu-icon--open {
           display: none;
@@ -316,7 +377,7 @@ const currentPath = Astro.url.pathname;
         }
       }
 
-      @media (min-width: 640px) {
+      @include ui.media-breakpoint-up(sm) {
         display: none;
       }
     }
@@ -327,16 +388,17 @@ const currentPath = Astro.url.pathname;
       top: 100%;
       left: 0;
       right: 0;
-      background-color: var(--bg-color);
-      border-bottom: 1px solid var(--border-color);
+      background-color: var(--bg-color, #{ui.$bg-light});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid var(--border-color, #{ui.$border-light});
       box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.12);
       max-height: 0;
       opacity: 0;
       overflow: hidden;
       transform: translateY(-6px);
-      transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-                  opacity 0.2s ease,
-                  transform 0.2s ease;
+      transition:
+        max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.2s ease,
+        transform 0.2s ease;
       pointer-events: none;
 
       &.is-open {
@@ -346,48 +408,44 @@ const currentPath = Astro.url.pathname;
         pointer-events: auto;
       }
 
-      @media (min-width: 640px) {
+      @include ui.media-breakpoint-up(sm) {
         display: none !important;
       }
     }
 
     &__drawer-nav {
-      padding: 0.85rem 1.25rem 1.15rem;
+      padding: var(--spacing-unit, #{ui.$spacing-unit}) var(--spacing-lg, #{ui.$spacing-lg});
       display: flex;
       flex-direction: column;
-      gap: 0.35rem;
+      gap: var(--spacing-2xs, #{ui.$spacing-2xs});
     }
 
     &__drawer-link {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.5rem 0.85rem;
-      border-radius: 8px;
-      font-family: var(--font-family-base);
-      font-size: 0.9375rem;
-      font-weight: 500;
-      color: var(--text-secondary);
+      padding: var(--spacing-xs, #{ui.$spacing-xs}) var(--spacing-sm, #{ui.$spacing-sm});
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-nav, #{ui.$font-size-nav});
+      font-weight: ui.$font-weight-medium;
+      color: var(--text-secondary, #{ui.$text-secondary-light});
       text-decoration: none;
-      transition: all 0.15s ease;
+      transition: all ui.$transition-fast;
 
       &:hover {
-        background-color: var(--surface-color);
-        color: var(--text-primary);
+        background-color: var(--surface-color, #{ui.$surface-light});
+        color: var(--text-primary, #{ui.$text-primary-light});
       }
 
       &--active {
-        background-color: var(--surface-color);
-        color: var(--accent-color);
-        font-weight: 600;
-      }
-
-      .rss-icon {
-        color: #f97316;
+        background-color: var(--surface-color, #{ui.$surface-light});
+        color: var(--accent-color, #{ui.$primary-accent});
+        font-weight: ui.$font-weight-semibold;
       }
 
       .external-icon {
-        color: var(--text-muted);
+        color: var(--text-muted, #{ui.$text-muted-light});
       }
     }
   }

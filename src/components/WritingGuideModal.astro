@@ -1,0 +1,883 @@
+---
+// File: src/components/WritingGuideModal.astro
+// ============================================================
+// Notesby — Writing Guide & Markdown Syntax Modal
+// Interactive searchable documentation modal with dark shaded backdrop,
+// live instant filtering, click-to-copy snippets, and keyboard navigation.
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+
+interface GuideItem {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  syntax: string;
+  example?: string;
+  note?: string;
+}
+
+const guideItems: GuideItem[] = [
+  {
+    id: 'headings-h2',
+    category: 'Headings',
+    title: 'H2 Section Heading (Table of Contents)',
+    description:
+      'Primary editorial section heading. Automatically generates an entry in the reader Table of Contents.',
+    syntax: '## Section Title',
+    example: '## The Architecture of Sovereign Clouds',
+    note: 'Generates anchor link #the-architecture-of-sovereign-clouds automatically.',
+  },
+  {
+    id: 'headings-h3',
+    category: 'Headings',
+    title: 'H3 Sub-heading',
+    description: 'Nested subsection heading indented under its parent H2 in the Table of Contents.',
+    syntax: '### Sub-heading Title',
+    example: '### Database Storage Layer',
+  },
+  {
+    id: 'headings-h4',
+    category: 'Headings',
+    title: 'H4 Minor Heading',
+    description: 'Deep section subdivision for specific technical items or minor paragraphs.',
+    syntax: '#### Minor Heading',
+  },
+  {
+    id: 'hashtags',
+    category: 'Hashtags & Tags',
+    title: 'Hashtags / Tags',
+    description:
+      'Tag your essays with topics to display badges on note preview cards across the feed.',
+    syntax: '#Architecture  #CloudRun  #Essays',
+    example: '#Sovereignty #Research',
+    note: 'Tags appear on note cards as high-contrast topic pills.',
+  },
+  {
+    id: 'links-internal-anchor',
+    category: 'Links',
+    title: 'Internal Section Anchor Link',
+    description:
+      'Jump to any section on the same page using its automatically slugified heading ID.',
+    syntax: '[Jump to Core Thesis](#the-core-thesis)',
+    example: '[Read our conclusion](#conclusion)',
+    note: 'Slugs are lowercase with hyphens replacing spaces.',
+  },
+  {
+    id: 'links-internal-note',
+    category: 'Links',
+    title: 'Linking to Other Notes',
+    description:
+      'Create internal backlinks to other published essays and field notes on your site.',
+    syntax: '[Title of Note](/notes/note-slug/)',
+    example: '[Getting Started with Notesby](/notes/getting-started/)',
+    note: 'Always include the trailing slash for optimal edge caching.',
+  },
+  {
+    id: 'links-external',
+    category: 'Links',
+    title: 'External Web Links',
+    description:
+      'Standard hyperlinks connecting readers to external sources, research, and platforms.',
+    syntax: '[CLSTRE Platform](https://clstre.com)',
+    example: '[Google Cloud Run](https://cloud.google.com/run)',
+  },
+  {
+    id: 'quotes-blockquote',
+    category: 'Quotes & Callouts',
+    title: 'Editorial Blockquote',
+    description:
+      'Featured high-contrast quotation with Newsreader italic typography and left accent border.',
+    syntax: '> "Simplicity is my prerequisite for reliability."\n> — Xavier Lawrence',
+  },
+  {
+    id: 'quotes-callout',
+    category: 'Quotes & Callouts',
+    title: 'Field Note Callout Box',
+    description:
+      'Framed highlight box for important notices, research caveats, and field dispatches.',
+    syntax: '> [!NOTE]\n> Sovereign publishing engines provide true content ownership.',
+  },
+  {
+    id: 'lists-bullet',
+    category: 'Lists',
+    title: 'Bulleted List',
+    description: 'Unordered list for items, principles, or summaries.',
+    syntax:
+      '- Field Notes (100–300 words)\n- Editorial Essays (Long-form)\n- Op-Eds (Perspectives)',
+  },
+  {
+    id: 'lists-numbered',
+    category: 'Lists',
+    title: 'Numbered Step List',
+    description: 'Ordered sequence for walkthroughs, tutorials, or numbered arguments.',
+    syntax: '1. Connect Cloud SQL\n2. Launch Cloud Run container\n3. Publish first essay',
+  },
+  {
+    id: 'text-formatting',
+    category: 'Text Emphasis',
+    title: 'Bold, Italic & Inline Code',
+    description: 'Inline typography stylings to emphasize prose.',
+    syntax: '**Bold thesis**, *italic observation*, and `inline_code()`.',
+    example: '**Crucial:** Always keep `dependencies` lean.',
+  },
+  {
+    id: 'code-block',
+    category: 'Code',
+    title: 'Fenced Code Block',
+    description: 'Syntax-highlighted code container with language specification.',
+    syntax: '```ts\nexport const sovereign = true;\n```',
+  },
+  {
+    id: 'media-image',
+    category: 'Media',
+    title: 'Images & Figures',
+    description: 'Editorial figure with responsive auto-scaling and accessible alt caption.',
+    syntax: '![Architecture Diagram](/images/diagram.webp)',
+  },
+  {
+    id: 'divider',
+    category: 'Dividers',
+    title: 'Horizontal Section Divider',
+    description: 'Subtle editorial separator rule between prose movements.',
+    syntax: '---',
+  },
+  {
+    id: 'cover-image',
+    category: 'Media',
+    title: 'Post Headline Cover Image',
+    description:
+      'Upload a single high-resolution cover image at the top of your post in Notesby Studio. Displays across the top of the reading canvas and serves as the og:image in search engines and social cards.',
+    syntax: 'Click "Add Cover Image" above your note title',
+    note: 'Optimal dimensions: 1200x630 (16:9). Supports JPEG, PNG, WebP, AVIF, and GIF up to 5MB.',
+  },
+  {
+    id: 'slash-commands',
+    category: 'Notesby Studio',
+    title: 'Slash Commands (Notesby Studio Shortcut)',
+    description:
+      'While writing in Notesby Studio, type "/" at the beginning of any empty line to trigger instant insertion.',
+    syntax: '/h2   /h3   /quote   /code   /list   /divider   /callout',
+    note: 'Press Enter or click any command in the popover to insert instantly.',
+  },
+];
+
+const categories = Array.from(new Set(guideItems.map((g) => g.category)));
+---
+
+<!-- Writing Guide Modal & Dark Backdrop -->
+<div
+  id="writing-guide-modal"
+  class="guide-modal-overlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="guide-modal-title"
+  style="display: none;"
+>
+  <div class="guide-modal" id="guide-modal-container">
+    <!-- Modal Header -->
+    <header class="guide-modal__header">
+      <div class="guide-modal__title-group">
+        <span class="guide-modal__icon">
+          <Icon name="book-open" size={20} />
+        </span>
+        <div>
+          <h2 id="guide-modal-title" class="guide-modal__title">
+            Writing & Formatting Guide
+          </h2>
+          <p class="guide-modal__subtitle">
+            Markdown syntax, Table of Contents anchors, hashtags, and Notesby Studio shortcuts.
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        id="guide-modal-close"
+        class="guide-modal__close-btn"
+        aria-label="Close Writing Guide"
+        title="Close (Esc)"
+      >
+        <Icon name="x" size={18} />
+      </button>
+    </header>
+
+    <!-- Modal Search Filter Bar -->
+    <div class="guide-modal__search-wrapper">
+      <div class="guide-modal__search-box">
+        <span class="guide-modal__search-icon">
+          <Icon name="search" size={16} />
+        </span>
+        <input
+          type="text"
+          id="guide-search-input"
+          class="guide-modal__search-input"
+          placeholder="Search writing guide (e.g. hashtags, h2, internal links, quote, code)..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button
+          type="button"
+          id="guide-search-clear"
+          class="guide-modal__search-clear"
+          style="display: none;"
+          aria-label="Clear Search"
+        >
+          <Icon name="x" size={14} />
+        </button>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="guide-modal__pills" id="guide-category-pills">
+        <button type="button" class="guide-pill guide-pill--active" data-cat="all">
+          All
+        </button>
+        {categories.map((cat) => (
+          <button type="button" class="guide-pill" data-cat={cat}>
+            {cat}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- Modal Scrollable Content Body -->
+    <div class="guide-modal__body" id="guide-modal-body">
+      <div class="guide-grid" id="guide-items-grid">
+        {guideItems.map((item) => (
+          <div
+            class="guide-card"
+            data-guide-id={item.id}
+            data-category={item.category}
+            data-search={`${item.title} ${item.description} ${item.syntax} ${item.category} ${item.note || ''}`.toLowerCase()}
+          >
+            <div class="guide-card__header">
+              <span class="guide-card__category">{item.category}</span>
+              <h3 class="guide-card__title">{item.title}</h3>
+            </div>
+
+            <p class="guide-card__description">{item.description}</p>
+
+            <div class="guide-card__snippet-wrapper">
+              <pre class="guide-card__syntax"><code>{item.syntax}</code></pre>
+              <button
+                type="button"
+                class="guide-card__copy-btn"
+                data-copy={item.syntax}
+                title="Click to copy syntax"
+              >
+                Copy
+              </button>
+            </div>
+
+            {item.example && (
+              <div class="guide-card__example">
+                <span class="guide-card__example-label">Example:</span>
+                <code>{item.example}</code>
+              </div>
+            )}
+
+            {item.note && <p class="guide-card__note">{item.note}</p>}
+          </div>
+        ))}
+      </div>
+
+      <!-- Empty Search State -->
+      <div id="guide-empty-state" class="guide-empty-state" style="display: none;">
+        <p class="guide-empty-state__title">No matching guides found</p>
+        <p class="guide-empty-state__text">
+          Try searching for "headings", "links", "hashtags", or "quotes".
+        </p>
+        <button type="button" id="guide-empty-reset" class="guide-empty-state__btn">
+          View All Guides
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <footer class="guide-modal__footer">
+      <div class="guide-modal__footer-left">
+        <span class="guide-modal__kbd-hint">
+          <kbd>?</kbd> Toggle Guide
+        </span>
+        <span class="guide-modal__kbd-hint">
+          <kbd>/</kbd> Focus Search
+        </span>
+        <span class="guide-modal__kbd-hint">
+          <kbd>Esc</kbd> Close
+        </span>
+      </div>
+      <div class="guide-modal__footer-right">
+        <span id="guide-count-label" class="guide-modal__count">
+          Showing all guides
+        </span>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script>
+  function setupWritingGuideModal() {
+    const modal = document.getElementById('writing-guide-modal');
+    const closeBtn = document.getElementById('guide-modal-close');
+    const searchInput = document.getElementById('guide-search-input') as HTMLInputElement | null;
+    const clearBtn = document.getElementById('guide-search-clear');
+    const emptyState = document.getElementById('guide-empty-state');
+    const emptyResetBtn = document.getElementById('guide-empty-reset');
+    const countLabel = document.getElementById('guide-count-label');
+    const cards = document.querySelectorAll<HTMLElement>('.guide-card');
+    const categoryPills = document.querySelectorAll<HTMLButtonElement>('.guide-pill');
+    const openBtns = document.querySelectorAll('[data-trigger-guide]');
+
+    let activeCategory = 'all';
+
+    function openModal() {
+      if (!modal) return;
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => {
+        searchInput?.focus();
+      }, 50);
+    }
+
+    function closeModal() {
+      if (!modal) return;
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    // Connect all elements configured with data-trigger-guide or id open-guide-btn
+    openBtns.forEach((btn) => btn.addEventListener('click', openModal));
+    document.getElementById('open-guide-btn')?.addEventListener('click', openModal);
+
+    closeBtn?.addEventListener('click', closeModal);
+
+    // Backdrop click to close (when clicking outside the container)
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Keyboard Shortcuts: '?' to toggle, 'Esc' to close, '/' to focus search
+    window.addEventListener('keydown', (e) => {
+      // Don't trigger if user is actively typing in a form input or textarea
+      const targetTag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+      const isInput = targetTag === 'input' || targetTag === 'textarea';
+
+      if (e.key === '?' && !isInput) {
+        e.preventDefault();
+        if (modal?.style.display === 'flex') {
+          closeModal();
+        } else {
+          openModal();
+        }
+      } else if (e.key === 'Escape' && modal?.style.display === 'flex') {
+        e.preventDefault();
+        closeModal();
+      } else if (e.key === '/' && modal?.style.display === 'flex' && !isInput) {
+        e.preventDefault();
+        searchInput?.focus();
+      }
+    });
+
+    // Real-time Search and Category Filter
+    function filterCards() {
+      const query = (searchInput?.value || '').trim().toLowerCase();
+      if (clearBtn) {
+        clearBtn.style.display = query.length > 0 ? 'inline-flex' : 'none';
+      }
+
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const searchText = card.getAttribute('data-search') || '';
+        const cardCategory = card.getAttribute('data-category') || '';
+
+        const matchesQuery = query === '' || searchText.includes(query);
+        const matchesCategory = activeCategory === 'all' || cardCategory === activeCategory;
+
+        if (matchesQuery && matchesCategory) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      if (emptyState) {
+        emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+
+      if (countLabel) {
+        countLabel.textContent = `Showing ${visibleCount} of ${cards.length} items`;
+      }
+    }
+
+    searchInput?.addEventListener('input', filterCards);
+
+    clearBtn?.addEventListener('click', () => {
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+        filterCards();
+      }
+    });
+
+    emptyResetBtn?.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      activeCategory = 'all';
+      categoryPills.forEach((p) =>
+        p.classList.toggle('guide-pill--active', p.getAttribute('data-cat') === 'all')
+      );
+      filterCards();
+    });
+
+    // Category Pill Click
+    categoryPills.forEach((pill) => {
+      pill.addEventListener('click', () => {
+        activeCategory = pill.getAttribute('data-cat') || 'all';
+        categoryPills.forEach((p) => p.classList.remove('guide-pill--active'));
+        pill.classList.add('guide-pill--active');
+        filterCards();
+      });
+    });
+
+    // Click to copy syntax snippet
+    cards.forEach((card) => {
+      const copyBtn = card.querySelector<HTMLButtonElement>('.guide-card__copy-btn');
+      if (!copyBtn) return;
+
+      copyBtn.addEventListener('click', async () => {
+        const text = copyBtn.getAttribute('data-copy') || '';
+        try {
+          await navigator.clipboard.writeText(text);
+          const original = copyBtn.textContent;
+          copyBtn.textContent = 'Copied!';
+          copyBtn.classList.add('guide-card__copy-btn--copied');
+          setTimeout(() => {
+            copyBtn.textContent = original;
+            copyBtn.classList.remove('guide-card__copy-btn--copied');
+          }, 1800);
+        } catch {
+          // Fallback
+        }
+      });
+    });
+  }
+
+  // Setup on page load and on Astro navigation
+  setupWritingGuideModal();
+  document.addEventListener('astro:page-load', setupWritingGuideModal);
+</script>
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  // Dark Shaded Backdrop Overlay
+  .guide-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md, #{ui.$spacing-md});
+    background-color: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: guide-overlay-fade 0.2s ease-out;
+  }
+
+  // Modal Container Box
+  .guide-modal {
+    width: 100%;
+    max-width: 820px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--surface-color, #{ui.$surface-light});
+    color: var(--text-primary, #{ui.$text-primary-light});
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+    border-radius: var(--border-radius-lg, #{ui.$border-radius-lg});
+    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    animation: guide-modal-pop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--spacing-md, #{ui.$spacing-md});
+      padding: var(--spacing-lg, #{ui.$spacing-lg}) var(--spacing-xl, #{ui.$spacing-xl});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-subtle, #{ui.$border-subtle-light});
+      background-color: var(--bg-color, #{ui.$bg-light});
+    }
+
+    &__title-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm, #{ui.$spacing-sm});
+    }
+
+    &__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+      background-color: rgba(7, 90, 170, 0.1);
+      color: var(--accent-color, #{ui.$primary-accent});
+      flex-shrink: 0;
+    }
+
+    &__title {
+      @include ui.h3-heading-style;
+      margin: 0 0 2px 0;
+      font-size: var(--font-size-md, #{ui.$font-size-md});
+    }
+
+    &__subtitle {
+      @include ui.description-text;
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      margin: 0;
+    }
+
+    &__close-btn {
+      @include ui.flex-center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-subtle, #{ui.$border-subtle-light});
+      background: transparent;
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      cursor: pointer;
+      transition: all ui.$transition-fast;
+
+      &:hover {
+        background-color: var(--tag-bg, #{ui.$tag-bg-light});
+        color: var(--text-primary, #{ui.$text-primary-light});
+      }
+    }
+
+    // Search Section
+    &__search-wrapper {
+      padding: var(--spacing-md, #{ui.$spacing-md}) var(--spacing-xl, #{ui.$spacing-xl})
+        var(--spacing-sm, #{ui.$spacing-sm});
+      background-color: var(--surface-color, #{ui.$surface-light});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-subtle, #{ui.$border-subtle-light});
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm, #{ui.$spacing-sm});
+    }
+
+    &__search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    &__search-icon {
+      position: absolute;
+      left: 12px;
+      color: var(--text-muted, #{ui.$text-muted-light});
+      display: inline-flex;
+      pointer-events: none;
+    }
+
+    &__search-input {
+      width: 100%;
+      padding: 10px 36px 10px 38px;
+      background-color: var(--bg-color, #{ui.$bg-light});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      color: var(--text-primary, #{ui.$text-primary-light});
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      outline: none;
+      transition: border-color ui.$transition-fast;
+
+      &:focus {
+        border-color: var(--accent-color, #{ui.$primary-accent});
+      }
+    }
+
+    &__search-clear {
+      position: absolute;
+      right: 10px;
+      @include ui.flex-center;
+      width: 20px;
+      height: 20px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted, #{ui.$text-muted-light});
+      cursor: pointer;
+
+      &:hover {
+        color: var(--text-primary, #{ui.$text-primary-light});
+      }
+    }
+
+    // Pills Bar
+    &__pills {
+      display: flex;
+      gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    // Scrollable Guide Body
+    &__body {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacing-lg, #{ui.$spacing-lg}) var(--spacing-xl, #{ui.$spacing-xl});
+    }
+
+    // Footer
+    &__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-xl, #{ui.$spacing-xl});
+      border-top: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-subtle, #{ui.$border-subtle-light});
+      background-color: var(--bg-color, #{ui.$bg-light});
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+      color: var(--text-muted, #{ui.$text-muted-light});
+    }
+
+    &__footer-left {
+      display: flex;
+      gap: var(--spacing-md, #{ui.$spacing-md});
+    }
+
+    &__kbd-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+
+      kbd {
+        display: inline-block;
+        padding: 1px 5px;
+        font-family: var(--font-family-mono, #{ui.$font-family-mono});
+        font-size: 10px;
+        background-color: var(--surface-color, #{ui.$surface-light});
+        border: var(--border-width-base, #{ui.$border-width-base}) solid
+          var(--border-color, #{ui.$border-light});
+        border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+        color: var(--text-primary, #{ui.$text-primary-light});
+      }
+    }
+  }
+
+  // Filter Pills
+  .guide-pill {
+    padding: 3px 10px;
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+    font-weight: ui.$font-weight-medium;
+    border-radius: var(--border-radius-full, #{ui.$border-radius-full});
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-subtle, #{ui.$border-subtle-light});
+    background-color: var(--bg-color, #{ui.$bg-light});
+    color: var(--text-secondary, #{ui.$text-secondary-light});
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all ui.$transition-fast;
+
+    &:hover {
+      border-color: var(--accent-color, #{ui.$primary-accent});
+      color: var(--text-primary, #{ui.$text-primary-light});
+    }
+
+    &--active {
+      background-color: var(--accent-color, #{ui.$primary-accent});
+      border-color: var(--accent-color, #{ui.$primary-accent});
+      color: #ffffff;
+
+      &:hover {
+        color: #ffffff;
+      }
+    }
+  }
+
+  // Grid of Guide Cards
+  .guide-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md, #{ui.$spacing-md});
+
+    @include ui.media-breakpoint-up(md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .guide-card {
+    @include ui.card-surface-style;
+    padding: var(--spacing-md, #{ui.$spacing-md});
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--bg-color, #{ui.$bg-light});
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-subtle, #{ui.$border-subtle-light});
+
+    &__header {
+      margin-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
+    }
+
+    &__category {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: ui.$font-weight-bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-color, #{ui.$primary-accent});
+      margin-bottom: 2px;
+    }
+
+    &__title {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-weight: ui.$font-weight-semibold;
+      margin: 0;
+      color: var(--text-primary, #{ui.$text-primary-light});
+    }
+
+    &__description {
+      @include ui.description-text;
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      line-height: 1.45;
+      margin-bottom: var(--spacing-sm, #{ui.$spacing-sm});
+    }
+
+    &__snippet-wrapper {
+      position: relative;
+      margin-bottom: var(--spacing-xs, #{ui.$spacing-xs});
+      border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+      overflow: hidden;
+    }
+
+    &__syntax {
+      margin: 0;
+      padding: 8px 54px 8px 10px;
+      background-color: var(--surface-color, #{ui.$surface-light});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+      font-family: var(--font-family-mono, #{ui.$font-family-mono});
+      font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+      color: var(--text-primary, #{ui.$text-primary-light});
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    &__copy-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      padding: 3px 8px;
+      font-size: 10px;
+      font-weight: ui.$font-weight-semibold;
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-subtle, #{ui.$border-subtle-light});
+      background-color: var(--bg-color, #{ui.$bg-light});
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      cursor: pointer;
+      transition: all ui.$transition-fast;
+
+      &:hover {
+        border-color: var(--accent-color, #{ui.$primary-accent});
+        color: var(--accent-color, #{ui.$primary-accent});
+      }
+
+      &--copied {
+        background-color: rgba(16, 185, 129, 0.15);
+        border-color: var(--success-color, #{ui.$success-color});
+        color: var(--success-color, #{ui.$success-color});
+      }
+    }
+
+    &__example {
+      font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+      color: var(--text-muted, #{ui.$text-muted-light});
+      margin-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
+
+      code {
+        font-family: var(--font-family-mono, #{ui.$font-family-mono});
+        color: var(--text-secondary, #{ui.$text-secondary-light});
+      }
+    }
+
+    &__example-label {
+      font-weight: ui.$font-weight-semibold;
+      margin-right: 4px;
+    }
+
+    &__note {
+      font-size: 11px;
+      color: var(--accent-color, #{ui.$primary-accent});
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+
+  // Empty Search State
+  .guide-empty-state {
+    text-align: center;
+    padding: var(--spacing-3xl, #{ui.$spacing-3xl}) var(--spacing-md, #{ui.$spacing-md});
+
+    &__title {
+      @include ui.h3-heading-style;
+      margin-bottom: var(--spacing-xs, #{ui.$spacing-xs});
+    }
+
+    &__text {
+      @include ui.description-text;
+      margin-bottom: var(--spacing-md, #{ui.$spacing-md});
+    }
+
+    &__btn {
+      @include ui.button-base;
+      padding: 6px 14px;
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      background-color: var(--accent-color, #{ui.$primary-accent});
+      color: #ffffff;
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    }
+  }
+
+  @keyframes guide-overlay-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes guide-modal-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+</style>

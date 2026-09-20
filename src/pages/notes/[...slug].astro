@@ -1,27 +1,110 @@
 ---
-import { getCollection, render } from 'astro:content';
-import EssayLayout from '../../layouts/EssayLayout.astro';
+// File: src/pages/notes/[...slug].astro
+// ============================================================
+// Notesby — Dynamic Note & Essay Page Route
+// Renders individual essays, op-eds, or field notes by slug
+// supporting both sovereign PostgreSQL publications & local MDX.
+// ============================================================
 
-export async function getStaticPaths() {
-  const notes = await getCollection('notes', ({ data }) => !data.draft);
-  return notes.map((note) => ({
-    params: { slug: note.id.replace(/\.(md|mdx)$/, '') },
-    props: { note },
-  }));
+import { getCollection, render } from 'astro:content';
+import EssayLayout from '@/layouts/EssayLayout.astro';
+import { getNoteBySlug, parseMarkdown } from '@/lib/notes';
+import { ROUTES } from '@/links';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+if (!slug) {
+  return Astro.redirect(ROUTES.HOME);
 }
 
-const { note } = Astro.props;
-const { Content, headings } = await render(note);
+// 1. Check PostgreSQL for sovereign published note
+const dbNote = await getNoteBySlug(slug);
+
+let noteData: {
+  title: string;
+  subtitle?: string;
+  description: string;
+  pubDate: Date | string;
+  updatedDate?: Date | string;
+  headings: { depth: number; slug: string; text: string }[];
+  coverImage?: string;
+  coverImageAlt?: string;
+  readingTime?: string;
+  keywords?: string[];
+  html?: string;
+  Content?: any;
+} | null = null;
+
+if (dbNote && dbNote.status === 'published') {
+  // Read from published snapshot so working drafts remain private until published!
+  const contentToRender =
+    dbNote.publishedContent !== null && dbNote.publishedContent !== undefined
+      ? dbNote.publishedContent
+      : dbNote.content;
+  const titleToRender = dbNote.publishedTitle || dbNote.title;
+  const subtitleToRender =
+    dbNote.publishedSubtitle !== null && dbNote.publishedSubtitle !== undefined
+      ? dbNote.publishedSubtitle
+      : dbNote.subtitle;
+  const coverToRender =
+    dbNote.publishedCoverImage !== null && dbNote.publishedCoverImage !== undefined
+      ? dbNote.publishedCoverImage
+      : dbNote.coverImage;
+
+  const { html, headings } = parseMarkdown(contentToRender);
+  noteData = {
+    title: titleToRender,
+    subtitle: subtitleToRender || undefined,
+    description: dbNote.excerpt || '',
+    pubDate: dbNote.publishedAt || dbNote.createdAt,
+    updatedDate: dbNote.updatedAt,
+    headings,
+    coverImage: coverToRender || undefined,
+    coverImageAlt: titleToRender,
+    readingTime: dbNote.readingTime || undefined,
+    keywords: dbNote.tags || [],
+    html,
+  };
+} else {
+  // 2. Fallback to Content Collections (sample / markdown essays)
+  const allCollectionNotes = await getCollection('notes');
+  const collectionNote = allCollectionNotes.find((n) => n.id.replace(/\.(md|mdx)$/, '') === slug);
+
+  if (collectionNote) {
+    const { Content, headings } = await render(collectionNote);
+    noteData = {
+      title: collectionNote.data.title,
+      subtitle: collectionNote.data.subtitle,
+      description: collectionNote.data.description,
+      pubDate: collectionNote.data.pubDate,
+      headings,
+      coverImage: collectionNote.data.coverImage,
+      coverImageAlt: collectionNote.data.coverImageAlt,
+      keywords: collectionNote.data.tags || [],
+      Content,
+    };
+  }
+}
+
+if (!noteData) {
+  return Astro.redirect('/404');
+}
+
+const ContentComponent = noteData.Content;
 ---
 
 <EssayLayout
-  title={note.data.title}
-  subtitle={note.data.subtitle}
-  description={note.data.description}
-  pubDate={note.data.pubDate}
-  headings={headings}
-  coverImage={note.data.coverImage}
-  coverImageAlt={note.data.coverImageAlt}
+  title={noteData.title}
+  subtitle={noteData.subtitle}
+  description={noteData.description}
+  pubDate={noteData.pubDate}
+  updatedDate={noteData.updatedDate}
+  headings={noteData.headings}
+  coverImage={noteData.coverImage}
+  coverImageAlt={noteData.coverImageAlt}
+  readingTime={noteData.readingTime}
+  keywords={noteData.keywords}
 >
-  <Content />
+  {noteData.html ? <Fragment set:html={noteData.html} /> : ContentComponent && <ContentComponent />}
 </EssayLayout>

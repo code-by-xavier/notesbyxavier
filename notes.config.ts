@@ -1,3 +1,11 @@
+// File: notes.config.ts
+// ============================================================
+// Notesby — Publication Configuration
+// Global configuration for author identity, metadata, and nav.
+// ============================================================
+
+import { ROUTES, EXTERNAL_LINKS } from '@/links';
+
 export interface CategoryConfig {
   name: string;
   description?: string;
@@ -8,7 +16,10 @@ export interface NotesConfig {
   authorName: string;
   authorBio: string;
   authorAvatar?: string;
+  siteLogo?: string;
+  siteLogoDark?: string;
   favicon?: string;
+  appleTouchIcon?: string;
   ogImage?: string;
   domain: string;
   description: string;
@@ -35,12 +46,17 @@ export interface NotesConfig {
 export const notesConfig: NotesConfig = {
   siteTitle: 'Notes by Xavier',
   authorName: 'Xavier Lawrence',
-  authorBio: 'Founder & Cloud Architect. Writing about software engineering, autonomous systems, and sovereign infrastructure.',
+  authorBio:
+    'Founder & Cloud Architect. Writing about software engineering, autonomous systems, and sovereign infrastructure.',
   authorAvatar: '/images/xavier-avatar.webp',
+  siteLogo: '/images/notesby-logo-black.svg',
+  siteLogoDark: '/images/notesby-logo-white.svg',
   favicon: '/images/xavier-avatar.webp',
+  appleTouchIcon: '/images/notesby-logo-dark.png',
   ogImage: '/images/og-image.png',
   domain: 'https://www.notesbyxavier.com',
-  description: 'Essays, architectural blueprints, and personal reflections by Xavier Lawrence.',
+  description:
+    'Essays, architectural blueprints, and personal reflections by Xavier Lawrence.',
   repository: 'https://github.com/code-by-xavier/notesbyxavier',
   categories: [
     {
@@ -63,11 +79,11 @@ export const notesConfig: NotesConfig = {
     email: 'XLawrence@clstre.com',
   },
   navLinks: [
-    { label: 'Notes', href: '/' },
+    { label: 'Notes', href: ROUTES.HOME },
     { label: 'Projects', href: '/projects' },
-    { label: 'About', href: '/about' },
-    { label: 'RSS', href: '/rss.xml', isRss: true },
-    { label: 'CLSTRE ↗', href: 'https://www.clstre.com', external: true },
+    { label: 'About', href: ROUTES.ABOUT },
+    { label: 'RSS', href: ROUTES.RSS, isRss: true },
+    { label: 'CLSTRE ↗', href: EXTERNAL_LINKS.CLSTRE, external: true },
   ],
   footer: {
     copyrightText: `© ${new Date().getFullYear()} notesbyxavier.com. All rights reserved.`,

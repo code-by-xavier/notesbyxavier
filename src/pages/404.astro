@@ -1,5 +1,11 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+// File: src/pages/404.astro
+// ============================================================
+// Notesby — 404 Page Not Found
+// ============================================================
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { ROUTES } from '@/links';
 ---
 
 <BaseLayout title="404 — Page Not Found">
@@ -7,10 +13,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <span class="not-found-page__code">404</span>
     <h1 class="not-found-page__title">Note Not Found</h1>
     <p class="not-found-page__message">
-      The essay or page you are looking for does not exist, has been moved, or is still being drafted.
+      The essay or page you are looking for does not exist, has been moved, or is still being
+      drafted.
     </p>
     <div class="not-found-page__actions">
-      <a href="/" class="not-found-page__button">
+      <a href={ROUTES.HOME} class="not-found-page__button">
         ← Return to all notes
       </a>
     </div>
@@ -19,40 +26,36 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <style lang="scss">
   .not-found-page {
-    padding: 6rem 1.5rem 8rem;
+    padding: var(--spacing-7xl, #{ui.$spacing-7xl}) var(--spacing-lg, #{ui.$spacing-lg})
+      var(--spacing-8xl, #{ui.$spacing-8xl});
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
 
     &__code {
-      font-family: var(--font-family-mono);
-      font-size: 0.9375rem;
-      font-weight: 500;
-      color: var(--accent-color);
-      letter-spacing: 0.1em;
-      margin-bottom: 1rem;
-      padding: 0.25rem 0.75rem;
-      background-color: var(--tag-bg);
-      border-radius: 9999px;
+      font-family: var(--font-family-mono, #{ui.$font-family-mono});
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-weight: ui.$font-weight-medium;
+      color: var(--accent-color, #{ui.$primary-accent});
+      letter-spacing: var(--letter-spacing-mono, #{ui.$letter-spacing-mono});
+      margin-bottom: var(--spacing-unit, #{ui.$spacing-unit});
+      padding: var(--spacing-2xs, #{ui.$spacing-2xs}) var(--spacing-sm, #{ui.$spacing-sm});
+      background-color: var(--tag-bg, #{ui.$tag-bg-light});
+      border-radius: var(--border-radius-full, #{ui.$border-radius-full});
     }
 
     &__title {
-      font-family: var(--font-family-headings);
-      font-size: 2.75rem;
-      font-weight: 600;
-      letter-spacing: -0.025em;
-      color: var(--text-primary);
-      margin-bottom: 1rem;
+      @include ui.page-heading-style;
+      margin-top: 0;
+      margin-bottom: var(--spacing-unit, #{ui.$spacing-unit});
     }
 
     &__message {
-      font-family: var(--font-family-base);
-      font-size: 1.0625rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      max-width: 480px;
-      margin-bottom: 2.25rem;
+      @include ui.description-text;
+      font-size: var(--font-size-lg, #{ui.$font-size-lg});
+      max-width: var(--reading-narrow-width, #{ui.$reading-narrow-width});
+      margin-bottom: var(--hero-padding-bottom, #{ui.$hero-padding-bottom});
     }
 
     &__actions {
@@ -61,21 +64,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
 
     &__button {
-      font-family: var(--font-family-base);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.65rem 1.25rem;
-      font-size: 0.90625rem;
-      font-weight: 500;
-      color: var(--surface-color);
-      background-color: var(--text-primary);
-      border-radius: 8px;
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      @include ui.button-base;
+      color: var(--surface-color, #{ui.$surface-light});
+      background-color: var(--text-primary, #{ui.$text-primary-light});
+      border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+      transition:
+        opacity ui.$transition-fast,
+        transform ui.$transition-fast;
 
       &:hover {
         opacity: 0.88;
-        transform: translateY(-1px);
+        transform: translateY(calc(-1 * var(--border-width-base, #{ui.$border-width-base})));
       }
     }
   }

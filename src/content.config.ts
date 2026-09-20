@@ -1,3 +1,9 @@
+// File: src/content.config.ts
+// ============================================================
+// Notesby — Content Collections Configuration & Schema
+// Defines schema validation and loading for notes and essays.
+// ============================================================
+
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
@@ -9,7 +15,7 @@ const notes = defineCollection({
     description: z.string(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
-    author: z.string().default('Xavier Lawrence'),
+    author: z.string().default('Jane Doe'),
     coverImage: z.string().optional(),
     coverImageAlt: z.string().optional(),
     tags: z.array(z.string()).default([]),

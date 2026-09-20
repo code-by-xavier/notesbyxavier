@@ -1,8 +1,17 @@
 ---
-import BaseLayout from './BaseLayout.astro';
-import TableOfContents from '../components/TableOfContents.astro';
-import type { HeadingItem } from '../components/TableOfContents.astro';
-import { notesConfig } from '../../notes.config';
+// File: src/layouts/EssayLayout.astro
+// ============================================================
+// Notesby — Essay Layout
+// Editorial long-form reading layout with Table of Contents.
+// ============================================================
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import TableOfContents from '@/components/TableOfContents.astro';
+import type { HeadingItem } from '@/components/TableOfContents.astro';
+import Icon from '@/components/Icon.astro';
+import { notesConfig } from '@config';
+import { getSiteSettings } from '@/lib/settings';
+import { ROUTES } from '@/links';
 
 interface Props {
   title: string;
@@ -14,6 +23,7 @@ interface Props {
   coverImage?: string;
   coverImageAlt?: string;
   readingTime?: string;
+  keywords?: string[] | string;
 }
 
 const {
@@ -26,12 +36,10 @@ const {
   coverImage,
   coverImageAlt,
   readingTime = '10 min read',
+  keywords,
 } = Astro.props;
 
-const formattedDate = new Intl.DateTimeFormat('en-US', {
-  month: 'long',
-  year: 'numeric',
-}).format(new Date(pubDate));
+const settings = await getSiteSettings();
 ---
 
 <BaseLayout
@@ -41,35 +49,38 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
   pubDate={pubDate}
   updatedDate={updatedDate}
   image={coverImage}
+  keywords={keywords}
 >
   <div class="essay-layout">
     <div class="container essay-layout__container">
-      <!-- Left Sidebar: Contents TOC -->
+      <!-- Left: Table of Contents (Sticky sidebar for wide desktop screens) -->
       <TableOfContents headings={headings} />
 
-      <!-- Main Reading Column -->
-      <article class="essay-main">
+      <!-- Center: Main Reading Column -->
+      <article class="reading-container essay-article">
         <header class="essay-header">
+          <div class="essay-header__meta">
+            <time datetime={new Date(pubDate).toISOString()} class="essay-header__date">
+              {new Date(pubDate).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </time>
+            {readingTime && <span class="essay-header__reading-time">{readingTime}</span>}
+          </div>
+
           <h1 class="essay-header__title">{title}</h1>
           {subtitle && <p class="essay-header__subtitle">{subtitle}</p>}
-          <div class="essay-header__meta">
-            <time datetime={new Date(pubDate).toISOString()}>{formattedDate}</time>
-            <span class="essay-header__dot">·</span>
-            <span>{readingTime}</span>
-          </div>
         </header>
 
         <!-- Optional Header Cover Image -->
-        {
-          coverImage && (
-            <figure class="essay-cover">
-              <img src={coverImage} alt={coverImageAlt || title} class="essay-cover__img" />
-              {coverImageAlt && (
-                <figcaption class="essay-cover__caption">{coverImageAlt}</figcaption>
-              )}
-            </figure>
-          )
-        }
+        {coverImage && (
+          <figure class="essay-cover">
+            <img src={coverImage} alt={coverImageAlt || title} class="essay-cover__img" />
+            {coverImageAlt && <figcaption class="essay-cover__caption">{coverImageAlt}</figcaption>}
+          </figure>
+        )}
 
         <div class="prose-editorial essay-content">
           <slot />
@@ -78,12 +89,17 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
         <!-- Footnote / Author Sign-off -->
         <footer class="essay-footer">
           <div class="essay-footer__author">
-            <div class="essay-footer__author-name">{notesConfig.authorName}</div>
-            <p class="essay-footer__author-bio">{notesConfig.authorBio}</p>
+            <div class="essay-footer__author-name">{settings.authorName}</div>
+            <p class="essay-footer__author-bio">{settings.postBottomCopy || settings.authorBio}</p>
           </div>
           <div class="essay-footer__actions">
-            <a href="/" class="essay-footer__back-link">← Read all notes</a>
-            <a href="/rss.xml" class="essay-footer__rss-link">RSS Feed</a>
+            <a href={ROUTES.HOME} class="essay-footer__back-link">
+              ← Read all notes
+            </a>
+            <a href={ROUTES.RSS} class="essay-footer__rss-link">
+              <Icon name="rss" size={13} class="rss-icon" color="var(--rss-accent, #f97316)" />
+              <span>RSS Feed</span>
+            </a>
           </div>
         </footer>
       </article>
@@ -93,58 +109,49 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
 
 <style lang="scss">
   .essay-layout {
-    padding-top: 2.5rem;
+    padding-top: var(--feed-padding-top, #{ui.$feed-padding-top});
 
     &__container {
       display: flex;
       justify-content: center;
-      gap: 3.5rem;
+      gap: var(--page-section-gap, #{ui.$page-section-gap});
       position: relative;
     }
   }
 
   .essay-main {
     width: 100%;
-    max-width: var(--reading-max-width);
+    max-width: var(--reading-max-width, #{ui.$reading-max-width});
     min-width: 0;
   }
 
-    .essay-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
+  .essay-header {
+    margin-bottom: var(--spacing-xl, #{ui.$spacing-xl});
+    padding-bottom: var(--spacing-lg, #{ui.$spacing-lg});
+    border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
 
     &__title {
-      font-family: var(--font-family-headings);
-      font-size: 2.65rem;
-      font-weight: 600;
-      line-height: 1.15;
-      letter-spacing: -0.025em;
-      color: var(--text-primary);
-      margin-bottom: 0.6rem;
+      font-family: var(--font-family-headings, #{ui.$font-family-headings});
+      font-size: var(--font-size-h1-desktop, #{ui.$font-size-h1-desktop});
+      font-weight: ui.$font-weight-semibold;
+      line-height: ui.$h1-line-height;
+      letter-spacing: var(--letter-spacing-heading-lg, #{ui.$letter-spacing-heading-lg});
+      color: var(--text-primary, #{ui.$text-primary-light});
+      margin-bottom: var(--spacing-2xs-plus, #{ui.$spacing-2xs-plus});
 
-      @media (max-width: 680px) {
-        font-size: 2.1rem;
+      @include ui.media-breakpoint-down(sm) {
+        font-size: var(--font-size-h1-mobile, #{ui.$font-size-h1-mobile});
       }
     }
 
     &__subtitle {
-      font-family: var(--font-family-serif);
-      font-size: 1.25rem;
-      font-style: italic;
-      color: var(--text-secondary);
-      line-height: 1.4;
-      margin-bottom: 1rem;
+      @include ui.subtitle-serif-style(xl);
+      margin-bottom: var(--spacing-unit, #{ui.$spacing-unit});
     }
 
     &__meta {
-      font-family: var(--font-family-base);
-      font-size: 0.8125rem;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      letter-spacing: 0.02em;
+      @include ui.meta-row-style(sm, xs);
     }
 
     &__dot {
@@ -154,59 +161,58 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
 
   // Optional Cover Image
   .essay-cover {
-    margin: 0 0 2.75rem 0;
+    margin: 0 0 var(--spacing-3xl, #{ui.$spacing-3xl}) 0;
 
     &__img {
       width: 100%;
       height: auto;
-      max-height: 440px;
+      max-height: var(--cover-max-height, #{ui.$cover-max-height});
       object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
       display: block;
     }
 
     &__caption {
-      margin-top: 0.6rem;
-      font-family: var(--font-family-base);
-      font-size: 0.8125rem;
-      color: var(--text-muted);
+      margin-top: var(--spacing-2xs-plus, #{ui.$spacing-2xs-plus});
+      @include ui.meta-text-style(sm);
       text-align: center;
     }
   }
 
   .essay-footer {
-    margin-top: 4.5rem;
-    padding-top: 2.5rem;
-    border-top: 1px solid var(--border-color);
+    margin-top: var(--feed-padding-bottom, #{ui.$feed-padding-bottom});
+    padding-top: var(--spacing-2xl, #{ui.$spacing-2xl});
+    border-top: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
 
     &__author-name {
-      font-family: var(--font-family-headings);
-      font-size: 1.35rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 0.25rem;
+      font-family: var(--font-family-headings, #{ui.$font-family-headings});
+      font-size: var(--h3-size, #{ui.$h3-font-size});
+      font-weight: ui.$font-weight-semibold;
+      color: var(--text-primary, #{ui.$text-primary-light});
+      margin-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
     }
 
     &__author-bio {
-      font-family: var(--font-family-base);
-      font-size: 0.9375rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 2rem;
+      @include ui.description-text;
+      font-size: var(--font-size-nav, #{ui.$font-size-nav});
+      line-height: var(--line-height-prose, #{ui.$line-height-prose});
+      margin-bottom: var(--spacing-xl, #{ui.$spacing-xl});
     }
 
     &__actions {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-family: var(--font-family-base);
-      font-size: 0.9375rem;
-      font-weight: 500;
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-nav, #{ui.$font-size-nav});
+      font-weight: ui.$font-weight-medium;
     }
 
     &__back-link {
-      color: var(--accent-color);
+      color: var(--accent-color, #{ui.$primary-accent});
 
       &:hover {
         text-decoration: underline;
@@ -214,10 +220,25 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     }
 
     &__rss-link {
-      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-3xs, #{ui.$spacing-3xs});
+      color: var(--text-muted, #{ui.$text-muted-light});
+      transition: color ui.$transition-fast;
+
+      :global(.rss-icon),
+      .rss-icon {
+        color: var(--rss-accent, #{ui.$rss-accent}) !important;
+        transition: color ui.$transition-fast;
+      }
 
       &:hover {
-        color: var(--text-primary);
+        color: var(--text-primary, #{ui.$text-primary-light});
+
+        :global(.rss-icon),
+        .rss-icon {
+          color: var(--rss-accent-hover, #{ui.$rss-accent-hover}) !important;
+        }
       }
     }
   }

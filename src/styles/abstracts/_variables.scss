@@ -1,0 +1,223 @@
+// File: src/styles/abstracts/_variables.scss
+// ============================================================
+// Notesby — Design System Variables & Tokens
+// Core tokens for brand colors, typography, breakpoints,
+// spacing scales, and layout dimensions.
+// ============================================================
+
+// ==========================================================================
+// 1. BRAND & ACCENT COLORS
+// ==========================================================================
+$primary-accent: #075aaa !default; // CLSTRE Brand Blue
+$primary-accent-hover: #0369a1 !default;
+$primary-accent-light: rgba(7, 90, 170, 0.12) !default;
+$secondary-accent: #38bdf8 !default; // Sky Blue (Dark mode accent)
+$secondary-accent-hover: #7dd3fc !default;
+$rss-accent: #f97316 !default; // RSS Syndication Orange
+$rss-accent-hover: #ea580c !default;
+$color-white: #ffffff !default;
+
+// ==========================================================================
+// 2. THEME NEUTRALS (LIGHT / DARK BASELINE)
+// ==========================================================================
+$bg-light: #fbfbfa !default; // Warm editorial paper
+$surface-light: #ffffff !default;
+$border-light: #e7e7e5 !default;
+$border-subtle-light: #f0f0ee !default;
+$text-primary-light: #1c1917 !default;
+$text-secondary-light: #57534e !default;
+$text-muted-light: #8c8883 !default;
+$code-bg-light: #f4f4f2 !default;
+$tag-bg-light: #f2f2f0 !default;
+$tag-text-light: #44403c !default;
+
+$bg-dark: #161616 !default; // Warm deep charcoal
+$surface-dark: #1f1f1f !default;
+$border-dark: #2e2e2e !default;
+$border-subtle-dark: #242424 !default;
+$text-primary-dark: #f2f2f2 !default;
+$text-secondary-dark: #a3a3a3 !default;
+$text-muted-dark: #737373 !default;
+$code-bg-dark: #222222 !default;
+$tag-bg-dark: #262626 !default;
+$tag-text-dark: #d4d4d4 !default;
+
+// ==========================================================================
+// 3. STATUS & EDITORIAL TAGS
+// ==========================================================================
+$success-color: #10b981 !default;
+$error-color: #ef4444 !default;
+$color-danger-light: #fef2f2 !default;
+$warning-color: #f59e0b !default;
+$draft-color: #eab308 !default;
+
+// ==========================================================================
+// 4. TYPOGRAPHY (FAMILIES & WEIGHTS)
+// ==========================================================================
+$font-family-base:
+  -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif !default;
+$font-family-headings: 'Newsreader', Charter, Georgia, serif !default;
+$font-family-serif: 'Newsreader', Charter, Georgia, serif !default;
+$font-family-mono: 'JetBrains Mono', monospace !default;
+
+$font-weight-normal: 400 !default;
+$font-weight-medium: 500 !default;
+$font-weight-semibold: 600 !default;
+$font-weight-bold: 700 !default;
+
+// ==========================================================================
+// 5. TYPOGRAPHY (FONT SIZES)
+// ==========================================================================
+$font-size-3xs: 0.65rem !default; // ~10.4px (Tags)
+$font-size-2xs: 0.72rem !default; // ~11.5px (Meta)
+$font-size-xs: 0.75rem !default; // 12px (Badges/Pills)
+$font-size-footer: 0.8125rem !default; // 13px (Footer text)
+$font-size-code: 0.85rem !default; // ~13.6px (Inline code)
+$font-size-sm: 0.875rem !default; // 14px (Nav/Subtext/Code block)
+$font-size-subhead: 0.90625rem !default; // ~14.5px (Card subtitle)
+$font-size-nav: 0.9375rem !default; // 15px (Brand Name/Nav/Author Bio/TOC)
+$font-size-base: 1rem !default; // 16px (Body standard)
+$font-size-md: 1.05rem !default; // ~17px (Lead / Bio)
+$font-size-lg: 1.125rem !default; // 18px (Prominent body)
+$font-size-blockquote: 1.18rem !default; // ~18.8px (Blockquote prose)
+$font-size-prose: 1.2rem !default; // 19.2px (Editorial prose)
+$font-size-xl: 1.25rem !default; // 20px (Essay subtitle / H3 small)
+$font-size-2xl: 1.35rem !default; // ~22px (Card title / H3)
+$font-size-h3-prose: 1.4rem !default; // ~22.4px (Editorial prose H3)
+$font-size-3xl: 1.55rem !default; // ~25px (Slider title)
+$font-size-4xl: 1.85rem !default; // ~30px (Section H2 / Prose H2)
+$font-size-h1-mobile: 2.1rem !default; // ~33.6px (Essay H1 mobile)
+$font-size-5xl: 2.25rem !default; // 36px (Page H1 mobile)
+$font-size-h1-desktop: 2.65rem !default; // ~42.4px (Essay H1 desktop)
+$font-size-6xl: 2.75rem !default; // 44px (Page H1 desktop)
+
+// Semantic Headings
+$h1-font-size: $font-size-5xl !default;
+$h1-font-size-lg: $font-size-6xl !default;
+$h1-line-height: 1.15 !default;
+$h1-letter-spacing: -0.03em !default;
+
+$h2-font-size: $font-size-3xl !default;
+$h2-font-size-lg: $font-size-4xl !default;
+$h2-line-height: 1.22 !default;
+
+$h3-font-size: $font-size-xl !default;
+$h3-font-size-lg: $font-size-2xl !default;
+$h3-line-height: 1.28 !default;
+
+$line-height-tight: 1.2 !default;
+$line-height-base: 1.55 !default;
+$line-height-normal: 1.55 !default;
+$line-height-prose: 1.62 !default;
+
+// ==========================================================================
+// 6. SPACING SCALE
+// ==========================================================================
+$spacing-3xs: 0.125rem !default; // 2px
+$spacing-2xs: 0.25rem !default; // 4px
+$spacing-2xs-plus: 0.375rem !default; // 6px
+$spacing-xs: 0.5rem !default; // 8px
+$spacing-sm: 0.75rem !default; // 12px
+$spacing-unit: 1rem !default; // 16px (Base Unit)
+$spacing-md: 1rem !default; // 16px
+$spacing-md-plus: 1.25rem !default; // 20px
+$spacing-lg: 1.5rem !default; // 24px
+$spacing-xl: 2rem !default; // 32px
+$spacing-2xl: 2.5rem !default; // 40px
+$spacing-3xl: 3rem !default; // 48px
+$spacing-4xl: 3.5rem !default; // 56px
+$spacing-5xl: 4rem !default; // 64px
+$spacing-6xl: 5rem !default; // 80px
+$spacing-7xl: 6rem !default; // 96px
+$spacing-8xl: 8rem !default; // 128px
+
+// Section Spacers
+$hero-padding-top: 3.5rem !default; // 56px
+$hero-padding-bottom: 2.25rem !default; // 36px
+$feed-padding-top: 2.5rem !default; // 40px
+$feed-padding-bottom: 4.5rem !default; // 72px
+$page-section-gap: 3.5rem !default; // 56px
+
+// ==========================================================================
+// 7. COMPONENT DIMENSIONS & PADDINGS
+// ==========================================================================
+$container-max-width: 1280px !default;
+$reading-max-width: 760px !default;
+$reading-narrow-width: 480px !default;
+$hero-bio-max-width: 720px !default;
+$header-height: 68px !default;
+$sidebar-width: 250px !default;
+$avatar-size: 32px !default;
+$slider-btn-size: 34px !default;
+$slider-item-min-width: 380px !default;
+$card-padding-y: 1.35rem !default;
+$card-padding-x: 1.45rem !default;
+$thumbnail-height: 70px !default;
+$cover-max-height: 440px !default;
+$scrollbar-size: 4px !default;
+$portal-nav-max-width: 900px !default;
+$settings-bottom-padding: 90px !default;
+
+// Theme Toggle Dimensions
+$toggle-track-width: 44px !default;
+$toggle-track-height: 24px !default;
+$toggle-thumb-size: 20px !default;
+$toggle-padding: 6px !default;
+
+// Tag & Badge Paddings
+$badge-padding-y: 0.15rem !default;
+$badge-padding-x: 0.55rem !default;
+$tag-padding-y: 0.12rem !default;
+$tag-padding-x: 0.45rem !default;
+$mobile-link-padding-y: 0.3rem !default;
+$mobile-link-padding-x: 0.65rem !default;
+
+// ==========================================================================
+// 8. BORDER RADII & BORDER WIDTHS
+// ==========================================================================
+$border-radius-xs: 2px !default;
+$border-radius-sm: 4px !default;
+$border-radius-base: 6px !default;
+$border-radius-md: 8px !default;
+$border-radius-lg: 12px !default;
+$border-radius-full: 9999px !default;
+
+$border-width-base: 1px !default;
+$border-width-bold: 1.5px !default;
+$border-width-thick: 3px !default;
+
+// Letter Spacing Tokens
+$letter-spacing-tight: -0.01em !default;
+$letter-spacing-tighter: -0.015em !default;
+$letter-spacing-heading-sm: -0.02em !default;
+$letter-spacing-heading-lg: -0.025em !default;
+$letter-spacing-meta: 0.02em !default;
+$letter-spacing-category: 0.03em !default;
+$letter-spacing-mono: 0.1em !default;
+
+// ==========================================================================
+// 9. BREAKPOINTS
+// ==========================================================================
+$breakpoints: (
+  xs: 480px,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1280px,
+) !default;
+
+// ==========================================================================
+// 10. TRANSITIONS & SHADOWS
+// ==========================================================================
+$transition-fast: 0.15s ease !default;
+$transition-base: 0.25s ease !default;
+$transition-slow: 0.35s ease !default;
+
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05) !default;
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.07) !default;
+$shadow-lg:
+  0 10px 25px -5px rgba(0, 0, 0, 0.1),
+  0 8px 10px -6px rgba(0, 0, 0, 0.1) !default;
+$shadow-hover:
+  0 8px 24px -4px rgba(7, 90, 170, 0.14),
+  0 4px 12px -2px rgba(0, 0, 0, 0.05) !default;

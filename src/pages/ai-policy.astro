@@ -1,0 +1,227 @@
+---
+// File: src/pages/ai-policy.astro
+// ============================================================
+// Notesby — Artificial Intelligence & Data Mining Policy
+// Sovereign policy governing automated crawling, AI model training,
+// text and data mining (TDM), and content licensing reservations.
+// ============================================================
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getSiteSettings } from '@/lib/settings';
+import { ROUTES } from '@/links';
+import { marked } from 'marked';
+
+export const prerender = false;
+
+const settings = await getSiteSettings();
+const entityName = settings.legalEntityName || settings.authorName || settings.siteTitle;
+const rawPolicy = settings.aiPolicyText ? settings.aiPolicyText.trim() : '';
+
+// Detect whether the author provided a multi-section full custom Markdown document
+const isFullCustomDocument =
+  rawPolicy.startsWith('#') ||
+  rawPolicy.includes('\n#') ||
+  rawPolicy.split('\n\n').filter((p) => p.trim().length > 0).length > 2;
+
+const parsedContent = rawPolicy ? await marked.parse(rawPolicy) : null;
+---
+
+<BaseLayout
+  title={`AI Policy — ${settings.siteTitle}`}
+  description="Editorial policy governing artificial intelligence training, scraping, and automated data mining."
+>
+  <div class="reading-container legal-page">
+    <h1 class="legal-page__title">Artificial Intelligence & Crawler Policy</h1>
+    <p class="legal-page__meta">Operating Entity: {entityName} · Sovereign Cloud</p>
+
+    {isFullCustomDocument && parsedContent ? (
+      <div class="prose-editorial" set:html={parsedContent} />
+    ) : (
+      <div class="prose-editorial">
+        {rawPolicy && (
+          <div class="ai-policy-lead">
+            <div class="ai-policy-lead__badge">
+              <span class="ai-policy-lead__dot" aria-hidden="true" />
+              Official Publication Policy
+            </div>
+            <div class="ai-policy-lead__body" set:html={parsedContent} />
+          </div>
+        )}
+
+        <p>
+          This policy sets forth the terms and conditions under which automated systems, machine
+          learning models, web scrapers, and artificial intelligence agents may interact with{' '}
+          <strong>{settings.siteTitle}</strong> (&ldquo;the Publication&rdquo;), published and
+          maintained by <strong>{entityName}</strong> on the Notesby sovereign publishing engine.
+        </p>
+
+        <h2>1. Comprehensive Reservation of Rights (EU DSM & International Law)</h2>
+        <p>
+          Pursuant to <strong>Article 4(3) of Directive (EU) 2019/790</strong> of the European
+          Parliament and of the Council on Copyright and Related Rights in the Digital Single
+          Market, and all equivalent statutory and common law rights globally, the author and
+          publisher <strong>expressly reserve all rights</strong> regarding the reproduction,
+          extraction, and harvesting of this site&rsquo;s contents for the purposes of Text and Data
+          Mining (TDM), machine learning, or artificial intelligence model training.
+        </p>
+        <p>
+          This reservation applies universally to all text, essays, field notes, op-eds, code
+          samples, photographic works, diagrams, and metadata hosted across this domain and its
+          associated media buckets.
+        </p>
+
+        <h2>2. Prohibition on Generative AI & Foundation Model Ingestion</h2>
+        <p>
+          No entity may crawl, scrape, ingest, tokenize, or cache any content from this publication
+          to develop, train, fine-tune, validate, evaluate, or enhance any artificial intelligence
+          system, large language model (LLM), neural network, retrieval-augmented generation (RAG)
+          store, or commercial dataset without an explicit, negotiated written licensing agreement
+          signed by {entityName}.
+        </p>
+        <p>
+          This restriction explicitly encompasses both commercial and non-commercial crawlers,
+          including but not limited to bots identified as:
+        </p>
+        <ul>
+          <li>
+            <code>GPTBot</code>, <code>ChatGPT-User</code>, and <code>OAI-SearchBot</code> (OpenAI)
+          </li>
+          <li>
+            <code>ClaudeBot</code> and <code>Anthropic-AI</code> (Anthropic)
+          </li>
+          <li>
+            <code>PerplexityBot</code> (Perplexity AI)
+          </li>
+          <li>
+            <code>CCBot</code> (Common Crawl)
+          </li>
+          <li>
+            <code>Bytespider</code> (ByteDance)
+          </li>
+          <li>
+            <code>Google-Extended</code> (Google AI / Gemini)
+          </li>
+          <li>
+            <code>cohere-ai</code> and other foundation model web scrapers
+          </li>
+        </ul>
+
+        <h2>3. Search Engine Discovery vs. Model Harvesting</h2>
+        <p>
+          We draw a fundamental architectural distinction between traditional search engines that
+          index web pages to direct human readers to original source URLs, versus generative AI
+          systems that consume creative work to synthesize surrogate answers without referral or
+          economic reciprocity.
+        </p>
+        <p>
+          Standard search engines (such as Googlebot and Bingbot) are permitted to index public
+          pages exclusively for the purpose of serving direct links and snippets in traditional
+          search engine results pages. Any secondary ingestion of indexed content into generative AI
+          summarization layers or training pipelines is strictly prohibited without prior written
+          consent.
+        </p>
+
+        <h2>4. Academic Research & Commercial Licensing</h2>
+        <p>
+          Legitimate academic institutions, non-profit digital preservation libraries, and research
+          organizations seeking to cite or study our publications for peer-reviewed research may
+          request written permission.
+        </p>
+        <p>
+          For commercial licensing, syndication, or enterprise research requests, please contact{' '}
+          {entityName} at{' '}
+          <a
+            href={
+              settings.contactEmail
+                ? `mailto:${settings.contactEmail}`
+                : `mailto:support@clstre.com`
+            }
+          >
+            {settings.contactEmail || 'contact@clstre.com'}
+          </a>
+          .
+        </p>
+
+        <h2>5. Automated Defense & Server Protection</h2>
+        <p>
+          To protect sovereign server resources and reader availability, this publication employs
+          active edge-level rate limiting, automated bot challenges, and IP filtering. Excessive or
+          unauthorized crawling activity will be blocked at the infrastructure boundary.
+        </p>
+
+        <h2>6. Related Policies</h2>
+        <p>
+          For general publication rules, please review our{' '}
+          <a href={ROUTES.TERMS}>Terms of Service</a>. For details regarding our zero-tracker,
+          privacy-respecting architecture, review our <a href={ROUTES.PRIVACY}>Privacy Policy</a>.
+        </p>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  .legal-page {
+    padding: var(--spacing-5xl, #{ui.$spacing-5xl}) var(--spacing-lg, #{ui.$spacing-lg});
+
+    &__title {
+      @include ui.page-heading-style;
+      margin-top: 0;
+      margin-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
+    }
+
+    &__meta {
+      @include ui.meta-text-style(sm);
+      margin-bottom: var(--spacing-xl, #{ui.$spacing-xl});
+      padding-bottom: var(--spacing-lg, #{ui.$spacing-lg});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+    }
+  }
+
+  .ai-policy-lead {
+    background: var(--surface-color, #{ui.$surface-light});
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+    border-left: 3px solid var(--accent-color, #{ui.$primary-accent});
+    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    padding: var(--spacing-md, #{ui.$spacing-md}) var(--spacing-lg, #{ui.$spacing-lg});
+    margin-bottom: var(--spacing-xl, #{ui.$spacing-xl});
+
+    &__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-xs, #{ui.$spacing-xs});
+      font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+      font-weight: ui.$font-weight-semibold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-color, #{ui.$primary-accent});
+      margin-bottom: var(--spacing-xs, #{ui.$spacing-xs});
+    }
+
+    &__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-color, #{ui.$primary-accent});
+      display: inline-block;
+    }
+
+    &__body {
+      font-size: var(--font-size-base, #{ui.$font-size-base});
+      line-height: var(--line-height-prose, #{ui.$line-height-prose});
+      color: var(--text-primary, #{ui.$text-primary-light});
+
+      :global(p) {
+        margin: 0;
+      }
+
+      :global(p + p) {
+        margin-top: var(--spacing-xs, #{ui.$spacing-xs});
+      }
+    }
+  }
+</style>

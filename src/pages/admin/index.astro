@@ -1,0 +1,784 @@
+---
+// File: src/pages/admin/index.astro
+// ============================================================
+// Notesby — Admin Portal & Writing Sanctuary
+// Authenticated dashboard displaying author profile, studio launcher,
+// and sovereign PostgreSQL note management.
+// ============================================================
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+import WritingGuideModal from '@/components/WritingGuideModal.astro';
+import PortalToast from '@/components/PortalToast.astro';
+import { listNotesByAuthor } from '@/lib/notes';
+import { getSiteSettings } from '@/lib/settings';
+import { ROUTES } from '@/links';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect(ROUTES.ADMIN.LOGIN);
+}
+
+const userNotes = await listNotesByAuthor(user.id);
+const settings = await getSiteSettings();
+---
+
+<BaseLayout title="Studio Portal — Notesby" hideNav={true} hideFooter={true}>
+  <PortalToast />
+  <div class="portal-layout">
+    <!-- Top Minimal Navigation Bar -->
+    <header class="portal-nav">
+      <div class="portal-nav__container">
+        <a href={ROUTES.ADMIN.ROOT} class="portal-brand" aria-label="Go to Dashboard">
+          {settings.customLogo ? (
+            <img src={settings.customLogo} alt={settings.siteTitle} class="portal-brand__logo" />
+          ) : (
+            <>
+              <img
+                src={settings.siteLogo}
+                alt="Notesby"
+                class="portal-brand__logo portal-brand__logo--light"
+              />
+              <img
+                src={settings.siteLogoDark}
+                alt="Notesby"
+                class="portal-brand__logo portal-brand__logo--dark"
+              />
+            </>
+          )}
+          <span class="portal-brand__name">Studio</span>
+        </a>
+
+        <div class="portal-nav__actions">
+          <button
+            type="button"
+            id="open-guide-btn"
+            class="portal-nav__btn-guide"
+            title="Writing Guide & Markdown Reference (Press ?)"
+            aria-label="Open Writing Guide"
+          >
+            <Icon name="book-open" size={15} />
+            <span>Guide</span>
+          </button>
+          <a href={ROUTES.ADMIN.SETTINGS} class="portal-nav__link" title="Publication Settings">
+            <Icon name="settings" size={14} />
+            <span>Settings</span>
+          </a>
+          <a href={ROUTES.HOME} class="portal-nav__link" target="_blank" rel="noopener noreferrer">
+            <span>View Live Site</span>
+            <Icon name="external-link" size={14} />
+          </a>
+          <a href={ROUTES.API.LOGOUT} class="portal-nav__btn-logout">
+            Sign Out
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Canvas -->
+    <main class="portal-main">
+      <div class="portal-container">
+        <!-- Welcome Hero -->
+        <section class="portal-hero">
+          <div class="portal-hero__meta">
+            <div class="portal-hero__badge">AUTHENTICATED PUBLISHER</div>
+            <h1 class="portal-hero__title">Welcome back, {user.name}</h1>
+            <p class="portal-hero__subtitle">
+              Your sovereign cloud publication is active and connected to PostgreSQL.
+            </p>
+          </div>
+          <div class="portal-hero__cta">
+            <a href={ROUTES.ADMIN.EDITOR} class="portal-btn-primary">
+              <Icon name="pen" size={15} />
+              <span>New Note</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Studio Quick Actions Grid -->
+        <div class="portal-grid">
+          <!-- Card 1: Notesby Studio -->
+          <a href={ROUTES.ADMIN.EDITOR} class="portal-card portal-card--primary portal-card--link">
+            <div class="portal-card__body">
+              <div class="portal-card__header">
+                <span class="portal-card__icon">
+                  <Icon name="pen" size={18} />
+                </span>
+                <h2 class="portal-card__title">Notesby Studio</h2>
+              </div>
+              <p class="portal-card__text">
+                Distraction-free Markdown & MDX editor with live typography preview and slash
+                commands.
+              </p>
+            </div>
+            <div class="portal-card__footer">
+              <span class="portal-card__status">Launch Editor</span>
+              <Icon name="chevron-right" size={14} />
+            </div>
+          </a>
+
+          <!-- Card 2: Account & Settings -->
+          <a href={ROUTES.ADMIN.SETTINGS} class="portal-card portal-card--link">
+            <div class="portal-card__body">
+              <div class="portal-card__header">
+                <span class="portal-card__icon">
+                  <Icon name="settings" size={18} />
+                </span>
+                <h2 class="portal-card__title">Publisher Profile & Settings</h2>
+              </div>
+              <div class="portal-card__details">
+                <div class="portal-detail-row">
+                  <span class="portal-detail-label">Name</span>
+                  <span class="portal-detail-val">{user.name}</span>
+                </div>
+                <div class="portal-detail-row">
+                  <span class="portal-detail-label">Email</span>
+                  <span class="portal-detail-val">{user.email}</span>
+                </div>
+                <div class="portal-detail-row">
+                  <span class="portal-detail-label">Role</span>
+                  <span class="portal-detail-val portal-detail-val--badge">{user.role}</span>
+                </div>
+              </div>
+            </div>
+            <div class="portal-card__footer">
+              <span class="portal-card__status">Configure Publication</span>
+              <Icon name="chevron-right" size={14} />
+            </div>
+          </a>
+
+          <!-- Card 3: Cloud Architecture -->
+          <div class="portal-card">
+            <div class="portal-card__body">
+              <div class="portal-card__header">
+                <span class="portal-card__icon">
+                  <Icon name="cloud" size={18} />
+                </span>
+                <h2 class="portal-card__title">Sovereign Cloud Engine</h2>
+              </div>
+              <p class="portal-card__text">
+                Database: PostgreSQL via Drizzle ORM. Reader pages statically edge-cached on Google
+                Cloud CDN.
+              </p>
+            </div>
+            <div class="portal-card__footer">
+              <span class="portal-status-dot"></span>
+              <span class="portal-status-label">Database Connected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes Management Section -->
+        <section class="portal-section">
+          <div class="portal-section__header">
+            <div>
+              <h2 class="portal-section__title">Your Notes & Essays</h2>
+              <p class="portal-section__subtitle">
+                Drafts and published writings saved in your PostgreSQL database.
+              </p>
+            </div>
+          </div>
+
+          {userNotes.length === 0 ? (
+            <div class="portal-empty-state">
+              <div class="portal-empty-state__icon">
+                <Icon name="pen" size={24} />
+              </div>
+              <h3 class="portal-empty-state__title">No notes written yet</h3>
+              <p class="portal-empty-state__text">
+                Your writing canvas is ready. Launch Notesby Studio to craft your first note.
+              </p>
+              <a href={ROUTES.ADMIN.EDITOR} class="portal-btn-primary">
+                Write First Note
+              </a>
+            </div>
+          ) : (
+            <div class="portal-table-wrapper">
+              <table class="portal-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Last Updated</th>
+                    <th class="text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {userNotes.map((n) => (
+                    <tr>
+                      <td class="portal-table__title-cell">
+                        <a href={ROUTES.ADMIN.EDIT_NOTE(n.id)} class="portal-table__note-link">
+                          {n.title}
+                        </a>
+                      </td>
+                      <td>
+                        <span class="portal-category-pill">{n.category}</span>
+                      </td>
+                      <td>
+                        <span
+                          class:list={['portal-status-pill', `portal-status-pill--${n.status}`]}
+                        >
+                          {n.status}
+                        </span>
+                        {n.status === 'published' && n.hasUnpublishedChanges && (
+                          <span
+                            class="portal-status-pill portal-status-pill--modified"
+                            title="Has unpublished draft changes"
+                          >
+                            Unpublished Edits
+                          </span>
+                        )}
+                      </td>
+                      <td class="portal-table__date">
+                        {new Intl.DateTimeFormat('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        }).format(new Date(n.updatedAt))}
+                      </td>
+                      <td class="text-right">
+                        <a href={ROUTES.ADMIN.EDIT_NOTE(n.id)} class="portal-table__edit-btn">
+                          Edit
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </div>
+    </main>
+  </div>
+  <WritingGuideModal />
+</BaseLayout>
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  .portal-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-color, #{ui.$bg-light});
+  }
+
+  .portal-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--bg-color, #{ui.$bg-light});
+    border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-subtle, #{ui.$border-subtle-light});
+    backdrop-filter: blur(8px);
+    padding: var(--spacing-sm, #{ui.$spacing-sm}) 0;
+
+    &__container {
+      @include ui.container;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md, #{ui.$spacing-md});
+    }
+
+    &__link {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-weight: 500;
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1;
+      transition: color ui.$transition-fast;
+
+      svg {
+        display: block;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      span {
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      &:hover {
+        color: var(--text-primary, #{ui.$text-primary-light});
+      }
+    }
+
+    &__btn-guide {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-weight: 500;
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      background-color: var(--surface-color, #{ui.$surface-light});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+      padding: var(--spacing-2xs, #{ui.$spacing-2xs}) var(--spacing-sm, #{ui.$spacing-sm});
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1;
+      cursor: pointer;
+      transition: all ui.$transition-fast;
+
+      svg {
+        display: block;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      span {
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      &:hover {
+        border-color: var(--accent-color, #{ui.$primary-accent});
+        color: var(--accent-color, #{ui.$primary-accent});
+      }
+    }
+
+    &__btn-logout {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      color: var(--text-muted, #{ui.$text-muted-light});
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+      transition: color ui.$transition-fast;
+
+      &:hover {
+        color: var(--error-color, #{ui.$error-color});
+      }
+    }
+  }
+
+  .portal-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs, #{ui.$spacing-xs});
+    text-decoration: none;
+    color: var(--text-primary, #{ui.$text-primary-light});
+
+    &__logo {
+      height: 24px;
+      width: auto;
+      max-width: 120px;
+      object-fit: contain;
+      display: block;
+
+      &--dark {
+        display: none;
+      }
+    }
+
+    :global([data-theme='dark']) & {
+      .portal-brand__logo--light {
+        display: none;
+      }
+      .portal-brand__logo--dark {
+        display: block;
+      }
+    }
+
+    &__mark {
+      @include ui.flex-center;
+      width: 26px;
+      height: 26px;
+      border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+      background-color: var(--accent-color, #{ui.$primary-accent});
+      color: #ffffff;
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-family: var(--font-family-mono, #{ui.$font-family-mono});
+      font-weight: ui.$font-weight-bold;
+    }
+
+    &__name {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-weight: ui.$font-weight-semibold;
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      letter-spacing: -0.01em;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+    }
+  }
+
+  .portal-main {
+    flex: 1;
+    padding: var(--spacing-2xl, #{ui.$spacing-2xl}) 0 var(--spacing-5xl, #{ui.$spacing-5xl});
+  }
+
+  .portal-container {
+    @include ui.container;
+  }
+
+  .portal-hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-md, #{ui.$spacing-md});
+    margin-bottom: var(--spacing-xl, #{ui.$spacing-xl});
+
+    @include ui.media-breakpoint-up(sm) {
+      flex-direction: row;
+      align-items: flex-end;
+    }
+
+    &__badge {
+      display: inline-block;
+      @include ui.badge-pill-style;
+      color: var(--accent-color, #{ui.$primary-accent});
+      border-color: var(--accent-color, #{ui.$primary-accent});
+      background-color: rgba(7, 90, 170, 0.08);
+      margin-bottom: var(--spacing-xs, #{ui.$spacing-xs});
+    }
+
+    &__title {
+      @include ui.h1-heading-style;
+      margin-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
+    }
+
+    &__subtitle {
+      @include ui.description-text;
+      font-size: var(--font-size-base, #{ui.$font-size-base});
+    }
+  }
+
+  .portal-btn-primary {
+    @include ui.button-base;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: var(--spacing-xs, #{ui.$spacing-xs}) var(--spacing-md, #{ui.$spacing-md});
+    background-color: var(--accent-color, #{ui.$primary-accent});
+    color: #ffffff;
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    font-weight: ui.$font-weight-semibold;
+    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    box-shadow: var(--shadow-sm, #{ui.$shadow-sm});
+    transition: all ui.$transition-fast;
+
+    &:hover {
+      filter: brightness(0.92);
+      transform: translateY(-1px);
+    }
+  }
+
+  .portal-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg, #{ui.$spacing-lg});
+    margin-bottom: var(--spacing-3xl, #{ui.$spacing-3xl});
+
+    @include ui.media-breakpoint-up(md) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .portal-card {
+    @include ui.card-surface-style;
+    padding: var(--spacing-lg, #{ui.$spacing-lg});
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-decoration: none;
+    color: inherit;
+
+    &--link {
+      cursor: pointer;
+    }
+
+    &--primary {
+      border-color: var(--accent-color, #{ui.$primary-accent});
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm, #{ui.$spacing-sm});
+      margin-bottom: var(--spacing-sm, #{ui.$spacing-sm});
+    }
+
+    &__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+      background-color: var(--tag-bg, #{ui.$tag-bg-light});
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      flex-shrink: 0;
+    }
+
+    &--primary &__icon {
+      background-color: rgba(7, 90, 170, 0.1);
+      color: var(--accent-color, #{ui.$primary-accent});
+    }
+
+    &__title {
+      @include ui.h3-heading-style;
+      margin: 0;
+    }
+
+    &__text {
+      @include ui.description-text;
+      line-height: var(--line-height-normal, #{ui.$line-height-normal});
+      margin-bottom: var(--spacing-md, #{ui.$spacing-md});
+    }
+
+    &__details {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs, #{ui.$spacing-xs});
+      margin-bottom: var(--spacing-md, #{ui.$spacing-md});
+    }
+
+    &__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-xs, #{ui.$spacing-xs});
+      padding-top: var(--spacing-sm, #{ui.$spacing-sm});
+      border-top: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-subtle, #{ui.$border-subtle-light});
+    }
+
+    &__status {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-weight: ui.$font-weight-semibold;
+      color: var(--accent-color, #{ui.$primary-accent});
+    }
+  }
+
+  .portal-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+  }
+
+  .portal-detail-label {
+    color: var(--text-muted, #{ui.$text-muted-light});
+  }
+
+  .portal-detail-val {
+    font-weight: ui.$font-weight-medium;
+    color: var(--text-primary, #{ui.$text-primary-light});
+
+    &--badge {
+      text-transform: uppercase;
+      font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+      background-color: var(--tag-bg, #{ui.$tag-bg-light});
+      padding: 2px 6px;
+      border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+      font-family: var(--font-family-mono, #{ui.$font-family-mono});
+    }
+  }
+
+  .portal-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--success-color, #{ui.$success-color});
+  }
+
+  .portal-status-label {
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    color: var(--success-color, #{ui.$success-color});
+    font-weight: ui.$font-weight-medium;
+  }
+
+  // Notes Management Table Section
+  .portal-section {
+    margin-top: var(--spacing-xl, #{ui.$spacing-xl});
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: var(--spacing-lg, #{ui.$spacing-lg});
+      padding-bottom: var(--spacing-sm, #{ui.$spacing-sm});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+    }
+
+    &__title {
+      @include ui.h2-heading-style;
+      margin-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
+    }
+
+    &__subtitle {
+      @include ui.description-text;
+    }
+  }
+
+  .portal-empty-state {
+    @include ui.card-surface-style;
+    text-align: center;
+    padding: var(--spacing-3xl, #{ui.$spacing-3xl}) var(--spacing-lg, #{ui.$spacing-lg});
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: rgba(7, 90, 170, 0.08);
+      color: var(--accent-color, #{ui.$primary-accent});
+      margin-bottom: var(--spacing-md, #{ui.$spacing-md});
+    }
+
+    &__title {
+      @include ui.h3-heading-style;
+      margin-bottom: var(--spacing-xs, #{ui.$spacing-xs});
+    }
+
+    &__text {
+      @include ui.description-text;
+      max-width: 420px;
+      margin-bottom: var(--spacing-lg, #{ui.$spacing-lg});
+    }
+  }
+
+  .portal-table-wrapper {
+    @include ui.card-surface-style;
+    overflow-x: auto;
+  }
+
+  .portal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+
+    th {
+      text-align: left;
+      padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+      background-color: var(--bg-color, #{ui.$bg-light});
+      color: var(--text-muted, #{ui.$text-muted-light});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-weight: ui.$font-weight-semibold;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+    }
+
+    td {
+      padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-subtle, #{ui.$border-subtle-light});
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background-color: var(--tag-bg, #{ui.$tag-bg-light});
+    }
+
+    &__title-cell {
+      font-weight: ui.$font-weight-medium;
+    }
+
+    &__note-link {
+      color: var(--text-primary, #{ui.$text-primary-light});
+      text-decoration: none;
+      transition: color ui.$transition-fast;
+
+      &:hover {
+        color: var(--accent-color, #{ui.$primary-accent});
+      }
+    }
+
+    &__date {
+      color: var(--text-muted, #{ui.$text-muted-light});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    }
+
+    &__edit-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-weight: ui.$font-weight-medium;
+      border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+      background-color: var(--surface-color, #{ui.$surface-light});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      color: var(--text-primary, #{ui.$text-primary-light});
+      text-decoration: none;
+      transition: all ui.$transition-fast;
+
+      &:hover {
+        border-color: var(--accent-color, #{ui.$primary-accent});
+        color: var(--accent-color, #{ui.$primary-accent});
+      }
+    }
+
+    .text-right {
+      text-align: right;
+    }
+  }
+
+  .portal-category-pill {
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    background-color: var(--tag-bg, #{ui.$tag-bg-light});
+    padding: 2px 8px;
+    border-radius: var(--border-radius-full, #{ui.$border-radius-full});
+    color: var(--tag-text, #{ui.$tag-text-light});
+  }
+
+  .portal-status-pill {
+    font-size: var(--font-size-3xs, #{ui.$font-size-3xs});
+    text-transform: uppercase;
+    font-weight: ui.$font-weight-bold;
+    letter-spacing: 0.05em;
+    padding: 2px 6px;
+    border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+
+    &--published {
+      background-color: rgba(16, 185, 129, 0.12);
+      color: var(--success-color, #{ui.$success-color});
+    }
+
+    &--draft {
+      background-color: rgba(234, 179, 8, 0.12);
+      color: var(--draft-color, #{ui.$draft-color});
+    }
+
+    &--modified {
+      background-color: rgba(7, 90, 170, 0.12);
+      color: var(--accent-color, #{ui.$primary-accent});
+      margin-left: 4px;
+    }
+  }
+</style>

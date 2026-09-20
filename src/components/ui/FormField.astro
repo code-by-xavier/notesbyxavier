@@ -1,0 +1,110 @@
+---
+// File: src/components/ui/FormField.astro
+// ============================================================
+// Notesby — Reusable Accessible Form Field Wrapper
+// Encapsulates field label, required indicators, inline error
+// messages, helper text, and input controls.
+// ============================================================
+
+import HelperText from '@/components/ui/HelperText.astro';
+
+interface Props {
+  label?: string;
+  forId?: string;
+  required?: boolean;
+  helperText?: string;
+  error?: string;
+  errorId?: string;
+  class?: string;
+}
+
+const {
+  label,
+  forId,
+  required = false,
+  helperText,
+  error,
+  errorId,
+  class: className = '',
+} = Astro.props;
+---
+
+<div class:list={['ui-form-field', { 'ui-form-field--has-error': Boolean(error) }, className]}>
+  {label && (
+    <div class="ui-form-field__label-row">
+      <label for={forId} class="ui-form-field__label">
+        {label}
+        {required && (
+          <span class="ui-form-field__required" aria-hidden="true">
+            *
+          </span>
+        )}
+      </label>
+      <slot name="label-action" />
+    </div>
+  )}
+
+  <div class="ui-form-field__control">
+    <slot />
+  </div>
+
+  {error && (
+    <p id={errorId} class="ui-form-field__error" role="alert">
+      {error}
+    </p>
+  )}
+
+  {helperText && !error && (
+    <div class="ui-form-field__helper">
+      <HelperText variant="muted">{helperText}</HelperText>
+    </div>
+  )}
+</div>
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  .ui-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+    width: 100%;
+
+    &__label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--spacing-xs, #{ui.$spacing-xs});
+    }
+
+    &__label {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-weight: ui.$font-weight-medium;
+      color: var(--text-primary, #{ui.$text-primary-light});
+      cursor: pointer;
+    }
+
+    &__required {
+      color: var(--error-color, #{ui.$error-color});
+      margin-left: 2px;
+    }
+
+    &__control {
+      position: relative;
+      width: 100%;
+    }
+
+    &__error {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      color: var(--error-color, #{ui.$error-color});
+      line-height: normal;
+      margin: 0;
+    }
+
+    &__helper {
+      margin-top: 1px;
+    }
+  }
+</style>

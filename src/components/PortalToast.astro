@@ -1,0 +1,168 @@
+---
+// File: src/components/PortalToast.astro
+// ============================================================
+// Notesby — Sovereign Studio Portal Toast Notifications
+// Floating responsive toast for instant feedback on saves, uploads,
+// resets, and errors without disruptive browser alert dialogs.
+// ============================================================
+---
+
+<div id="portal-toast-container" class="portal-toast-container" aria-live="polite" role="region">
+  <div id="portal-toast" class="portal-toast" style="display: none;">
+    <div id="portal-toast-icon" class="portal-toast__icon"></div>
+    <div class="portal-toast__content">
+      <div id="portal-toast-title" class="portal-toast__title"></div>
+      <div id="portal-toast-msg" class="portal-toast__msg"></div>
+    </div>
+    <button
+      type="button"
+      id="portal-toast-close"
+      class="portal-toast__close"
+      aria-label="Dismiss notification"
+    >
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  .portal-toast-container {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    z-index: 9999;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .portal-toast {
+    pointer-events: auto;
+    min-width: 320px;
+    max-width: 440px;
+    background-color: var(--surface-color, #{ui.$surface-light});
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+    border-left: 4px solid var(--accent-color, #{ui.$primary-accent});
+    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    box-shadow:
+      0 10px 25px -4px rgba(0, 0, 0, 0.15),
+      0 4px 10px -2px rgba(0, 0, 0, 0.06);
+    padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-xs, #{ui.$spacing-xs});
+    backdrop-filter: blur(12px);
+    animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+    &--success {
+      border-left-color: var(--success-color, #{ui.$success-color});
+      .portal-toast__icon {
+        color: var(--success-color, #{ui.$success-color});
+      }
+    }
+
+    &--error {
+      border-left-color: var(--error-color, #{ui.$error-color});
+      .portal-toast__icon {
+        color: var(--error-color, #{ui.$error-color});
+      }
+    }
+
+    &--info {
+      border-left-color: var(--accent-color, #{ui.$primary-accent});
+      .portal-toast__icon {
+        color: var(--accent-color, #{ui.$primary-accent});
+      }
+    }
+
+    &.portal-toast--hiding {
+      animation: toastSlideOut 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    &__icon {
+      flex-shrink: 0;
+      margin-top: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    &__title {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-weight: ui.$font-weight-semibold;
+      color: var(--text-primary, #{ui.$text-primary-light});
+    }
+
+    &__msg {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      line-height: 1.4;
+    }
+
+    &__close {
+      background: none;
+      border: none;
+      color: var(--text-muted, #{ui.$text-muted-light});
+      cursor: pointer;
+      padding: 2px;
+      margin-left: 4px;
+      margin-top: -1px;
+      border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: color ui.$transition-fast;
+
+      &:hover {
+        color: var(--text-primary, #{ui.$text-primary-light});
+      }
+    }
+  }
+
+  @keyframes toastSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(30px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  @keyframes toastSlideOut {
+    from {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(30px) scale(0.96);
+    }
+  }
+</style>

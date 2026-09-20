@@ -1,0 +1,79 @@
+---
+// File: src/components/ui/LegalNotice.astro
+// ============================================================
+// Notesby — Reusable Legal Notice & reCAPTCHA Disclaimer
+// Renders small, left-aligned legal text below forms linking
+// to Terms of Service, Privacy Policy, and Google reCAPTCHA terms.
+// ============================================================
+
+import { ROUTES } from '@/links';
+
+interface Props {
+  actionText?: string;
+  class?: string;
+}
+
+const { actionText = 'continuing', class: className = '' } = Astro.props;
+---
+
+<div class:list={['ui-legal-notice', className]}>
+  <p class="ui-legal-notice__text">
+    By {actionText}, you acknowledge and agree to our{' '}
+    <a href={ROUTES.TERMS} class="ui-legal-notice__link">
+      Terms of Service
+    </a>{' '}
+    and{' '}
+    <a href={ROUTES.PRIVACY} class="ui-legal-notice__link">
+      Privacy Policy
+    </a>
+    . This site is protected by reCAPTCHA and the Google{' '}
+    <a
+      href="https://policies.google.com/privacy"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="ui-legal-notice__link"
+    >
+      Privacy Policy
+    </a>{' '}
+    and{' '}
+    <a
+      href="https://policies.google.com/terms"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="ui-legal-notice__link"
+    >
+      Terms of Service
+    </a>{' '}
+    apply.
+  </p>
+</div>
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  .ui-legal-notice {
+    width: 100%;
+    text-align: left;
+    margin-top: var(--spacing-sm, #{ui.$spacing-sm});
+
+    &__text {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+      line-height: var(--line-height-normal, 1.5);
+      color: var(--text-muted, #{ui.$text-muted-light});
+      margin: 0;
+      text-align: left;
+    }
+
+    &__link {
+      color: var(--primary-accent, #{ui.$primary-accent});
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: color ui.$transition-fast;
+
+      &:hover {
+        color: var(--text-muted, #{ui.$text-muted-light});
+      }
+    }
+  }
+</style>

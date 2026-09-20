@@ -1,0 +1,1136 @@
+---
+// File: src/components/LinkModal.astro
+// ============================================================
+// Notesby — Centralized Link Builder & Editor Modal
+// Replaces browser native popups with a bespoke, accessible modal
+// supporting External URLs, Internal Notes, and Section Anchors.
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+
+export interface InternalNoteOption {
+  slug: string;
+  title: string;
+  category?: string;
+}
+
+interface Props {
+  notes?: InternalNoteOption[];
+}
+
+const { notes = [] } = Astro.props;
+---
+
+<!-- Centralized Link Modal Dialog -->
+<div
+  class="link-modal-overlay"
+  id="link-modal-overlay"
+  style="display: none;"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="link-modal-title"
+>
+  <div class="link-modal" id="link-modal-container">
+    <!-- Modal Header -->
+    <header class="link-modal__header">
+      <div class="link-modal__title-group">
+        <span class="link-modal__icon">
+          <Icon name="link" size={18} />
+        </span>
+        <div>
+          <h2 class="link-modal__title" id="link-modal-title">
+            Insert Link
+          </h2>
+          <p class="link-modal__subtitle" id="link-modal-subtitle">
+            Connect readers to external resources, internal notes, or page sections.
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        id="link-modal-close"
+        class="link-modal__close-btn"
+        title="Close (Esc)"
+        aria-label="Close Link Modal"
+      >
+        <Icon name="x" size={18} />
+      </button>
+    </header>
+
+    <!-- Segmented Link Type Switcher (Tabs) -->
+    <div class="link-modal__tabs" role="tablist" aria-label="Link Type">
+      <button
+        type="button"
+        class="link-tab is-active"
+        data-tab="external"
+        role="tab"
+        aria-selected="true"
+        aria-controls="panel-external"
+        id="tab-external"
+      >
+        <Icon name="external-link" size={13} />
+        <span>External URL</span>
+      </button>
+      <button
+        type="button"
+        class="link-tab"
+        data-tab="internal"
+        role="tab"
+        aria-selected="false"
+        aria-controls="panel-internal"
+        id="tab-internal"
+      >
+        <Icon name="book-open" size={13} />
+        <span>Internal Note</span>
+      </button>
+      <button
+        type="button"
+        class="link-tab"
+        data-tab="anchor"
+        role="tab"
+        aria-selected="false"
+        aria-controls="panel-anchor"
+        id="tab-anchor"
+      >
+        <Icon name="hash" size={13} />
+        <span>Section Anchor</span>
+      </button>
+    </div>
+
+    <!-- Modal Form Body -->
+    <form id="link-modal-form" class="link-modal__body" onsubmit="return false;">
+      <!-- 1. Universal Link Text Input -->
+      <div class="link-form-group">
+        <label for="link-text-input" class="link-label">
+          <span>Link Text</span>
+          <span class="link-label-hint">Visible display text</span>
+        </label>
+        <input
+          type="text"
+          id="link-text-input"
+          class="link-input"
+          placeholder="e.g. Read our core thesis, CLSTRE Platform..."
+          autocomplete="off"
+          spellcheck="true"
+        />
+      </div>
+
+      <!-- 2. Panel: External URL -->
+      <div class="link-panel" id="panel-external" role="tabpanel" aria-labelledby="tab-external">
+        <div class="link-form-group">
+          <label for="link-url-input" class="link-label">
+            <span>Destination URL</span>
+            <span class="link-label-hint">https://, mailto:, etc.</span>
+          </label>
+          <input
+            type="text"
+            id="link-url-input"
+            class="link-input"
+            placeholder="https://example.com"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+
+        <div class="link-checkbox-row">
+          <label class="link-checkbox-label" for="link-target-blank">
+            <input type="checkbox" id="link-target-blank" class="link-checkbox" checked />
+            <span>Open in new tab (target="_blank")</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 3. Panel: Internal Note -->
+      <div
+        class="link-panel"
+        id="panel-internal"
+        style="display: none;"
+        role="tabpanel"
+        aria-labelledby="tab-internal"
+      >
+        <div class="link-form-group">
+          <label class="link-label">
+            <span>Select Publication Note or Essay</span>
+            <span class="link-label-hint">Enforces /notes/slug/ trailing slash</span>
+          </label>
+          <div class="link-search-wrapper">
+            <span class="link-search-icon">
+              <Icon name="search" size={14} />
+            </span>
+            <input
+              type="text"
+              id="internal-note-search"
+              class="link-input link-input--search"
+              placeholder="Search published essays & field notes..."
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+
+          <!-- Note Suggestions List -->
+          <div class="link-notes-list" id="link-notes-list">
+            {notes.length === 0 ? (
+              <p class="link-empty-hint">No other published notes found yet.</p>
+            ) : (
+              notes.map((n) => (
+                <button
+                  type="button"
+                  class="link-note-item"
+                  data-slug={n.slug}
+                  data-title={n.title}
+                  data-search={`${n.title} ${n.slug} ${n.category || ''}`.toLowerCase()}
+                >
+                  <div class="link-note-item__info">
+                    <span class="link-note-item__title">{n.title}</span>
+                    <span class="link-note-item__path">/notes/{n.slug}/</span>
+                  </div>
+                  {n.category && <span class="link-note-item__badge">{n.category}</span>}
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div class="link-form-group">
+          <label for="internal-path-input" class="link-label">
+            <span>Custom Internal Path</span>
+            <span class="link-label-hint">e.g. /about, /terms, /rss.xml</span>
+          </label>
+          <input
+            type="text"
+            id="internal-path-input"
+            class="link-input"
+            placeholder="/notes/my-essay/ or /about"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+      </div>
+
+      <!-- 4. Panel: Section Anchor -->
+      <div
+        class="link-panel"
+        id="panel-anchor"
+        style="display: none;"
+        role="tabpanel"
+        aria-labelledby="tab-anchor"
+      >
+        <div class="link-form-group">
+          <label class="link-label">
+            <span>Jump to Heading on this Page</span>
+            <span class="link-label-hint">Auto-detected from active canvas</span>
+          </label>
+
+          <!-- Heading Anchors List -->
+          <div class="link-anchors-list" id="link-anchors-list">
+            <p class="link-empty-hint" id="link-anchors-empty">
+              No section headings (H2 or H3) detected on this note canvas yet.
+            </p>
+          </div>
+        </div>
+
+        <div class="link-form-group">
+          <label for="anchor-input" class="link-label">
+            <span>Custom Anchor ID</span>
+            <span class="link-label-hint">Must start with #</span>
+          </label>
+          <input
+            type="text"
+            id="anchor-input"
+            class="link-input"
+            placeholder="#the-core-thesis"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+      </div>
+
+      <!-- Live Preview Badge -->
+      <div class="link-preview-box">
+        <span class="link-preview-box__label">Preview:</span>
+        <div class="link-preview-box__content" id="link-preview-display">
+          <span class="link-preview-empty">Enter text and destination URL</span>
+        </div>
+      </div>
+    </form>
+
+    <!-- Modal Footer -->
+    <footer class="link-modal__footer">
+      <div class="link-modal__footer-left">
+        <button
+          type="button"
+          id="link-unlink-btn"
+          class="link-btn link-btn--danger"
+          style="display: none;"
+          title="Remove hyperlink and keep text"
+        >
+          <Icon name="trash" size={13} />
+          <span>Remove Link</span>
+        </button>
+      </div>
+
+      <div class="link-modal__footer-right">
+        <button type="button" id="link-cancel-btn" class="link-btn link-btn--secondary">
+          Cancel
+        </button>
+        <button type="button" id="link-submit-btn" class="link-btn link-btn--primary">
+          Insert Link
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script>
+  function setupLinkModal() {
+    const overlay = document.getElementById('link-modal-overlay');
+    const closeBtn = document.getElementById('link-modal-close');
+    const cancelBtn = document.getElementById('link-cancel-btn');
+    const submitBtn = document.getElementById('link-submit-btn');
+    const unlinkBtn = document.getElementById('link-unlink-btn');
+
+    const titleEl = document.getElementById('link-modal-title');
+    const subtitleEl = document.getElementById('link-modal-subtitle');
+    const textInput = document.getElementById('link-text-input') as HTMLInputElement | null;
+    const urlInput = document.getElementById('link-url-input') as HTMLInputElement | null;
+    const targetBlankBox = document.getElementById('link-target-blank') as HTMLInputElement | null;
+    const internalPathInput = document.getElementById(
+      'internal-path-input'
+    ) as HTMLInputElement | null;
+    const internalSearchInput = document.getElementById(
+      'internal-note-search'
+    ) as HTMLInputElement | null;
+    const anchorInput = document.getElementById('anchor-input') as HTMLInputElement | null;
+    const anchorsList = document.getElementById('link-anchors-list');
+    const anchorsEmpty = document.getElementById('link-anchors-empty');
+    const previewDisplay = document.getElementById('link-preview-display');
+
+    const tabs = document.querySelectorAll<HTMLButtonElement>('.link-tab');
+    const panels = document.querySelectorAll<HTMLElement>('.link-panel');
+    const noteItems = document.querySelectorAll<HTMLButtonElement>('.link-note-item');
+
+    let activeTab: 'external' | 'internal' | 'anchor' = 'external';
+    let isEditing = false;
+
+    function slugify(text: string): string {
+      return text
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+    }
+
+    function switchTab(tab: 'external' | 'internal' | 'anchor') {
+      activeTab = tab;
+      tabs.forEach((t) => {
+        const isSelected = t.getAttribute('data-tab') === tab;
+        t.classList.toggle('is-active', isSelected);
+        t.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+      });
+
+      panels.forEach((p) => {
+        const isPanelActive = p.id === `panel-${tab}`;
+        p.style.display = isPanelActive ? 'block' : 'none';
+      });
+
+      // Focus primary input of the active tab
+      if (tab === 'external') {
+        urlInput?.focus();
+      } else if (tab === 'internal') {
+        internalSearchInput?.focus();
+      } else if (tab === 'anchor') {
+        anchorInput?.focus();
+      }
+
+      updatePreview();
+    }
+
+    tabs.forEach((tabBtn) => {
+      tabBtn.addEventListener('click', () => {
+        const tab = tabBtn.getAttribute('data-tab') as 'external' | 'internal' | 'anchor';
+        if (tab) switchTab(tab);
+      });
+    });
+
+    // Populate Dynamic Section Headings from Editor Canvas
+    function scanCanvasHeadings() {
+      if (!anchorsList) return;
+      const contentEditable = document.getElementById('note-content');
+      if (!contentEditable) return;
+
+      const headings = contentEditable.querySelectorAll('h2, h3');
+      anchorsList.innerHTML = '';
+
+      if (headings.length === 0) {
+        if (anchorsEmpty) anchorsList.appendChild(anchorsEmpty);
+        return;
+      }
+
+      headings.forEach((h) => {
+        const text = (h.textContent || '').trim();
+        if (!text) return;
+
+        const slug = slugify(text);
+        const isH3 = h.tagName.toLowerCase() === 'h3';
+
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = `link-anchor-item ${isH3 ? 'link-anchor-item--h3' : ''}`;
+        item.setAttribute('data-anchor', `#${slug}`);
+        item.setAttribute('data-title', text);
+
+        item.innerHTML = `
+          <div class="link-anchor-item__left">
+            <span class="link-anchor-tag">${isH3 ? 'H3' : 'H2'}</span>
+            <span class="link-anchor-title">${text}</span>
+          </div>
+          <code class="link-anchor-code">#${slug}</code>
+        `;
+
+        item.addEventListener('click', () => {
+          if (anchorInput) anchorInput.value = `#${slug}`;
+          if (textInput && !textInput.value.trim()) {
+            textInput.value = text;
+          }
+          updatePreview();
+        });
+
+        anchorsList.appendChild(item);
+      });
+    }
+
+    // Filter Internal Notes in Internal tab
+    internalSearchInput?.addEventListener('input', () => {
+      const q = (internalSearchInput.value || '').trim().toLowerCase();
+      noteItems.forEach((item) => {
+        const searchData = item.getAttribute('data-search') || '';
+        item.style.display = searchData.includes(q) ? 'flex' : 'none';
+      });
+    });
+
+    // Click Internal Note Item
+    noteItems.forEach((item) => {
+      item.addEventListener('click', () => {
+        const slug = item.getAttribute('data-slug') || '';
+        const title = item.getAttribute('data-title') || '';
+        const formattedPath = `/notes/${slug}/`;
+
+        if (internalPathInput) internalPathInput.value = formattedPath;
+        if (textInput && !textInput.value.trim()) {
+          textInput.value = title;
+        }
+        updatePreview();
+      });
+    });
+
+    // Compute Current URL based on active tab
+    function getResolvedUrl(): string {
+      if (activeTab === 'external') {
+        let val = (urlInput?.value || '').trim();
+        if (!val) return '';
+        if (!/^https?:\/\/|^mailto:|^tel:/.test(val)) {
+          val = `https://${val}`;
+        }
+        return val;
+      }
+      if (activeTab === 'internal') {
+        let val = (internalPathInput?.value || '').trim();
+        if (!val) return '';
+        if (!val.startsWith('/')) val = `/${val}`;
+        return val;
+      }
+      if (activeTab === 'anchor') {
+        let val = (anchorInput?.value || '').trim();
+        if (!val) return '';
+        if (!val.startsWith('#')) val = `#${slugify(val)}`;
+        return val;
+      }
+      return '';
+    }
+
+    // Update Live Preview
+    function updatePreview() {
+      if (!previewDisplay) return;
+      const text = (textInput?.value || '').trim() || 'Link Text';
+      const url = getResolvedUrl();
+
+      if (!url) {
+        previewDisplay.innerHTML =
+          '<span class="link-preview-empty">Enter text and destination URL</span>';
+        return;
+      }
+
+      const targetBlank = activeTab === 'external' && targetBlankBox?.checked;
+      const targetAttr = targetBlank ? ' target="_blank" rel="noopener noreferrer"' : '';
+
+      previewDisplay.innerHTML = `
+        <a href="${url}" class="link-preview-anchor"${targetAttr}>${text}</a>
+        <span class="link-preview-destination">(${url})</span>
+      `;
+    }
+
+    [textInput, urlInput, internalPathInput, anchorInput].forEach((input) => {
+      input?.addEventListener('input', updatePreview);
+    });
+    targetBlankBox?.addEventListener('change', updatePreview);
+
+    function openModal(detail?: {
+      selectedText?: string;
+      existingAnchor?: { href: string; text: string; targetBlank: boolean } | null;
+    }) {
+      if (!overlay) return;
+      scanCanvasHeadings();
+
+      const existing = detail?.existingAnchor;
+      isEditing = !!existing;
+
+      if (titleEl) titleEl.textContent = isEditing ? 'Edit Link' : 'Insert Link';
+      if (subtitleEl) {
+        subtitleEl.textContent = isEditing
+          ? 'Update destination, display text, or unlink this reference.'
+          : 'Connect readers to external resources, internal notes, or page sections.';
+      }
+      if (submitBtn) submitBtn.textContent = isEditing ? 'Save Changes' : 'Insert Link';
+      if (unlinkBtn) unlinkBtn.style.display = isEditing ? 'inline-flex' : 'none';
+
+      // Reset fields
+      if (textInput) textInput.value = existing?.text || detail?.selectedText || '';
+      if (urlInput) urlInput.value = '';
+      if (internalPathInput) internalPathInput.value = '';
+      if (internalSearchInput) internalSearchInput.value = '';
+      if (anchorInput) anchorInput.value = '';
+      if (targetBlankBox) targetBlankBox.checked = true;
+
+      // Detect mode and prefill
+      if (existing) {
+        const href = existing.href;
+        if (href.startsWith('#')) {
+          if (anchorInput) anchorInput.value = href;
+          switchTab('anchor');
+        } else if (href.startsWith('/notes/') || href.startsWith('/')) {
+          if (internalPathInput) internalPathInput.value = href;
+          switchTab('internal');
+        } else {
+          if (urlInput) urlInput.value = href;
+          if (targetBlankBox) targetBlankBox.checked = !!existing.targetBlank;
+          switchTab('external');
+        }
+      } else {
+        // New insert: if selected text looks like a URL, prefill it!
+        const text = (detail?.selectedText || '').trim();
+        if (/^https?:\/\//i.test(text)) {
+          if (urlInput) urlInput.value = text;
+          if (textInput) textInput.value = text;
+          switchTab('external');
+        } else if (text.startsWith('#')) {
+          if (anchorInput) anchorInput.value = text;
+          switchTab('anchor');
+        } else if (text.startsWith('/')) {
+          if (internalPathInput) internalPathInput.value = text;
+          switchTab('internal');
+        } else {
+          switchTab('external');
+        }
+      }
+
+      updatePreview();
+      overlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+
+      setTimeout(() => {
+        if (!textInput?.value.trim()) {
+          textInput?.focus();
+        } else {
+          if (activeTab === 'external') urlInput?.focus();
+          else if (activeTab === 'internal') internalSearchInput?.focus();
+          else if (activeTab === 'anchor') anchorInput?.focus();
+        }
+      }, 50);
+    }
+
+    function closeModal() {
+      if (!overlay) return;
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+      window.dispatchEvent(new CustomEvent('notesby:close-link-modal'));
+    }
+
+    function submitLink() {
+      if (!overlay) return;
+      const text = (textInput?.value || '').trim() || 'link';
+      const url = getResolvedUrl();
+
+      if (!url) {
+        if (activeTab === 'external') urlInput?.focus();
+        else if (activeTab === 'internal') internalPathInput?.focus();
+        else if (activeTab === 'anchor') anchorInput?.focus();
+        return;
+      }
+
+      const targetBlank = activeTab === 'external' && targetBlankBox?.checked;
+
+      window.dispatchEvent(
+        new CustomEvent('notesby:apply-link', {
+          detail: {
+            text,
+            url,
+            targetBlank,
+            isEdit: isEditing,
+            remove: false,
+          },
+        })
+      );
+
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function removeLink() {
+      if (!overlay) return;
+      window.dispatchEvent(
+        new CustomEvent('notesby:apply-link', {
+          detail: {
+            remove: true,
+            isEdit: true,
+          },
+        })
+      );
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    closeBtn?.addEventListener('click', closeModal);
+    cancelBtn?.addEventListener('click', closeModal);
+    submitBtn?.addEventListener('click', submitLink);
+    unlinkBtn?.addEventListener('click', removeLink);
+
+    // Close on overlay backdrop click
+    overlay?.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
+    });
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (overlay?.style.display === 'flex') {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeModal();
+        } else if (e.key === 'Enter' && !e.shiftKey) {
+          const target = e.target as HTMLElement;
+          if (target.tagName.toLowerCase() === 'input') {
+            e.preventDefault();
+            submitLink();
+          }
+        }
+      }
+    });
+
+    // Listen for custom trigger event from Studio Editor
+    window.addEventListener('notesby:open-link-modal', (e: any) => {
+      openModal(e.detail);
+    });
+  }
+
+  setupLinkModal();
+  document.addEventListener('astro:page-load', setupLinkModal);
+</script>
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  // Dark shaded backdrop overlay
+  .link-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md, #{ui.$spacing-md});
+    background-color: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: link-overlay-fade 0.18s ease-out;
+  }
+
+  // Modal Dialog Container
+  .link-modal {
+    width: 100%;
+    max-width: 560px;
+    background-color: var(--surface-color, #{ui.$surface-light});
+    color: var(--text-primary, #{ui.$text-primary-light});
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+    border-radius: var(--border-radius-lg, #{ui.$border-radius-lg});
+    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.38);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: link-modal-pop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--spacing-md, #{ui.$spacing-md});
+      padding: var(--spacing-lg, #{ui.$spacing-lg}) var(--spacing-xl, #{ui.$spacing-xl});
+      background-color: var(--bg-color, #{ui.$bg-light});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-subtle, #{ui.$border-subtle-light});
+    }
+
+    &__title-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm, #{ui.$spacing-sm});
+    }
+
+    &__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+      background-color: rgba(7, 90, 170, 0.1);
+      color: var(--accent-color, #{ui.$primary-accent});
+      flex-shrink: 0;
+    }
+
+    &__title {
+      @include ui.h3-heading-style;
+      margin: 0 0 2px 0;
+      font-size: var(--font-size-md, #{ui.$font-size-md});
+    }
+
+    &__subtitle {
+      @include ui.description-text;
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      margin: 0;
+    }
+
+    &__close-btn {
+      @include ui.flex-center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-subtle, #{ui.$border-subtle-light});
+      background: transparent;
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      cursor: pointer;
+      transition: all ui.$transition-fast;
+
+      &:hover {
+        background-color: var(--tag-bg, #{ui.$tag-bg-light});
+        color: var(--text-primary, #{ui.$text-primary-light});
+      }
+    }
+
+    // Segmented Link Type Tabs
+    &__tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background-color: var(--bg-color, #{ui.$bg-light});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      padding: 4px;
+      gap: 4px;
+    }
+
+    // Form Body
+    &__body {
+      padding: var(--spacing-lg, #{ui.$spacing-lg}) var(--spacing-xl, #{ui.$spacing-xl});
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md, #{ui.$spacing-md});
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    // Footer
+    &__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-md, #{ui.$spacing-md});
+      padding: var(--spacing-md, #{ui.$spacing-md}) var(--spacing-xl, #{ui.$spacing-xl});
+      background-color: var(--bg-color, #{ui.$bg-light});
+      border-top: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-subtle, #{ui.$border-subtle-light});
+
+      &-right {
+        display: flex;
+        gap: var(--spacing-xs, #{ui.$spacing-xs});
+        margin-left: auto;
+      }
+    }
+  }
+
+  // Segmented Tab Button
+  .link-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 10px;
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    font-weight: ui.$font-weight-medium;
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    color: var(--text-muted, #{ui.$text-muted-light});
+    background: transparent;
+    border: none;
+    border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+    cursor: pointer;
+    transition: all ui.$transition-fast;
+
+    &:hover {
+      color: var(--text-primary, #{ui.$text-primary-light});
+      background-color: var(--tag-bg, #{ui.$tag-bg-light});
+    }
+
+    &.is-active {
+      color: var(--accent-color, #{ui.$primary-accent});
+      background-color: var(--surface-color, #{ui.$surface-light});
+      font-weight: ui.$font-weight-semibold;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  // Form Controls
+  .link-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .link-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    font-weight: ui.$font-weight-semibold;
+    color: var(--text-primary, #{ui.$text-primary-light});
+  }
+
+  .link-label-hint {
+    font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+    font-weight: ui.$font-weight-normal;
+    color: var(--text-muted, #{ui.$text-muted-light});
+  }
+
+  .link-input {
+    width: 100%;
+    padding: 9px 12px;
+    background-color: var(--bg-color, #{ui.$bg-light});
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    color: var(--text-primary, #{ui.$text-primary-light});
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    outline: none;
+    transition:
+      border-color ui.$transition-fast,
+      box-shadow ui.$transition-fast;
+
+    &:focus {
+      border-color: var(--accent-color, #{ui.$primary-accent});
+      box-shadow: 0 0 0 3px rgba(7, 90, 170, 0.15);
+    }
+
+    &--search {
+      padding-left: 34px;
+    }
+  }
+
+  .link-search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .link-search-icon {
+    position: absolute;
+    left: 10px;
+    color: var(--text-muted, #{ui.$text-muted-light});
+    display: inline-flex;
+    pointer-events: none;
+  }
+
+  .link-checkbox-row {
+    margin-top: 4px;
+  }
+
+  .link-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    color: var(--text-secondary, #{ui.$text-secondary-light});
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .link-checkbox {
+    accent-color: var(--accent-color, #{ui.$primary-accent});
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+  }
+
+  // Internal Notes Scrollable List
+  .link-notes-list,
+  .link-anchors-list {
+    max-height: 140px;
+    overflow-y: auto;
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-subtle, #{ui.$border-subtle-light});
+    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    background-color: var(--bg-color, #{ui.$bg-light});
+    display: flex;
+    flex-direction: column;
+  }
+
+  .link-note-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border: none;
+    border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-subtle, #{ui.$border-subtle-light});
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color ui.$transition-fast;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover,
+    &:focus {
+      background-color: rgba(7, 90, 170, 0.08);
+      outline: none;
+    }
+
+    &__info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow: hidden;
+    }
+
+    &__title {
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-weight: ui.$font-weight-medium;
+      color: var(--text-primary, #{ui.$text-primary-light});
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__path {
+      font-family: var(--font-family-mono, #{ui.$font-family-mono});
+      font-size: var(--font-size-3xs, #{ui.$font-size-3xs});
+      color: var(--text-muted, #{ui.$text-muted-light});
+    }
+
+    &__badge {
+      font-size: var(--font-size-3xs, #{ui.$font-size-3xs});
+      background-color: var(--tag-bg, #{ui.$tag-bg-light});
+      color: var(--tag-text, #{ui.$tag-text-light});
+      padding: 2px 6px;
+      border-radius: var(--border-radius-full, #{ui.$border-radius-full});
+      flex-shrink: 0;
+    }
+  }
+
+  // Anchor Headings List
+  .link-anchor-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 12px;
+    border: none;
+    border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-subtle, #{ui.$border-subtle-light});
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color ui.$transition-fast;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover,
+    &:focus {
+      background-color: rgba(7, 90, 170, 0.08);
+      outline: none;
+    }
+
+    &--h3 {
+      padding-left: 24px;
+    }
+
+    &__left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+
+  .link-anchor-tag {
+    font-size: 10px;
+    font-weight: ui.$font-weight-bold;
+    color: var(--accent-color, #{ui.$primary-accent});
+    background-color: rgba(7, 90, 170, 0.1);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .link-anchor-title {
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    color: var(--text-primary, #{ui.$text-primary-light});
+  }
+
+  .link-anchor-code {
+    font-family: var(--font-family-mono, #{ui.$font-family-mono});
+    font-size: var(--font-size-3xs, #{ui.$font-size-3xs});
+    color: var(--text-muted, #{ui.$text-muted-light});
+  }
+
+  .link-empty-hint {
+    padding: 16px;
+    text-align: center;
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    color: var(--text-muted, #{ui.$text-muted-light});
+    font-style: italic;
+    margin: 0;
+  }
+
+  // Live Preview Box
+  .link-preview-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background-color: var(--bg-color, #{ui.$bg-light});
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-subtle, #{ui.$border-subtle-light});
+    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+
+    &__label {
+      font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+      font-weight: ui.$font-weight-bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted, #{ui.$text-muted-light});
+      flex-shrink: 0;
+    }
+
+    &__content {
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  :global(.link-preview-anchor) {
+    color: var(--accent-color, #075aaa) !important;
+    text-decoration: underline !important;
+    text-underline-offset: 3px;
+    font-weight: 500;
+  }
+
+  .link-preview-destination {
+    font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+    color: var(--text-muted, #{ui.$text-muted-light});
+    font-family: var(--font-family-mono, #{ui.$font-family-mono});
+  }
+
+  .link-preview-empty {
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    color: var(--text-muted, #{ui.$text-muted-light});
+    font-style: italic;
+  }
+
+  // Footer Buttons
+  .link-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    font-weight: ui.$font-weight-medium;
+    border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+    border: none;
+    cursor: pointer;
+    transition: all ui.$transition-fast;
+
+    &--secondary {
+      background-color: transparent;
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+
+      &:hover {
+        background-color: var(--tag-bg, #{ui.$tag-bg-light});
+        color: var(--text-primary, #{ui.$text-primary-light});
+      }
+    }
+
+    &--primary {
+      background-color: var(--accent-color, #{ui.$primary-accent});
+      color: #ffffff;
+
+      &:hover {
+        filter: brightness(0.92);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+
+    &--danger {
+      background-color: transparent;
+      border: var(--border-width-base, #{ui.$border-width-base}) solid rgba(239, 68, 68, 0.3);
+      color: var(--error-color, #{ui.$error-color});
+
+      &:hover {
+        background-color: rgba(239, 68, 68, 0.08);
+        border-color: var(--error-color, #{ui.$error-color});
+      }
+    }
+  }
+
+  @keyframes link-overlay-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes link-modal-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+</style>
