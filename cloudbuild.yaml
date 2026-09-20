@@ -33,7 +33,7 @@ steps:
       - '--update-secrets=DATABASE_URL=notesby-database-url:latest,SESSION_SECRET=notesby-session-secret:latest,GCS_BUCKET_NAME=notesby-gcs-bucket:latest'
       # Connect to Cloud SQL via the sidecar proxy
       - '--add-cloudsql-instances=$PROJECT_ID:${_REGION}:${_DB_INSTANCE}'
-      - '--set-env-vars=NODE_ENV=production,HOST=0.0.0.0,PORT=8080'
+      - '--set-env-vars=NODE_ENV=production,HOST=0.0.0.0'
 
   # 4. Print the live setup wizard URL
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
