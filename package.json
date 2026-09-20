@@ -1,6 +1,6 @@
 {
   "name": "notesby",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "An open-source, minimalist static publishing engine where every post is a note. Built for distraction-free reading, editorial essays, and sovereign cloud deployment.",
   "type": "module",
   "scripts": {
