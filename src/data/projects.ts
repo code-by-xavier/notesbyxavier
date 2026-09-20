@@ -1,3 +1,10 @@
+// File: src/data/projects.ts
+// ============================================================
+// Notesby — Projects & Systems Architecture Showcase
+// Sovereign infrastructure, open-source software, and cloud platforms
+// designed and built by Xavier Lawrence.
+// ============================================================
+
 export interface Project {
   title: string;
   slug: string;
@@ -7,6 +14,10 @@ export interface Project {
   period: string;
   liveUrl?: string;
   githubUrl?: string;
+  deployUrl?: string;
+  deployLabel?: string;
+  logo?: string;
+  logoDark?: string;
   stack: string[];
   specs: {
     label: string;
@@ -17,45 +28,61 @@ export interface Project {
 }
 
 export const projects: Project[] = [
-  /*
-  {
-    title: 'CLSTRE Platform',
-    slug: 'clstre-platform',
-    tagline: 'Automated Single-Tenant Cloud Run SaaS platform with sovereign client GCP projects.',
-    status: 'Production',
-    role: 'Founder & Lead Architect',
-    period: '2025 — Present',
-    liveUrl: 'https://clstre.com',
-    githubUrl: 'https://github.com/CLSTRE-ORG/CLSTRE',
-    stack: ['Google Cloud Run', 'Cloud SQL PostgreSQL', 'Hono', 'Astro', 'TypeScript', 'Docker', 'Drizzle ORM'],
-    specs: [
-      { label: 'Deployment', value: 'Isolated Google Cloud Run microservices per client' },
-      { label: 'Database', value: 'Dedicated Google Cloud SQL PostgreSQL instance (Zero multi-tenancy)' },
-      { label: 'API Architecture', value: 'Decoupled edge-ready Hono backend engine' },
-      { label: 'Distribution', value: 'Master upstream Git sync directly into private client repositories' },
-    ],
-    overview: 'A turnkey platform delivering decoupled, Google-Workspace-like business software where every client owns their underlying Google Cloud infrastructure. Zero vendor lock-in, zero multi-tenant security leaks.',
-    whyKeepItSimple: 'Traditional SaaS architectures pile hundreds of companies into a massive shared multi-tenant database, creating constant risks of cross-tenant data leaks and complex row-level security. By dedicating sovereign Cloud Run and Cloud SQL instances to each client via automated Git synchronization, we eliminate multi-tenant complexity entirely. If a client ever wants to leave, they already own 100% of their data and infrastructure.',
-  },
-  */
   {
     title: 'Notesby Publishing Engine',
     slug: 'notesby',
-    tagline: 'Minimalist open-source static publishing engine where every post is an editorial note.',
+    tagline:
+      'Sovereign open-source publishing engine with Zen Studio, Cloud Run, and Cloud SQL micro-PostgreSQL.',
     status: 'Open Source',
-    role: 'Creator & Lead Developer',
+    role: 'Creator & Lead Architect',
     period: '2026 — Present',
     liveUrl: 'https://notesbyxavier.com',
     githubUrl: 'https://github.com/CLSTRE-ORG/Notesby',
-    stack: ['Astro v5', 'TypeScript', 'SCSS', 'Nginx Alpine', 'Docker', 'Google Cloud Run'],
-    specs: [
-      { label: 'Rendering Mode', value: 'Pure static pre-rendering (output: "static")' },
-      { label: 'Container Size', value: 'Alpine Nginx image weighing under 25MB' },
-      { label: 'Runtime Overhead', value: 'Zero client-side JavaScript hydration bloat' },
-      { label: 'Content Source', value: 'Native MDX collection with Zod schema validation' },
+    deployUrl:
+      'https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/CLSTRE-ORG/Notesby&cloudshell_tutorial=docs/deployment.md',
+    deployLabel: 'Deploy to GCP',
+    logo: '/images/notesby-logo-black.svg',
+    logoDark: '/images/notesby-logo-white.svg',
+    stack: [
+      'Astro 5',
+      'Google Cloud Run',
+      'PostgreSQL',
+      'Drizzle ORM',
+      'Google Cloud Storage',
+      'Docker',
+      'TypeScript',
+      'SCSS',
     ],
-    overview: 'An open-source, distraction-free publishing platform designed for writers, thinkers, and architects who value typography, reading flow, and zero-maintenance infrastructure.',
-    whyKeepItSimple: 'Traditional CMS platforms like WordPress or Ghost require database servers, memory-hungry node runtimes, cache plugins, and weekly security updates. Notesby compiles Markdown directly into static HTML served by a 25MB Alpine Nginx container on Cloud Run. It scales to zero when idle, costs pennies per month, and is virtually impervious to web injection attacks.',
+    specs: [
+      {
+        label: 'Rendering Architecture',
+        value: 'Hybrid SSR with static pre-rendered reader edge caching',
+      },
+      {
+        label: 'Database Standard',
+        value: 'Google Cloud SQL (db-f1-micro PostgreSQL) dedicated per writer',
+      },
+      {
+        label: 'Media Storage',
+        value: 'Google Cloud Storage (GCS) sovereign media bucket',
+      },
+      {
+        label: 'Writing Studio',
+        value: 'Zen Studio editor with slash commands, Markdown/MDX & auto-save',
+      },
+      {
+        label: 'Compute Cost',
+        value: 'Cloud Run serverless container auto-scaling 0 to N (~$10–$15/mo)',
+      },
+      {
+        label: 'Zero Bloat',
+        value: 'Strictly zero Redis, zero tracking scripts, sub-2ms query responses',
+      },
+    ],
+    overview:
+      'A sovereign, distraction-free publishing platform engineered for serious essayists, researchers, and technical architects who value high-contrast typography, reading flow, and complete infrastructure ownership.',
+    whyKeepItSimple:
+      'Traditional CMS platforms (WordPress, Ghost, Substack) either require complex multi-tenant database clusters, costly Redis caches (~$40/mo), or lock your publication behind closed subscriptions. Notesby dedicates an isolated Cloud Run container, Cloud SQL micro-instance, and GCS bucket to every writer. You own 100% of your data and infrastructure with zero vendor lock-in.',
   },
   {
     title: 'Sovereign Cloud Build Pipeline',
@@ -64,14 +91,34 @@ export const projects: Project[] = [
     status: 'Production',
     role: 'Cloud Architect',
     period: '2026',
-    stack: ['Google Cloud Build', 'Google Artifact Registry', 'Google Cloud Run', 'IAM', 'Secret Manager'],
-    specs: [
-      { label: 'Build Cycle', value: 'Sub-60-second build and zero-downtime traffic migration' },
-      { label: 'Security Model', value: 'Least-privilege service accounts with sealed secret injection' },
-      { label: 'Infrastructure', value: 'Serverless container orchestration scaling 0 to N instances' },
-      { label: 'Edge Delivery', value: 'Global Google edge proxy with automatic managed SSL certificates' },
+    stack: [
+      'Google Cloud Build',
+      'Google Artifact Registry',
+      'Google Cloud Run',
+      'IAM',
+      'Secret Manager',
     ],
-    overview: 'A resilient continuous deployment architecture connecting GitHub repositories directly to isolated Google Cloud Run environments without third-party CI/CD intermediaries.',
-    whyKeepItSimple: 'Relying on external CI/CD vendors often means granting broad third-party access to production credentials. By anchoring our deployment pipeline inside native Google Cloud Build and Secret Manager, credentials never leave the Google Cloud trust boundary. A single git push triggers a sealed build and atomic rollout.',
+    specs: [
+      {
+        label: 'Build Cycle',
+        value: 'Sub-60-second build and zero-downtime traffic migration',
+      },
+      {
+        label: 'Security Model',
+        value: 'Least-privilege service accounts with sealed secret injection',
+      },
+      {
+        label: 'Infrastructure',
+        value: 'Serverless container orchestration scaling 0 to N instances',
+      },
+      {
+        label: 'Edge Delivery',
+        value: 'Global Google edge proxy with automatic managed SSL certificates',
+      },
+    ],
+    overview:
+      'A resilient continuous deployment architecture connecting GitHub repositories directly to isolated Google Cloud Run environments without third-party CI/CD intermediaries.',
+    whyKeepItSimple:
+      'Relying on external CI/CD vendors often means granting broad third-party access to production credentials. By anchoring our deployment pipeline inside native Google Cloud Build and Secret Manager, credentials never leave the Google Cloud trust boundary. A single git push triggers a sealed build and atomic rollout.',
   },
 ];

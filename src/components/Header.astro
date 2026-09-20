@@ -89,7 +89,8 @@ const currentPath = Astro.url.pathname;
       <!-- Desktop Navigation -->
       <nav class="site-header__nav" aria-label="Main Navigation">
         {notesConfig.navLinks.map((link) => {
-          const isActive = link.href === '/' ? currentPath === '/' : currentPath.startsWith(link.href);
+          const isActive =
+            link.href === '/' ? currentPath === '/' : currentPath.startsWith(link.href);
           return (
             <a
               href={link.href}
@@ -120,12 +121,32 @@ const currentPath = Astro.url.pathname;
         aria-label="Toggle navigation menu"
         aria-expanded="false"
       >
-        <svg class="menu-icon menu-icon--open" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg
+          class="menu-icon menu-icon--open"
+          viewBox="0 0 24 24"
+          width="22"
+          height="22"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <line x1="4" y1="7" x2="20" y2="7"></line>
           <line x1="4" y1="12" x2="20" y2="12"></line>
           <line x1="4" y1="17" x2="20" y2="17"></line>
         </svg>
-        <svg class="menu-icon menu-icon--close" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg
+          class="menu-icon menu-icon--close"
+          viewBox="0 0 24 24"
+          width="22"
+          height="22"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
@@ -137,7 +158,8 @@ const currentPath = Astro.url.pathname;
   <div class="site-header__drawer" id="mobile-menu-drawer" aria-hidden="true">
     <nav class="site-header__drawer-nav" aria-label="Mobile Navigation">
       {notesConfig.navLinks.map((link) => {
-        const isActive = link.href === '/' ? currentPath === '/' : currentPath.startsWith(link.href);
+        const isActive =
+          link.href === '/' ? currentPath === '/' : currentPath.startsWith(link.href);
         return (
           <a
             href={link.href}
@@ -154,7 +176,17 @@ const currentPath = Astro.url.pathname;
               <Icon name="rss" size={13} class="rss-icon" color="var(--rss-accent, #f97316)" />
             )}
             {link.external && (
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="external-icon">
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="external-icon"
+              >
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                 <polyline points="15 3 21 3 21 9"></polyline>
                 <line x1="10" y1="14" x2="21" y2="3"></line>
@@ -348,7 +380,8 @@ const currentPath = Astro.url.pathname;
       align-items: center;
       justify-content: center;
       background: none;
-      border: var(--border-width-base, #{ui.$border-width-base}) solid var(--border-color, #{ui.$border-light});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
       border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
       padding: 6px;
       color: var(--text-secondary, #{ui.$text-secondary-light});
@@ -389,7 +422,8 @@ const currentPath = Astro.url.pathname;
       left: 0;
       right: 0;
       background-color: var(--bg-color, #{ui.$bg-light});
-      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid var(--border-color, #{ui.$border-light});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
       box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.12);
       max-height: 0;
       opacity: 0;

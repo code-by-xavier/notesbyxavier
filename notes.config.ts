@@ -55,8 +55,7 @@ export const notesConfig: NotesConfig = {
   appleTouchIcon: '/images/notesby-logo-dark.png',
   ogImage: '/images/og-image.png',
   domain: 'https://www.notesbyxavier.com',
-  description:
-    'Essays, architectural blueprints, and personal reflections by Xavier Lawrence.',
+  description: 'Essays, architectural blueprints, and personal reflections by Xavier Lawrence.',
   repository: 'https://github.com/code-by-xavier/notesbyxavier',
   categories: [
     {
