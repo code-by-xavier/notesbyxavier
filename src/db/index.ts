@@ -21,18 +21,21 @@ const ssl =
       : undefined;
 
 let socketHost: string | undefined;
+let cleanConnectionString = connectionString;
 try {
   const parsedUrl = new URL(connectionString);
   const hostQuery = parsedUrl.searchParams.get('host');
   if (hostQuery && hostQuery.startsWith('/')) {
     socketHost = hostQuery;
+    parsedUrl.searchParams.delete('host');
+    cleanConnectionString = parsedUrl.toString();
   }
 } catch {
   // Use default TCP connection if connectionString is not a valid URL
 }
 
 // Postgres.js client with lightweight connection pooling optimized for Cloud Run & Cloud SQL
-const client = postgres(connectionString, {
+const client = postgres(cleanConnectionString, {
   max: maxConnections,
   ...(socketHost ? { host: socketHost } : {}),
   ...(ssl ? { ssl } : {}),

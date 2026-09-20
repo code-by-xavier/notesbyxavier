@@ -7,8 +7,10 @@
 import { defineMiddleware } from 'astro:middleware';
 import { isSetupCompleted, validateSession, SESSION_COOKIE_NAME } from '@/lib/auth';
 import { ROUTES } from '@/links';
+import { ensureSchema } from '@/db';
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  await ensureSchema();
   const { url, cookies, redirect, locals } = context;
   const pathname = url.pathname;
 
