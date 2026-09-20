@@ -8,14 +8,14 @@ RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 
 # Install dependencies
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy source and build
 COPY . .
 RUN pnpm build
 
 # Prune devDependencies for a lean production image
-RUN pnpm prune --prod
+RUN pnpm prune --prod --ignore-scripts
 
 # Stage 2: Production Node.js Cloud Run container
 FROM node:22-alpine AS runner
