@@ -1,0 +1,132 @@
+---
+// File: src/pages/privacy.astro
+// ============================================================
+// Notesby — Privacy Policy
+// Editorial privacy policy and sovereign data sovereignty pledge.
+// ============================================================
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { notesConfig } from '@config';
+import { getSiteSettings } from '@/lib/settings';
+import { ROUTES } from '@/links';
+import { marked } from 'marked';
+
+export const prerender = false;
+
+const settings = await getSiteSettings();
+const entityName = settings.legalEntityName || settings.authorName || settings.siteTitle;
+const customHtml = settings.privacyPolicyText
+  ? await marked.parse(settings.privacyPolicyText)
+  : null;
+---
+
+<BaseLayout
+  title={`Privacy Policy — ${settings.siteTitle}`}
+  description="Distraction-free privacy policy and data sovereignty pledge."
+>
+  <div class="reading-container legal-page">
+    <h1 class="legal-page__title">Privacy Policy</h1>
+    <p class="legal-page__meta">Operating Entity: {entityName} · Sovereign Cloud</p>
+
+    {customHtml ? (
+      <div class="prose-editorial" set:html={customHtml} />
+    ) : (
+      <div class="prose-editorial">
+        <p>
+          At <strong>{settings.siteTitle}</strong> (operated by <strong>{entityName}</strong>), we
+          believe reading and writing on the web should be dignified, private, and distraction-free.
+          This Privacy Policy outlines our strict minimal-data philosophy.
+        </p>
+
+        <h2>1. The Distraction-Free Pledge</h2>
+        <p>Unlike legacy ad-driven media sites, this publication operates with:</p>
+        <ul>
+          <li>
+            <strong>Zero third-party advertising trackers</strong> (no behavioral ad networks).
+          </li>
+          <li>
+            <strong>Zero intrusive cookie consent popups</strong> (no non-essential cookies).
+          </li>
+          <li>
+            <strong>Zero cross-site user fingerprinting</strong> scripts.
+          </li>
+        </ul>
+
+        <h2>2. What Information Is Collected</h2>
+        <p>
+          We collect only the bare minimum technical data necessary to provide and secure the
+          service:
+        </p>
+        <ul>
+          <li>
+            <strong>Reader Sessions:</strong> When you read public essays, no personal
+            identification data is required or recorded.
+          </li>
+          <li>
+            <strong>Administrator Accounts:</strong> When an author sets up or signs in to the Zen
+            Studio, we store their email address, name, and a securely salted bcrypt password hash.
+            We never store plain-text passwords.
+          </li>
+          <li>
+            <strong>Essential Session Cookies:</strong> We issue a single HTTP-only, secure session
+            token (<code>notesby_session</code>) solely to maintain authenticated administrator
+            access.
+          </li>
+        </ul>
+
+        <h2>3. Spam Prevention & Google reCAPTCHA</h2>
+        <p>
+          To prevent automated bots, brute-force attacks, and credential stuffing on authentication
+          and setup forms, this site may employ Google reCAPTCHA. reCAPTCHA operates by analyzing
+          hardware and software information to verify legitimate human interaction.
+        </p>
+        <p>
+          The processing of such data is subject to the{' '}
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+            Google Privacy Policy
+          </a>{' '}
+          and{' '}
+          <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">
+            Google Terms of Service
+          </a>
+          .
+        </p>
+
+        <h2>4. Data Sovereignty & Portability</h2>
+        <p>
+          Because Notesby is an open-source, sovereign publishing system, your database (PostgreSQL)
+          and asset storage (Google Cloud Storage) belong entirely to you. You can export, migrate,
+          or delete your records at any time without vendor lock-in.
+        </p>
+
+        <h2>5. Questions & Inquiries</h2>
+        <p>
+          If you have questions regarding this policy or data practices, please refer to our{' '}
+          <a href={ROUTES.TERMS}>Terms of Service</a> or contact the publication author directly.
+        </p>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  .legal-page {
+    padding: var(--spacing-5xl, #{ui.$spacing-5xl}) var(--spacing-lg, #{ui.$spacing-lg});
+
+    &__title {
+      @include ui.page-heading-style;
+      margin-top: 0;
+      margin-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
+    }
+
+    &__meta {
+      @include ui.meta-text-style(sm);
+      margin-bottom: var(--spacing-xl, #{ui.$spacing-xl});
+      padding-bottom: var(--spacing-lg, #{ui.$spacing-lg});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+    }
+  }
+</style>

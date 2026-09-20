@@ -1,4 +1,12 @@
 ---
+// File: src/components/NoteCard.astro
+// ============================================================
+// Notesby — Note Card Component
+// Compact card preview for essays, op-eds, and field notes.
+// ============================================================
+
+import { ROUTES } from '@/links';
+
 interface Props {
   title: string;
   subtitle?: string;
@@ -20,7 +28,6 @@ const {
   tags = [],
   category,
   readingTime = '5 min read',
-  coverImage,
 } = Astro.props;
 
 const formattedDate = new Intl.DateTimeFormat('en-US', {
@@ -50,41 +57,25 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     </div>
 
     <h2 class="note-card__title">
-      <a href={`/notes/${slug}/`}>
-        {title}
-      </a>
+      <a href={ROUTES.NOTE(slug)}>{title}</a>
     </h2>
 
     {subtitle && <p class="note-card__subtitle">{subtitle}</p>}
     <p class="note-card__description">{description}</p>
   </div>
-
-  {coverImage && (
-    <div class="note-card__thumbnail">
-      <img src={coverImage} alt={title} loading="lazy" />
-    </div>
-  )}
 </article>
 
 <style lang="scss">
   .note-card {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.35rem 1.45rem;
+    @include ui.card-surface-style;
+    padding: var(--card-padding-y, #{ui.$card-padding-y})
+      var(--card-padding-x, #{ui.$card-padding-x});
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     width: 100%;
     height: 100%;
     box-sizing: border-box;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-
-    &:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent-color);
-      box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.12);
-    }
 
     &__content {
       width: 100%;
@@ -98,28 +89,21 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.5rem;
-      margin-bottom: 0.6rem;
+      gap: var(--spacing-xs, #{ui.$spacing-xs});
+      margin-bottom: var(--spacing-sm, #{ui.$spacing-sm});
       flex-wrap: nowrap;
     }
 
     &__meta {
-      font-family: var(--font-family-base);
-      font-size: 0.72rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      letter-spacing: 0.02em;
+      @include ui.meta-row-style(xs, 2xs-plus);
       text-transform: uppercase;
       white-space: nowrap;
     }
 
     &__category {
-      font-weight: 600;
-      color: var(--accent-color);
-      letter-spacing: 0.03em;
+      font-weight: ui.$font-weight-semibold;
+      color: var(--accent-color, #{ui.$primary-accent});
+      letter-spacing: var(--letter-spacing-category, #{ui.$letter-spacing-category});
     }
 
     &__dot {
@@ -129,81 +113,40 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     &__tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.35rem;
+      gap: var(--spacing-2xs-plus, #{ui.$spacing-2xs-plus});
       justify-content: flex-end;
     }
 
     &__tag {
-      font-family: var(--font-family-base);
-      font-size: 0.65rem;
-      font-weight: 500;
-      color: var(--tag-text);
-      background-color: var(--tag-bg);
-      padding: 0.12rem 0.45rem;
-      border-radius: 4px;
-      white-space: nowrap;
+      @include ui.tag-pill-style;
     }
 
     &__title {
-      font-family: var(--font-family-headings);
-      font-size: 1.35rem;
-      font-weight: 600;
-      line-height: 1.25;
-      letter-spacing: -0.015em;
-      margin-bottom: 0.35rem;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      font-family: var(--font-family-headings, #{ui.$font-family-headings});
+      font-size: var(--h3-size, #{ui.$h3-font-size});
+      font-weight: ui.$font-weight-semibold;
+      line-height: var(--line-height-tight, #{ui.$line-height-tight});
+      letter-spacing: var(--letter-spacing-tighter, #{ui.$letter-spacing-tighter});
+      margin-bottom: var(--spacing-2xs-plus, #{ui.$spacing-2xs-plus});
+      @include ui.line-clamp(2);
 
       a {
-        color: var(--text-primary);
+        color: var(--text-primary, #{ui.$text-primary-light});
         text-decoration: none;
 
         &:hover {
-          color: var(--accent-color);
+          color: var(--accent-color, #{ui.$primary-accent});
         }
       }
     }
 
     &__subtitle {
-      font-family: var(--font-family-serif);
-      font-size: 0.90625rem;
-      font-style: italic;
-      color: var(--text-secondary);
-      margin-bottom: 0.45rem;
-      line-height: 1.35;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      @include ui.subtitle-serif-style(subhead, 1);
+      margin-bottom: var(--spacing-xs, #{ui.$spacing-xs});
     }
 
     &__description {
-      font-family: var(--font-family-base);
-      font-size: 0.8125rem;
-      color: var(--text-secondary);
-      line-height: 1.48;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    &__thumbnail {
-      margin-top: 0.75rem;
-      width: 100%;
-      height: 70px;
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
+      @include ui.description-text(2);
     }
   }
 </style>

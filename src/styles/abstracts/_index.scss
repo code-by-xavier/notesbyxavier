@@ -1,0 +1,9 @@
+// File: src/styles/abstracts/_index.scss
+// ============================================================
+// Notesby — Abstracts Barrel
+// Forward variables and mixins so components can use via:
+// @use '@/styles/abstracts' as ui; (or auto-injected by Vite)
+// ============================================================
+
+@forward 'variables';
+@forward 'mixins';

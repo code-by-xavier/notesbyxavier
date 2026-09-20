@@ -1,3 +1,9 @@
+// File: src/content.config.ts
+// ============================================================
+// Notesby — Content Collections Configuration & Schema
+// Defines schema validation and loading for notes and essays.
+// ============================================================
+
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 

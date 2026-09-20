@@ -1,34 +1,71 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { notesConfig } from '../../notes.config';
+// File: src/pages/about.astro
+// ============================================================
+// Notesby — About Page
+// Publication philosophy and platform introduction.
+// ============================================================
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { notesConfig } from '@config';
+import { getSiteSettings } from '@/lib/settings';
+import { EXTERNAL_LINKS } from '@/links';
+
+export const prerender = false;
+
+const settings = await getSiteSettings();
 ---
 
-<BaseLayout title="About">
+<BaseLayout title={`About — ${settings.siteTitle}`}>
   <div class="reading-container about-page">
     <h1 class="about-page__title">About</h1>
 
     <div class="prose-editorial">
       <p>
-        Welcome to <strong>{notesConfig.siteTitle}</strong>. This publication is an open intellectual journal dedicated to deep-dive essays on software engineering, technology, and architectural thought.
+        Welcome to <strong>{settings.siteTitle}</strong>, a personal space for essays, working
+        notes, and considered perspectives.
       </p>
 
       <h2>Philosophy</h2>
       <p>
-        Writing clarifies thought. In an age of ephemeral social media feeds and algorithmic noise, this site is deliberately crafted as a calm, high-signal reading sanctuary. Inspired by classic long-form technical writing and architectural blueprints, each piece here represents deliberate, distilled perspective.
+        Writing helps clarify what we think and why. Most platforms push for quick reactions and
+        endless scrolling, so this site takes a simpler approach: clean typography, no tracking
+        popups, and room to sit with an idea from start to finish.
       </p>
 
       <h2>The Platform</h2>
       <p>
-        This site is powered by <strong>Notesby</strong>, an open-source static publishing engine created under the <strong>CLSTRE</strong> tech ecosystem and designed and developed by <a href="https://notesbyxavier.com" target="_blank" rel="noopener noreferrer">Xavier Lawrence</a>. It is completely static, lightning-fast, and built on Astro with zero runtime client bloat.
+        This site runs on <strong>Notesby</strong>, an open-source publishing engine created by{' '}
+        <a href={EXTERNAL_LINKS.AUTHOR} target="_blank" rel="noopener noreferrer">
+          Xavier Lawrence
+        </a>{' '}
+        as part of the{' '}
+        <a href={EXTERNAL_LINKS.CLSTRE} target="_blank" rel="noopener noreferrer">
+          CLSTRE
+        </a>{' '}
+        ecosystem. It gives writers full ownership of their content, their data, and their reading
+        experience.
       </p>
 
       <p>
-        You can view or contribute to the open-source codebase on <a href={notesConfig.repository} target="_blank" rel="noopener noreferrer">GitHub</a>.
+        The source code is open and available on{' '}
+        <a
+          href={settings.githubUrl || EXTERNAL_LINKS.REPOSITORY}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub
+        </a>
+        .
       </p>
 
       <h2>Connect</h2>
       <p>
-        Follow ongoing developments on <a href={notesConfig.socials.twitter} target="_blank" rel="noopener noreferrer">X (Twitter)</a> or explore sovereign infrastructure on <a href="https://clstre.com" target="_blank" rel="noopener noreferrer">CLSTRE</a>.
+        You can reach out via <a href={`mailto:${settings.contactEmail}`}>email</a> or follow
+        updates on{' '}
+        <a href={settings.twitterUrl} target="_blank" rel="noopener noreferrer">
+          X
+        </a>
+        .
       </p>
     </div>
   </div>
@@ -36,17 +73,15 @@ import { notesConfig } from '../../notes.config';
 
 <style lang="scss">
   .about-page {
-    padding: 4rem 1.5rem;
+    padding: var(--spacing-5xl, #{ui.$spacing-5xl}) var(--spacing-lg, #{ui.$spacing-lg});
 
     &__title {
-      font-family: var(--font-family-headings);
-      font-size: 2.75rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
+      @include ui.page-heading-style;
+      margin-top: 0;
+      margin-bottom: var(--spacing-xl, #{ui.$spacing-xl});
+      padding-bottom: var(--spacing-lg, #{ui.$spacing-lg});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
     }
   }
 </style>

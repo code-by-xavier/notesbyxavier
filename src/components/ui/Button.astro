@@ -1,0 +1,162 @@
+---
+// File: src/components/ui/Button.astro
+// ============================================================
+// Notesby — Reusable Button & Action Primitive
+// Polymorphic button/anchor component with size, variant, block,
+// and loading state support.
+// ============================================================
+
+interface Props {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  type?: 'button' | 'submit' | 'reset';
+  href?: string;
+  block?: boolean;
+  disabled?: boolean;
+  id?: string;
+  loadingText?: string;
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  type = 'button',
+  href,
+  block = false,
+  disabled = false,
+  id,
+  loadingText,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const isLink = Boolean(href);
+const classes = [
+  'ui-button',
+  `ui-button--${variant}`,
+  `ui-button--${size}`,
+  { 'ui-button--block': block },
+  className,
+];
+---
+
+{isLink ? (
+  <a id={id} href={href} class:list={classes} {...rest}>
+    <slot />
+  </a>
+) : (
+  <button id={id} type={type} disabled={disabled} class:list={classes} {...rest}>
+    <span class="ui-button__text">
+      <slot />
+    </span>
+    {loadingText && (
+      <span class="ui-button__spinner" style="display: none;">
+        <svg
+          class="ui-button__spin-icon"
+          viewBox="0 0 24 24"
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+        </svg>
+        <span>{loadingText}</span>
+      </span>
+    )}
+  </button>
+)}
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  .ui-button {
+    @include ui.button-base;
+
+    // Sizes
+    &--sm {
+      padding: var(--spacing-2xs, #{ui.$spacing-2xs}) var(--spacing-sm, #{ui.$spacing-sm});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    }
+
+    &--md {
+      padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+    }
+
+    &--lg {
+      padding: var(--spacing-md, #{ui.$spacing-md}) var(--spacing-lg, #{ui.$spacing-lg});
+      font-size: var(--font-size-base, #{ui.$font-size-base});
+      border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+    }
+
+    // Width
+    &--block {
+      width: 100%;
+    }
+
+    // Variants
+    &--primary {
+      @include ui.button-variant(
+        ui.$primary-accent,
+        #ffffff,
+        transparent,
+        ui.$primary-accent-hover,
+        #ffffff
+      );
+      font-weight: ui.$font-weight-semibold;
+      box-shadow: var(--shadow-sm, #{ui.$shadow-sm});
+    }
+
+    &--secondary {
+      @include ui.button-variant(
+        transparent,
+        var(--text-primary, #{ui.$text-primary-light}),
+        var(--border-color, #{ui.$border-light}),
+        var(--surface-color, #{ui.$surface-light}),
+        var(--text-primary, #{ui.$text-primary-light})
+      );
+    }
+
+    &--ghost {
+      @include ui.button-variant(
+        transparent,
+        var(--text-secondary, #{ui.$text-secondary-light}),
+        transparent,
+        var(--tag-bg, #{ui.$tag-bg-light}),
+        var(--text-primary, #{ui.$text-primary-light})
+      );
+    }
+
+    &--danger {
+      @include ui.button-variant(ui.$error-color, #ffffff, transparent, #dc2626, #ffffff);
+    }
+
+    &__spinner {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+    }
+
+    &__spin-icon {
+      animation: ui-spin 0.8s linear infinite;
+    }
+  }
+
+  @keyframes ui-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>

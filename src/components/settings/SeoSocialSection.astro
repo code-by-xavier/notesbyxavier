@@ -1,0 +1,122 @@
+---
+// File: src/components/settings/SeoSocialSection.astro
+// ============================================================
+// Notesby — SEO & Social Profiles Section
+// Configures canonical domain, contact email, search description,
+// and public social media links.
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+import type { ResolvedSiteSettings } from '@/lib/settings';
+
+interface Props {
+  settings: ResolvedSiteSettings;
+}
+
+const { settings } = Astro.props;
+---
+
+<section class="settings-card">
+  <div class="settings-card__header">
+    <div class="settings-card__icon-wrap">
+      <Icon name="external-link" size={18} />
+    </div>
+    <div>
+      <h2 class="settings-card__title">SEO & Social Profiles</h2>
+      <p class="settings-card__desc">Search engine metadata and public social media links.</p>
+    </div>
+  </div>
+
+  <div class="settings-card__body">
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label for="domain" class="form-label">
+          Canonical Domain URL
+        </label>
+        <input
+          type="url"
+          id="domain"
+          name="domain"
+          class="form-input"
+          value={settings.domain}
+          placeholder="https://example.com"
+          required
+        />
+        <p class="form-help">Base URL used for RSS feeds, sitemaps, and canonical SEO tags.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="contactEmail" class="form-label">
+          Public Contact / Inquiries Email
+        </label>
+        <input
+          type="email"
+          id="contactEmail"
+          name="contactEmail"
+          class="form-input"
+          value={settings.contactEmail}
+          placeholder="hello@example.com"
+        />
+        <p class="form-help">Displayed in the footer and about page for reader outreach.</p>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description" class="form-label">
+        Publication Meta Description
+      </label>
+      <textarea
+        id="description"
+        name="description"
+        class="form-textarea form-textarea--short"
+        rows="2"
+        placeholder="A personal publication featuring essays, op-eds, and field notes."
+      >{settings.description}</textarea>
+      <p class="form-help">Used by Google and search engines for homepage previews.</p>
+    </div>
+
+    <div class="form-grid form-grid--3">
+      <div class="form-group">
+        <label for="twitterUrl" class="form-label">
+          X / Twitter URL
+        </label>
+        <input
+          type="url"
+          id="twitterUrl"
+          name="twitterUrl"
+          class="form-input"
+          value={settings.twitterUrl}
+          placeholder="https://x.com/username"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="linkedinUrl" class="form-label">
+          LinkedIn URL
+        </label>
+        <input
+          type="url"
+          id="linkedinUrl"
+          name="linkedinUrl"
+          class="form-input"
+          value={settings.linkedinUrl}
+          placeholder="https://linkedin.com/in/username"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="githubUrl" class="form-label">
+          GitHub Repository / Profile
+        </label>
+        <input
+          type="url"
+          id="githubUrl"
+          name="githubUrl"
+          class="form-input"
+          value={settings.githubUrl}
+          placeholder="https://github.com/username"
+        />
+      </div>
+    </div>
+  </div>
+</section>

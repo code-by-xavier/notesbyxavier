@@ -1,0 +1,24 @@
+---
+// File: src/components/settings/SettingsSaveBar.astro
+// ============================================================
+// Notesby — Settings Sticky Save Bar
+// Displays dirty/saving/saved status and triggers form submit.
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+---
+
+<div class="settings-save-bar">
+  <div class="settings-save-bar__container">
+    <div class="settings-save-status">
+      <span id="save-status-dot" class="save-status-dot"></span>
+      <span id="save-status-text" class="save-status-text">
+        Ready
+      </span>
+    </div>
+    <button type="submit" id="save-settings-btn" class="settings-btn-save">
+      <Icon name="check" size={15} />
+      <span class="settings-btn-text">Save Changes</span>
+    </button>
+  </div>
+</div>

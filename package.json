@@ -1,22 +1,61 @@
 {
   "name": "notesby",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "An open-source, minimalist static publishing engine where every post is a note. Built for distraction-free reading, editorial essays, and sovereign cloud deployment.",
   "type": "module",
   "scripts": {
+    "setup:env": "tsx ./scripts/setup-env.ts",
+    "services:infra": "docker compose up -d db storage",
+    "services:storage": "docker compose up -d storage",
+    "services:up": "docker compose up -d",
+    "services:down": "docker compose down",
+    "services:stop": "docker compose stop",
+    "services:restart": "docker compose down && docker compose up -d db storage",
+    "services:reset": "docker compose down -v",
+    "services:status": "docker compose ps",
+    "services:logs": "docker compose logs -f",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "rescue:admin": "tsx ./scripts/rescue-admin.ts",
+    "clean": "tsx ./scripts/clean.ts --cache",
+    "clean:cache": "tsx ./scripts/clean.ts --cache",
+    "clean:deps": "tsx ./scripts/clean.ts --deps",
+    "clean:uploads": "tsx ./scripts/clean.ts --uploads",
+    "clean:all": "tsx ./scripts/clean.ts --all",
+    "clean:full": "tsx ./scripts/clean.ts --all",
+    "predev": "pnpm run setup:env",
     "dev": "astro dev --port 4330",
+    "fresh": "pnpm run clean && pnpm run dev",
+    "restart": "pnpm run clean && pnpm run services:restart && pnpm run setup:env",
     "start": "astro dev --port 4330",
     "build": "astro build",
     "preview": "astro preview --port 4330",
     "typecheck": "astro check && tsc --noEmit",
-    "validate": "tsx ./scripts/validate.ts && astro check && tsc --noEmit"
+    "lint": "prettier --check .",
+    "format": "prettier --write .",
+    "validate": "tsx ./scripts/validate.ts",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,ts,mjs,astro,scss,css,json,md,mdx}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/mdx": "^4.3.14",
+    "@astrojs/node": "^9.5.5",
     "@astrojs/rss": "^4.0.11",
     "@astrojs/sitemap": "^3.2.1",
+    "@google-cloud/storage": "^8.2.0",
     "astro": "^5.18.2",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^18.0.1",
+    "drizzle-orm": "^0.45.2",
+    "marked": "^18.0.13",
+    "postgres": "^3.4.9",
     "reading-time": "^1.5.0",
     "sass": "^1.83.4",
     "tsx": "^4.19.2",
@@ -26,8 +65,15 @@
   "homepage": "https://github.com/CLSTRE-ORG/Notesby",
   "bugs": {
     "url": "https://github.com/CLSTRE-ORG/Notesby/issues",
-    "email": "support@clstre.com"
+    "email": "notesby.support@clstre.com"
   },
   "license": "MIT",
-  "packageManager": "pnpm@10.30.1"
+  "packageManager": "pnpm@10.30.1",
+  "devDependencies": {
+    "drizzle-kit": "^0.31.10",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.1",
+    "prettier": "^3.9.8",
+    "prettier-plugin-astro": "^1.0.1"
+  }
 }

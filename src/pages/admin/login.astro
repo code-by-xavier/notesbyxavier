@@ -1,0 +1,250 @@
+---
+// File: src/pages/admin/login.astro
+// ============================================================
+// Notesby — Authentication Login Screen
+// Clean, high-contrast login screen for the publication owner.
+// Utilizes reusable UI form primitives with seamless canvas aesthetics.
+// ============================================================
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import FormField from '@/components/ui/FormField.astro';
+import Input from '@/components/ui/Input.astro';
+import Button from '@/components/ui/Button.astro';
+import FormError from '@/components/ui/FormError.astro';
+import LegalNotice from '@/components/ui/LegalNotice.astro';
+import { isSetupCompleted, validateSession, SESSION_COOKIE_NAME } from '@/lib/auth';
+import { ROUTES } from '@/links';
+
+export const prerender = false;
+
+// If setup is not completed yet, redirect to setup
+const setupDone = await isSetupCompleted();
+if (!setupDone) {
+  return Astro.redirect(ROUTES.ADMIN.SETUP);
+}
+
+// If already logged in, redirect to admin
+const sessionToken = Astro.cookies.get(SESSION_COOKIE_NAME)?.value;
+if (sessionToken) {
+  const sessionData = await validateSession(sessionToken);
+  if (sessionData) {
+    return Astro.redirect(ROUTES.ADMIN.ROOT);
+  }
+}
+---
+
+<BaseLayout title="Sign In — Notesby" hideNav={true} hideFooter={true}>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <header class="auth-card__header">
+        <a href={ROUTES.HOME} class="auth-brand" aria-label="Notesby Home">
+          <img src="/images/notesby-logo-dark.png" alt="Notesby" class="auth-brand__logo" />
+          <span class="auth-brand__name">Notesby</span>
+        </a>
+        <h1 class="auth-card__title">Sign In to Studio</h1>
+        <p class="auth-card__subtitle">Enter your credentials to access your writing canvas.</p>
+      </header>
+
+      <form id="login-form" class="auth-form" novalidate>
+        <FormError id="error-message" />
+
+        <FormField label="Email Address" forId="email" required={true}>
+          <Input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="publisher@example.com"
+            required={true}
+            autocomplete="email"
+          />
+        </FormField>
+
+        <FormField label="Password" forId="password" required={true}>
+          <a slot="label-action" href={ROUTES.ADMIN.RESET_PASSWORD} class="auth-link">
+            Forgot password?
+          </a>
+          <Input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Your password"
+            required={true}
+            autocomplete="current-password"
+          />
+        </FormField>
+
+        <Button
+          type="submit"
+          id="submit-btn"
+          variant="primary"
+          size="md"
+          block={true}
+          loadingText="Signing in..."
+        >
+          Sign In
+        </Button>
+
+        <LegalNotice actionText="signing in" />
+      </form>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('login-form') as HTMLFormElement | null;
+  const errorBox = document.getElementById('error-message') as HTMLDivElement | null;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement | null;
+  const btnText = submitBtn?.querySelector('.ui-button__text') as HTMLElement | null;
+  const btnSpinner = submitBtn?.querySelector('.ui-button__spinner') as HTMLElement | null;
+
+  function showError(msg: string) {
+    if (!errorBox) return;
+    const msgEl = errorBox.querySelector('.ui-form-error__message');
+    if (msgEl) {
+      msgEl.textContent = msg;
+    } else {
+      errorBox.textContent = msg;
+    }
+    errorBox.style.display = 'flex';
+  }
+
+  function hideError() {
+    if (!errorBox) return;
+    errorBox.style.display = 'none';
+  }
+
+  function setLoading(loading: boolean) {
+    if (!submitBtn || !btnText || !btnSpinner) return;
+    submitBtn.disabled = loading;
+    btnText.style.display = loading ? 'none' : 'inline';
+    btnSpinner.style.display = loading ? 'inline-flex' : 'none';
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError();
+
+    const email = (document.getElementById('email') as HTMLInputElement)?.value.trim();
+    const password = (document.getElementById('password') as HTMLInputElement)?.value;
+
+    if (!email || !password) {
+      showError('Please enter both email and password.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        showError(result.error || 'Invalid credentials.');
+        setLoading(false);
+        return;
+      }
+
+      window.location.href = result.redirect || '/admin';
+    } catch (err: any) {
+      showError('A network error occurred. Please try again.');
+      setLoading(false);
+    }
+  });
+</script>
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  .auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-2xl, #{ui.$spacing-2xl}) var(--spacing-md, #{ui.$spacing-md});
+    background-color: var(--bg-color, #{ui.$bg-light});
+  }
+
+  // Seamless form canvas without background card, border, or shadow
+  .auth-card {
+    width: 100%;
+    max-width: 440px;
+    padding: var(--spacing-sm, #{ui.$spacing-sm}) 0;
+
+    &__header {
+      text-align: center;
+      margin-bottom: var(--spacing-lg, #{ui.$spacing-lg});
+    }
+
+    &__title {
+      @include ui.h2-heading-style;
+      margin-top: var(--spacing-sm, #{ui.$spacing-sm});
+      margin-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
+    }
+
+    &__subtitle {
+      @include ui.description-text;
+      margin: 0 auto;
+      max-width: 90%;
+    }
+  }
+
+  .auth-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs, #{ui.$spacing-xs});
+    text-decoration: none;
+    color: var(--text-primary, #{ui.$text-primary-light});
+    font-weight: ui.$font-weight-bold;
+    font-size: var(--font-size-lg, #{ui.$font-size-lg});
+
+    &__logo {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      object-fit: contain;
+      display: block;
+    }
+
+    &__mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      background-color: var(--accent-color, #{ui.$primary-accent});
+      color: #ffffff;
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-family: var(--font-family-mono, #{ui.$font-family-mono});
+      font-weight: ui.$font-weight-bold;
+    }
+
+    &__name {
+      font-family: var(--font-family-serif, #{ui.$font-family-serif});
+      font-size: var(--font-size-xl, #{ui.$font-size-xl});
+    }
+  }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md, #{ui.$spacing-md});
+  }
+
+  .auth-link {
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    color: var(--accent-color, #{ui.$primary-accent});
+    text-decoration: none;
+    transition: color ui.$transition-fast;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+</style>

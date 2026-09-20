@@ -1,3 +1,11 @@
+// File: notes.config.ts
+// ============================================================
+// Notesby — Publication Configuration
+// Global configuration for author identity, metadata, and nav.
+// ============================================================
+
+import { ROUTES, EXTERNAL_LINKS } from '@/links';
+
 export interface CategoryConfig {
   name: string;
   description?: string;
@@ -8,7 +16,10 @@ export interface NotesConfig {
   authorName: string;
   authorBio: string;
   authorAvatar?: string;
+  siteLogo?: string;
+  siteLogoDark?: string;
   favicon?: string;
+  appleTouchIcon?: string;
   ogImage?: string;
   domain: string;
   description: string;
@@ -35,38 +46,42 @@ export interface NotesConfig {
 export const notesConfig: NotesConfig = {
   siteTitle: 'Notesby',
   authorName: 'Jane Doe',
-  authorBio: 'Writer, thinker, and researcher. Publishing long-form perspectives on technology, design, and architecture.',
-  authorAvatar: '/images/avatar-placeholder.svg',
+  authorBio: 'Writer and researcher. Exploring ideas, culture, and long-form writing.',
+  authorAvatar: '/images/avatar.webp',
+  siteLogo: '/images/notesby-logo-black.svg',
+  siteLogoDark: '/images/notesby-logo-white.svg',
   favicon: '/favicon.webp',
+  appleTouchIcon: '/images/notesby-logo-dark.png',
   ogImage: '/images/og-image.png',
   domain: 'https://example.com',
-  description: 'An open-source, minimalist static publishing engine where every post is a note.',
-  repository: 'https://github.com/CLSTRE-ORG/Notesby',
+  description: 'A personal publication featuring essays, op-eds, and field notes.',
+  repository: EXTERNAL_LINKS.REPOSITORY,
+  // Primary Content Categories displayed across sliders and feeds
   categories: [
     {
       name: 'Essays',
-      description: 'Deep-dive explorations, systems design, and architectural blueprints.',
+      description: 'Long-form pieces, in-depth research, and detailed explorations.',
     },
     {
       name: 'Op-Eds',
-      description: 'Perspectives on technology, digital sovereignty, and the modern web.',
+      description: 'Commentary, critiques, and opinion pieces on current topics.',
     },
     {
       name: 'Field Notes',
-      description: 'Rapid dispatches, benchmarks, and engineering observations.',
+      description: 'Brief thoughts, working logs, and everyday observations.',
     },
   ],
   socials: {
-    github: 'https://github.com/CLSTRE-ORG/Notesby',
+    github: EXTERNAL_LINKS.REPOSITORY,
     twitter: 'https://x.com',
     linkedin: 'https://linkedin.com',
     email: 'hello@example.com',
   },
   navLinks: [
-    { label: 'Notes', href: '/' },
-    { label: 'About', href: '/about' },
-    { label: 'RSS', href: '/rss.xml', isRss: true },
-    { label: 'CLSTRE ↗', href: 'https://clstre.com', external: true },
+    { label: 'Notes', href: ROUTES.HOME },
+    { label: 'About', href: ROUTES.ABOUT },
+    { label: 'RSS', href: ROUTES.RSS, isRss: true },
+    { label: 'CLSTRE ↗', href: EXTERNAL_LINKS.CLSTRE, external: true },
   ],
   footer: {
     copyrightText: `© ${new Date().getFullYear()} Jane Doe. All rights reserved.`,

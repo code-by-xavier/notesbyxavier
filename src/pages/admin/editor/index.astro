@@ -1,0 +1,21 @@
+---
+// File: src/pages/admin/editor/index.astro
+// ============================================================
+// Notesby — Notesby Studio New Draft Launcher
+// Creates an authenticated draft note and redirects directly to the canvas.
+// ============================================================
+
+import { createNoteDraft } from '@/lib/notes';
+import { ROUTES } from '@/links';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect(ROUTES.ADMIN.LOGIN);
+}
+
+// Automatically provision new draft note and redirect to canvas
+const newDraft = await createNoteDraft(user.id);
+return Astro.redirect(ROUTES.ADMIN.EDIT_NOTE(newDraft.id));
+---
