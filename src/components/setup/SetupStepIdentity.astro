@@ -1,0 +1,100 @@
+---
+// File: src/components/setup/SetupStepIdentity.astro
+// ============================================================
+// Notesby — Setup Step 2: Publication Identity
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+---
+
+<div class="step-panel" data-panel="2" id="panel-2" role="tabpanel" aria-labelledby="step-nav-2">
+  <header class="step-header">
+    <div class="step-badge">STEP 2 OF 5</div>
+    <h2 class="step-title">Publication Identity</h2>
+    <p class="step-desc">Name your publication and introduce yourself to your readers.</p>
+  </header>
+
+  <div class="form-stack" id="identity-form">
+    <div class="form-field">
+      <label class="form-label" for="siteTitle">
+        Publication Title{' '}
+        <span class="required-dot" aria-hidden="true">
+          *
+        </span>
+      </label>
+      <input
+        class="form-input"
+        type="text"
+        id="siteTitle"
+        name="siteTitle"
+        placeholder="e.g. Xavier's Notes"
+        autocomplete="organization"
+        required
+      />
+      <p class="form-helper">Displayed in your publication header, RSS feed, and browser tab.</p>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="authorName">
+        Your Full Name{' '}
+        <span class="required-dot" aria-hidden="true">
+          *
+        </span>
+      </label>
+      <input
+        class="form-input"
+        type="text"
+        id="authorName"
+        name="authorName"
+        placeholder="e.g. Xavier Lawrence"
+        autocomplete="name"
+        required
+      />
+      <p class="form-helper">Displayed on bylines and your author profile.</p>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="authorBio">
+        Short Bio{' '}
+        <span class="char-counter" id="bio-counter">
+          0 / 200
+        </span>
+      </label>
+      <textarea
+        class="form-input form-textarea"
+        id="authorBio"
+        name="authorBio"
+        placeholder="Writer and researcher exploring ideas at the intersection of…"
+        rows="3"
+        maxlength="200"
+      ></textarea>
+      <p class="form-helper">Optional. Shown on your About page and reader profile card.</p>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="domain">
+        Publication URL
+      </label>
+      <input
+        class="form-input"
+        type="url"
+        id="domain"
+        name="domain"
+        placeholder="https://yourdomain.com"
+        autocomplete="url"
+      />
+      <p class="form-helper">Your canonical public URL (can be updated later in Settings).</p>
+    </div>
+  </div>
+
+  <div class="step-actions">
+    <button class="btn btn--ghost" id="step2-back" type="button">
+      <Icon name="arrow-left" size={14} strokeWidth={2.5} />
+      Back
+    </button>
+    <button class="btn btn--primary" id="step2-next" type="button">
+      <span>Continue</span>
+      <Icon name="arrow-right" size={14} strokeWidth={2.5} />
+    </button>
+  </div>
+</div>

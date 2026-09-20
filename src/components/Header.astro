@@ -121,35 +121,8 @@ const currentPath = Astro.url.pathname;
         aria-label="Toggle navigation menu"
         aria-expanded="false"
       >
-        <svg
-          class="menu-icon menu-icon--open"
-          viewBox="0 0 24 24"
-          width="22"
-          height="22"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <line x1="4" y1="7" x2="20" y2="7"></line>
-          <line x1="4" y1="12" x2="20" y2="12"></line>
-          <line x1="4" y1="17" x2="20" y2="17"></line>
-        </svg>
-        <svg
-          class="menu-icon menu-icon--close"
-          viewBox="0 0 24 24"
-          width="22"
-          height="22"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
+        <Icon name="menu" size={22} class="menu-icon menu-icon--open" />
+        <Icon name="x" size={22} class="menu-icon menu-icon--close" />
       </button>
     </div>
   </div>
@@ -175,23 +148,7 @@ const currentPath = Astro.url.pathname;
             {link.isRss && (
               <Icon name="rss" size={13} class="rss-icon" color="var(--rss-accent, #f97316)" />
             )}
-            {link.external && (
-              <svg
-                viewBox="0 0 24 24"
-                width="14"
-                height="14"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="external-icon"
-              >
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-              </svg>
-            )}
+            {link.external && <Icon name="external-link" size={14} class="external-icon" />}
           </a>
         );
       })}

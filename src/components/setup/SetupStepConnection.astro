@@ -1,0 +1,86 @@
+---
+// File: src/components/setup/SetupStepConnection.astro
+// ============================================================
+// Notesby — Setup Step 1: Cloud Connection
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+---
+
+<div
+  class="step-panel step-panel--active"
+  data-panel="1"
+  id="panel-1"
+  role="tabpanel"
+  aria-labelledby="step-nav-1"
+>
+  <header class="step-header">
+    <div class="step-badge">STEP 1 OF 5</div>
+    <h1 class="step-title">Cloud Connection</h1>
+    <p class="step-desc">
+      Verifying your database and media storage are reachable before we proceed.
+    </p>
+  </header>
+
+  <div class="health-grid" id="health-grid">
+    <!-- Database card -->
+    <div class="health-card" id="health-db">
+      <div class="health-card__icon health-card__icon--pending">
+        <Icon name="database" size={22} strokeWidth={1.75} />
+      </div>
+      <div class="health-card__body">
+        <div class="health-card__name">PostgreSQL Database</div>
+        <div class="health-card__status" id="db-status">
+          Checking…
+        </div>
+      </div>
+      <div class="health-card__badge health-card__badge--pending" id="db-badge">
+        <Icon name="loader" size={14} strokeWidth={2.5} class="spin" />
+      </div>
+    </div>
+
+    <!-- Storage card -->
+    <div class="health-card" id="health-storage">
+      <div class="health-card__icon health-card__icon--pending">
+        <Icon name="cloud" size={22} strokeWidth={1.75} />
+      </div>
+      <div class="health-card__body">
+        <div class="health-card__name">Cloud Storage (GCS)</div>
+        <div class="health-card__status" id="storage-status">
+          Checking…
+        </div>
+      </div>
+      <div class="health-card__badge health-card__badge--pending" id="storage-badge">
+        <Icon name="loader" size={14} strokeWidth={2.5} class="spin" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Error hint box -->
+  <div class="info-box info-box--error" id="health-error-box" style="display:none">
+    <Icon name="alert" size={16} strokeWidth={2} />
+    <span id="health-error-msg">
+      Connection failed. Check your environment variables and ensure services are running.
+    </span>
+  </div>
+
+  <!-- Cloud Shell tip box -->
+  <div class="info-box info-box--tip">
+    <Icon name="shield-check" size={16} strokeWidth={2} />
+    <span>
+      Deploying fresh to GCP? Use the <strong>Cloud Shell provisioning script</strong> — it sets up
+      Cloud SQL, GCS, and Secret Manager in under 4 minutes.
+    </span>
+  </div>
+
+  <div class="step-actions">
+    <button class="btn btn--ghost btn--sm" id="retry-health-btn" type="button">
+      <Icon name="refresh-cw" size={13} strokeWidth={2.5} />
+      Retry
+    </button>
+    <button class="btn btn--primary" id="step1-next" type="button" disabled>
+      <span>Continue</span>
+      <Icon name="arrow-right" size={14} strokeWidth={2.5} />
+    </button>
+  </div>
+</div>

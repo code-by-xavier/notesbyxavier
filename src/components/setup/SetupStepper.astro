@@ -1,0 +1,35 @@
+---
+// File: src/components/setup/SetupStepper.astro
+// ============================================================
+// Notesby — Setup Progress Stepper
+// ============================================================
+---
+
+<nav class="stepper" aria-label="Setup progress" id="stepper-nav">
+  <ol class="stepper__list">
+    <li class="stepper__item stepper__item--active" data-step="1" id="step-nav-1">
+      <span class="stepper__dot"></span>
+      <span class="stepper__label">Connection</span>
+    </li>
+    <li class="stepper__item" data-step="2" id="step-nav-2">
+      <span class="stepper__dot"></span>
+      <span class="stepper__label">Identity</span>
+    </li>
+    <li class="stepper__item" data-step="3" id="step-nav-3">
+      <span class="stepper__dot"></span>
+      <span class="stepper__label">Account</span>
+    </li>
+    <li class="stepper__item" data-step="4" id="step-nav-4">
+      <span class="stepper__dot"></span>
+      <span class="stepper__label">Branding</span>
+    </li>
+    <li class="stepper__item" data-step="5" id="step-nav-5">
+      <span class="stepper__dot"></span>
+      <span class="stepper__label">Launch</span>
+    </li>
+  </ol>
+  <!-- Progress bar -->
+  <div class="stepper__track" aria-hidden="true">
+    <div class="stepper__fill" id="stepper-fill"></div>
+  </div>
+</nav>

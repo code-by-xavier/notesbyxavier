@@ -6,6 +6,7 @@
 
 export type IconName =
   | 'arrow-left'
+  | 'arrow-right'
   | 'chevron-left'
   | 'chevron-right'
   | 'rss'
@@ -25,6 +26,18 @@ export type IconName =
   | 'upload'
   | 'trash'
   | 'eye'
+  | 'eye-off'
   | 'undo'
   | 'redo'
-  | 'check';
+  | 'check'
+  | 'shield-check'
+  | 'refresh-cw'
+  | 'loader'
+  | 'rocket'
+  | 'zap'
+  | 'send'
+  | 'github'
+  | 'sun'
+  | 'alert-triangle'
+  | 'menu'
+  | 'alert';

@@ -1,0 +1,75 @@
+---
+// File: src/components/setup/SetupStepLaunch.astro
+// ============================================================
+// Notesby — Setup Step 5: Review & Launch
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+---
+
+<div class="step-panel" data-panel="5" id="panel-5" role="tabpanel" aria-labelledby="step-nav-5">
+  <header class="step-header">
+    <div class="step-badge">STEP 5 OF 5</div>
+    <h2 class="step-title">Ready to Launch</h2>
+    <p class="step-desc">Review your configuration below, then claim your publication.</p>
+  </header>
+
+  <!-- Summary card -->
+  <div class="summary-card" id="summary-card">
+    <div class="summary-row">
+      <span class="summary-label">Publication</span>
+      <span class="summary-value" id="sum-title">
+        —
+      </span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-row">
+      <span class="summary-label">Author</span>
+      <span class="summary-value" id="sum-author">
+        —
+      </span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-row">
+      <span class="summary-label">Admin Email</span>
+      <span class="summary-value" id="sum-email">
+        —
+      </span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-row">
+      <span class="summary-label">Domain</span>
+      <span class="summary-value" id="sum-domain">
+        —
+      </span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-row">
+      <span class="summary-label">Avatar</span>
+      <span class="summary-value" id="sum-avatar">
+        —
+      </span>
+    </div>
+  </div>
+
+  <!-- Final error box -->
+  <div class="alert alert--error" id="launch-error" style="display:none">
+    <Icon name="alert" size={15} strokeWidth={2} />
+    <span id="launch-error-msg"></span>
+  </div>
+
+  <div class="step-actions">
+    <button class="btn btn--ghost" id="step5-back" type="button">
+      <Icon name="arrow-left" size={14} strokeWidth={2.5} />
+      Back
+    </button>
+    <button class="btn btn--primary btn--launch" id="launch-btn" type="button">
+      <Icon name="send" size={15} strokeWidth={2} />
+      <span id="launch-text">Launch My Publication →</span>
+      <span id="launch-spinner" style="display:none; align-items:center; gap:6px;">
+        <Icon name="loader" size={14} strokeWidth={2.5} class="spin" />
+        Launching…
+      </span>
+    </button>
+  </div>
+</div>
