@@ -70,5 +70,32 @@ export const onRequest = defineMiddleware(async (context, next) => {
     locals.session = sessionData.session;
   }
 
+  // Guard protected API routes (e.g. /api/notes, /api/upload, /api/settings)
+  if (
+    pathname.startsWith('/api/notes') ||
+    pathname.startsWith('/api/upload') ||
+    pathname.startsWith('/api/settings')
+  ) {
+    const sessionToken = cookies.get(SESSION_COOKIE_NAME)?.value;
+    if (!sessionToken) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const sessionData = await validateSession(sessionToken);
+    if (!sessionData) {
+      cookies.delete(SESSION_COOKIE_NAME, { path: '/' });
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    locals.user = sessionData.user;
+    locals.session = sessionData.session;
+  }
+
   return next();
 });

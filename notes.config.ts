@@ -16,7 +16,10 @@ export interface NotesConfig {
   authorName: string;
   authorBio: string;
   authorAvatar?: string;
+  siteLogo?: string;
+  siteLogoDark?: string;
   favicon?: string;
+  appleTouchIcon?: string;
   ogImage?: string;
   domain: string;
   description: string;
@@ -45,7 +48,10 @@ export const notesConfig: NotesConfig = {
   authorName: 'Jane Doe',
   authorBio: 'Writer and researcher. Exploring ideas, culture, and long-form writing.',
   authorAvatar: '/images/avatar.webp',
+  siteLogo: '/images/notesby-logo-black.svg',
+  siteLogoDark: '/images/notesby-logo-white.svg',
   favicon: '/favicon.webp',
+  appleTouchIcon: '/images/notesby-logo-dark.png',
   ogImage: '/images/og-image.png',
   domain: 'https://example.com',
   description: 'A personal publication featuring essays, op-eds, and field notes.',

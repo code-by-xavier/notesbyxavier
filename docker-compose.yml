@@ -1,7 +1,8 @@
 # File: docker-compose.yml
 # ============================================================
 # Notesby — Local Infrastructure Services
-# Spins up PostgreSQL 16 Alpine container for local development.
+# Spins up PostgreSQL 16 Alpine container and Google Cloud Storage (GCS)
+# emulator for local development and sovereign asset hosting.
 # Note: Redis is strictly avoided per Notesby architecture.
 # ============================================================
 
@@ -24,6 +25,28 @@ services:
       timeout: 5s
       retries: 5
 
+  storage:
+    image: fsouza/fake-gcs-server:latest
+    container_name: notesby_storage
+    restart: unless-stopped
+    ports:
+      - '${GCS_EMULATOR_PORT:-4443}:4443'
+    volumes:
+      - notesby_storage_data:/data
+    command:
+      - -scheme=http
+      - -port=4443
+      - -external-url=http://localhost:4443
+      - -public-host=localhost:4443
+      - -data=/data
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:4443/storage/v1/b']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   notesby_pgdata:
     name: notesby_pgdata
+  notesby_storage_data:
+    name: notesby_storage_data

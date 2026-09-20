@@ -8,6 +8,7 @@
 import Header from '@/components/Header.astro';
 import SEO from '@/components/SEO.astro';
 import { notesConfig } from '@config';
+import { getSiteSettings } from '@/lib/settings';
 import { ROUTES } from '@/links';
 import '@/styles/main.scss';
 
@@ -18,6 +19,7 @@ interface Props {
   pubDate?: Date | string;
   updatedDate?: Date | string;
   image?: string;
+  keywords?: string[] | string;
   hideNav?: boolean;
   hideFooter?: boolean;
 }
@@ -29,9 +31,12 @@ const {
   pubDate,
   updatedDate,
   image,
+  keywords,
   hideNav = false,
   hideFooter = false,
 } = Astro.props;
+
+const settings = await getSiteSettings();
 ---
 
 <!doctype html>
@@ -44,6 +49,7 @@ const {
       pubDate={pubDate}
       updatedDate={updatedDate}
       image={image}
+      keywords={keywords}
     />
 
     <!-- Inline Script to prevent Dark/Light theme flash -->
@@ -66,19 +72,27 @@ const {
     {!hideFooter && (
       <footer class="site-footer">
         <div class="container site-footer__container">
-          <p class="site-footer__copyright">{notesConfig.footer.copyrightText}</p>
-          <div class="site-footer__legal">
-            <a href={ROUTES.TERMS} class="site-footer__link">
-              Terms
-            </a>
-            <span class="site-footer__dot" aria-hidden="true">
-              &bull;
-            </span>
-            <a href={ROUTES.PRIVACY} class="site-footer__link">
-              Privacy
-            </a>
+          <div class="site-footer__left">
+            <p class="site-footer__copyright">{settings.copyrightText}</p>
+            <div class="site-footer__legal">
+              <a href={ROUTES.TERMS} class="site-footer__link">
+                Terms of Service
+              </a>
+              <span class="site-footer__dot" aria-hidden="true">
+                &bull;
+              </span>
+              <a href={ROUTES.PRIVACY} class="site-footer__link">
+                Privacy Policy
+              </a>
+              <span class="site-footer__dot" aria-hidden="true">
+                &bull;
+              </span>
+              <a href={ROUTES.AI_POLICY} class="site-footer__link">
+                AI Policy
+              </a>
+            </div>
           </div>
-          <p class="site-footer__powered">{notesConfig.footer.poweredByText}</p>
+          <p class="site-footer__powered">{settings.colophonText}</p>
         </div>
       </footer>
     )}
@@ -96,35 +110,59 @@ const {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
-          gap: var(--spacing-xs, #{ui.$spacing-xs});
+          gap: var(--spacing-md, #{ui.$spacing-md});
           text-align: left;
 
-          @include ui.media-breakpoint-up(sm) {
+          @include ui.media-breakpoint-up(md) {
             flex-direction: row;
             justify-content: space-between;
-            align-items: center;
-            text-align: left;
+            align-items: flex-start;
+            gap: var(--spacing-lg, #{ui.$spacing-lg});
           }
+        }
+
+        &__left {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: var(--spacing-xs, #{ui.$spacing-xs});
+          text-align: left;
+        }
+
+        &__copyright {
+          margin: 0;
+          color: var(--text-muted, #{ui.$text-muted-light});
         }
 
         &__legal {
           display: inline-flex;
           align-items: center;
           gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+          text-align: left;
         }
 
         &__link {
-          color: var(--text-muted, #{ui.$text-muted-light});
+          color: var(--accent-color, #{ui.$primary-accent});
           text-decoration: none;
-          transition: color ui.$transition-fast;
+          font-weight: ui.$font-weight-medium;
+          transition:
+            color ui.$transition-fast,
+            text-decoration ui.$transition-fast;
 
           &:hover {
-            color: var(--accent-color, #{ui.$primary-accent});
+            color: var(--accent-hover, #{ui.$primary-accent-hover});
+            text-decoration: underline;
           }
         }
 
         &__dot {
+          color: var(--text-muted, #{ui.$text-muted-light});
           opacity: 0.5;
+        }
+
+        &__powered {
+          margin: 0;
+          color: var(--text-muted, #{ui.$text-muted-light});
         }
       }
     </style>

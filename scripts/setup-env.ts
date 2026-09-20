@@ -62,6 +62,9 @@ function hydrate(): void {
       getVal('SESSION_SECRET') ||
       'notesby_dev_secret_key_change_in_production_min_32_chars_long_random',
     NOTESBY_SETUP_COMPLETED: getVal('NOTESBY_SETUP_COMPLETED') || 'false',
+    GCS_BUCKET_NAME: getVal('GCS_BUCKET_NAME') || 'notesby-media',
+    STORAGE_EMULATOR_HOST: getVal('STORAGE_EMULATOR_HOST') || 'http://127.0.0.1:4443',
+    GCS_PUBLIC_URL: getVal('GCS_PUBLIC_URL') || 'http://localhost:4443',
   };
 
   const templatePath = path.join(ROOT_DIR, '.env.template');

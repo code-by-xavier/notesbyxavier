@@ -12,6 +12,7 @@ export const ROUTES = {
   ABOUT: '/about',
   TERMS: '/terms',
   PRIVACY: '/privacy',
+  AI_POLICY: '/ai-policy',
   RSS: '/rss.xml',
   NOTE: (slug: string) => `/notes/${slug}/`,
 
@@ -19,6 +20,7 @@ export const ROUTES = {
   ADMIN: {
     ROOT: '/admin',
     LOGIN: '/admin/login',
+    SETTINGS: '/admin/settings',
     SETUP: '/admin/setup',
     RESET_PASSWORD: '/admin/reset-password',
     EDITOR: '/admin/editor',
@@ -32,8 +34,11 @@ export const ROUTES = {
     MAGIC_LINK: '/api/auth/magic-link',
     VERIFY: '/api/auth/verify',
     RESET_PASSWORD: '/api/auth/reset-password',
+    SETTINGS: '/api/settings',
     NOTES: '/api/notes',
     NOTE: (id: string | number) => `/api/notes/${id}`,
+    PUBLISH_NOTE: (id: string | number) => `/api/notes/${id}/publish`,
+    UPLOAD: '/api/upload',
   },
 } as const;
 

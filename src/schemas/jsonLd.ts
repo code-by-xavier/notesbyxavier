@@ -14,6 +14,7 @@ export interface JsonLdOptions {
   isEssay?: boolean;
   pubDate?: Date | string;
   updatedDate?: Date | string;
+  keywords?: string[] | string;
 }
 
 /**
@@ -38,7 +39,8 @@ export function generateWebsiteSchema() {
  * Generate JSON-LD schema for essays and note publications.
  */
 export function generateArticleSchema(options: JsonLdOptions) {
-  const { title, description, canonicalUrl, resolvedOgImage, pubDate, updatedDate } = options;
+  const { title, description, canonicalUrl, resolvedOgImage, pubDate, updatedDate, keywords } =
+    options;
 
   return {
     '@context': 'https://schema.org',
@@ -53,6 +55,7 @@ export function generateArticleSchema(options: JsonLdOptions) {
         ? new Date(pubDate).toISOString()
         : undefined,
     image: resolvedOgImage,
+    keywords: Array.isArray(keywords) ? keywords.join(', ') : keywords,
     author: {
       '@type': 'Person',
       name: notesConfig.authorName,

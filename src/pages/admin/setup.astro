@@ -1,18 +1,13 @@
 ---
 // File: src/pages/admin/setup.astro
 // ============================================================
-// Notesby — Publication Onboarding Setup Wizard
-// First-run setup screen to claim the publication and create the admin.
-// Utilizes reusable UI form primitives with seamless canvas aesthetics.
+// Notesby — Premium 5-Step Guided Setup Wizard
+// First-run sovereign cloud onboarding experience.
+// Steps: Cloud Connection → Identity → Admin Account → Branding → Launch
+// Step locking: each step validates before the next unlocks.
 // ============================================================
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import FormField from '@/components/ui/FormField.astro';
-import Input from '@/components/ui/Input.astro';
-import Button from '@/components/ui/Button.astro';
-import FormError from '@/components/ui/FormError.astro';
-import HelperText from '@/components/ui/HelperText.astro';
-import LegalNotice from '@/components/ui/LegalNotice.astro';
 import { isSetupCompleted } from '@/lib/auth';
 import { ROUTES } from '@/links';
 
@@ -25,192 +20,1144 @@ if (alreadySetup) {
 ---
 
 <BaseLayout title="Setup Your Publication — Notesby" hideNav={true} hideFooter={true}>
-  <div class="auth-wrapper">
-    <div class="auth-card">
-      <header class="auth-card__header">
-        <a href={ROUTES.HOME} class="auth-brand" aria-label="Notesby Home">
-          <span class="auth-brand__mark">N</span>
-          <span class="auth-brand__name">Notesby</span>
-        </a>
-        <h1 class="auth-card__title">Claim Your Publication</h1>
-        <p class="auth-card__subtitle">
-          Configure your master administrator account and publication identity.
-        </p>
-      </header>
-
-      <form id="setup-form" class="auth-form" novalidate>
-        <FormError id="error-message" />
-
-        <FormField
-          label="Publication Title"
-          forId="siteTitle"
-          required={true}
-          helperText="The title displayed across your publication header and RSS feeds."
-        >
-          <Input
-            type="text"
-            id="siteTitle"
-            name="siteTitle"
-            placeholder="e.g. Xavier's Notes"
-            required={true}
-            autocomplete="organization"
-          />
-        </FormField>
-
-        <FormField
-          label="Your Full Name"
-          forId="authorName"
-          required={true}
-          helperText="Displayed on essay bylines and author profile."
-        >
-          <Input
-            type="text"
-            id="authorName"
-            name="authorName"
-            placeholder="e.g. Xavier Lawrence"
-            required={true}
-            autocomplete="name"
-          />
-        </FormField>
-
-        <FormField
-          label="Admin Email Address"
-          forId="email"
-          required={true}
-          helperText="Your sovereign master credential used for logging into Studio."
-        >
-          <Input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="you@example.com"
-            required={true}
-            autocomplete="email"
-          />
-        </FormField>
-
-        <FormField
-          label="Master Password"
-          forId="password"
-          required={true}
-          helperText="At least 8 characters. Hashed with bcrypt before storage."
-        >
-          <Input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="At least 8 characters"
-            required={true}
-            minlength={8}
-            autocomplete="new-password"
-          />
-        </FormField>
-
-        <FormField label="Confirm Password" forId="confirmPassword" required={true}>
-          <Input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            placeholder="Repeat your password"
-            required={true}
-            minlength={8}
-            autocomplete="new-password"
-          />
-        </FormField>
-
-        <Button
-          type="submit"
-          id="submit-btn"
-          variant="primary"
-          size="md"
-          block={true}
-          loadingText="Initializing..."
-        >
-          Complete Setup & Launch
-        </Button>
-
-        <LegalNotice actionText="completing setup" />
-      </form>
+  <div class="setup-root" id="setup-root">
+    <!-- Background gradient canvas -->
+    <div class="setup-bg" aria-hidden="true">
+      <div class="setup-bg__orb setup-bg__orb--1"></div>
+      <div class="setup-bg__orb setup-bg__orb--2"></div>
     </div>
+
+    <!-- Main centered container -->
+    <div class="setup-shell">
+      <!-- Brand wordmark -->
+      <a href={ROUTES.HOME} class="setup-brand" aria-label="Notesby Home">
+        <img src="/images/notesby-logo-dark.png" alt="Notesby" class="setup-brand__logo" />
+        <span class="setup-brand__name">Notesby</span>
+      </a>
+
+      <!-- Top progress stepper -->
+      <nav class="stepper" aria-label="Setup progress" id="stepper-nav">
+        <ol class="stepper__list">
+          <li class="stepper__item stepper__item--active" data-step="1" id="step-nav-1">
+            <span class="stepper__dot"></span>
+            <span class="stepper__label">Connection</span>
+          </li>
+          <li class="stepper__item" data-step="2" id="step-nav-2">
+            <span class="stepper__dot"></span>
+            <span class="stepper__label">Identity</span>
+          </li>
+          <li class="stepper__item" data-step="3" id="step-nav-3">
+            <span class="stepper__dot"></span>
+            <span class="stepper__label">Account</span>
+          </li>
+          <li class="stepper__item" data-step="4" id="step-nav-4">
+            <span class="stepper__dot"></span>
+            <span class="stepper__label">Branding</span>
+          </li>
+          <li class="stepper__item" data-step="5" id="step-nav-5">
+            <span class="stepper__dot"></span>
+            <span class="stepper__label">Launch</span>
+          </li>
+        </ol>
+        <!-- Progress bar -->
+        <div class="stepper__track" aria-hidden="true">
+          <div class="stepper__fill" id="stepper-fill"></div>
+        </div>
+      </nav>
+
+      <!-- Step panels -->
+      <div class="step-container">
+        <!-- ─────────────────────────────────────────────────────────────────
+             STEP 1: CLOUD CONNECTION
+        ───────────────────────────────────────────────────────────────────── -->
+        <div
+          class="step-panel step-panel--active"
+          data-panel="1"
+          id="panel-1"
+          role="tabpanel"
+          aria-labelledby="step-nav-1"
+        >
+          <header class="step-header">
+            <div class="step-badge">STEP 1 OF 5</div>
+            <h1 class="step-title">Cloud Connection</h1>
+            <p class="step-desc">
+              Verifying your database and media storage are reachable before we proceed.
+            </p>
+          </header>
+
+          <div class="health-grid" id="health-grid">
+            <!-- Database card -->
+            <div class="health-card" id="health-db">
+              <div class="health-card__icon health-card__icon--pending">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="22"
+                  height="22"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                >
+                  <ellipse cx="12" cy="5" rx="9" ry="3" />
+                  <path d="M3 5v6c0 1.66 4.03 3 9 3s9-1.34 9-3V5" />
+                  <path d="M3 11v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6" />
+                </svg>
+              </div>
+              <div class="health-card__body">
+                <div class="health-card__name">PostgreSQL Database</div>
+                <div class="health-card__status" id="db-status">
+                  Checking…
+                </div>
+              </div>
+              <div class="health-card__badge health-card__badge--pending" id="db-badge">
+                <svg
+                  class="spin"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  height="14"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Storage card -->
+            <div class="health-card" id="health-storage">
+              <div class="health-card__icon health-card__icon--pending">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="22"
+                  height="22"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+              </div>
+              <div class="health-card__body">
+                <div class="health-card__name">Cloud Storage (GCS)</div>
+                <div class="health-card__status" id="storage-status">
+                  Checking…
+                </div>
+              </div>
+              <div class="health-card__badge health-card__badge--pending" id="storage-badge">
+                <svg
+                  class="spin"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  height="14"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error hint box -->
+          <div class="info-box info-box--error" id="health-error-box" style="display:none">
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span id="health-error-msg">
+              Connection failed. Check your environment variables and ensure services are running.
+            </span>
+          </div>
+
+          <!-- Cloud Shell tip box -->
+          <div class="info-box info-box--tip">
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M9 12l2 2 4-4" />
+              <path d="M21 12c0 1.2-.504 2.3-1.31 3.1L12 22l-7.69-6.9A4.5 4.5 0 0 1 3 12V5l9-3 9 3v7z" />
+            </svg>
+            <span>
+              Deploying fresh to GCP? Use the <strong>Cloud Shell provisioning script</strong> — it
+              sets up Cloud SQL, GCS, and Secret Manager in under 4 minutes.
+            </span>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn btn--ghost btn--sm" id="retry-health-btn" type="button">
+              <svg
+                viewBox="0 0 24 24"
+                width="13"
+                height="13"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 1 0 .49-4.95" />
+              </svg>
+              Retry
+            </button>
+            <button class="btn btn--primary" id="step1-next" type="button" disabled>
+              <span>Continue</span>
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────────────────────────────
+             STEP 2: PUBLICATION IDENTITY
+        ───────────────────────────────────────────────────────────────────── -->
+        <div
+          class="step-panel"
+          data-panel="2"
+          id="panel-2"
+          role="tabpanel"
+          aria-labelledby="step-nav-2"
+        >
+          <header class="step-header">
+            <div class="step-badge">STEP 2 OF 5</div>
+            <h2 class="step-title">Publication Identity</h2>
+            <p class="step-desc">Name your publication and introduce yourself to your readers.</p>
+          </header>
+
+          <div class="form-stack" id="identity-form">
+            <div class="form-field">
+              <label class="form-label" for="siteTitle">
+                Publication Title{' '}
+                <span class="required-dot" aria-hidden="true">
+                  *
+                </span>
+              </label>
+              <input
+                class="form-input"
+                type="text"
+                id="siteTitle"
+                name="siteTitle"
+                placeholder="e.g. Xavier's Notes"
+                autocomplete="organization"
+                required
+              />
+              <p class="form-helper">
+                Displayed in your publication header, RSS feed, and browser tab.
+              </p>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="authorName">
+                Your Full Name{' '}
+                <span class="required-dot" aria-hidden="true">
+                  *
+                </span>
+              </label>
+              <input
+                class="form-input"
+                type="text"
+                id="authorName"
+                name="authorName"
+                placeholder="e.g. Xavier Lawrence"
+                autocomplete="name"
+                required
+              />
+              <p class="form-helper">Displayed on bylines and your author profile.</p>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="authorBio">
+                Short Bio{' '}
+                <span class="char-counter" id="bio-counter">
+                  0 / 200
+                </span>
+              </label>
+              <textarea
+                class="form-input form-textarea"
+                id="authorBio"
+                name="authorBio"
+                placeholder="Writer and researcher exploring ideas at the intersection of…"
+                rows="3"
+                maxlength="200"
+              ></textarea>
+              <p class="form-helper">Optional. Shown on your About page and reader profile card.</p>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="domain">
+                Publication URL
+              </label>
+              <input
+                class="form-input"
+                type="url"
+                id="domain"
+                name="domain"
+                placeholder="https://yourdomain.com"
+                autocomplete="url"
+              />
+              <p class="form-helper">
+                Your canonical public URL (can be updated later in Settings).
+              </p>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn btn--ghost" id="step2-back" type="button">
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+              Back
+            </button>
+            <button class="btn btn--primary" id="step2-next" type="button">
+              <span>Continue</span>
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────────────────────────────
+             STEP 3: ADMIN ACCOUNT
+        ───────────────────────────────────────────────────────────────────── -->
+        <div
+          class="step-panel"
+          data-panel="3"
+          id="panel-3"
+          role="tabpanel"
+          aria-labelledby="step-nav-3"
+        >
+          <header class="step-header">
+            <div class="step-badge">STEP 3 OF 5</div>
+            <h2 class="step-title">Master Admin Account</h2>
+            <p class="step-desc">
+              Create your sovereign credential. This is the only login for your Notesby Studio.
+            </p>
+          </header>
+
+          <div class="form-stack">
+            <div class="form-field">
+              <label class="form-label" for="email">
+                Admin Email{' '}
+                <span class="required-dot" aria-hidden="true">
+                  *
+                </span>
+              </label>
+              <input
+                class="form-input"
+                type="email"
+                id="email"
+                name="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="password">
+                Master Password{' '}
+                <span class="required-dot" aria-hidden="true">
+                  *
+                </span>
+              </label>
+              <div class="input-wrap">
+                <input
+                  class="form-input"
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="At least 8 characters"
+                  autocomplete="new-password"
+                  minlength="8"
+                  required
+                />
+                <button
+                  class="input-toggle"
+                  type="button"
+                  aria-label="Toggle password visibility"
+                  id="toggle-pw"
+                >
+                  <svg
+                    id="eye-open"
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <svg
+                    id="eye-closed"
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    style="display:none"
+                  >
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                </button>
+              </div>
+              <!-- Password strength meter -->
+              <div class="pw-strength" id="pw-strength" aria-label="Password strength">
+                <div class="pw-strength__bar">
+                  <div class="pw-strength__fill" id="pw-fill"></div>
+                </div>
+                <span class="pw-strength__label" id="pw-label">
+                  Enter password
+                </span>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="confirmPassword">
+                Confirm Password{' '}
+                <span class="required-dot" aria-hidden="true">
+                  *
+                </span>
+              </label>
+              <div class="input-wrap">
+                <input
+                  class="form-input"
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder="Repeat your password"
+                  autocomplete="new-password"
+                  minlength="8"
+                  required
+                />
+                <button
+                  class="input-toggle"
+                  type="button"
+                  aria-label="Toggle confirm password visibility"
+                  id="toggle-cpw"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+              </div>
+              <p class="form-helper form-helper--error" id="pw-match-error" style="display:none">
+                Passwords do not match.
+              </p>
+            </div>
+
+            <!-- Global error -->
+            <div class="alert alert--error" id="step3-error" style="display:none">
+              <svg
+                viewBox="0 0 24 24"
+                width="15"
+                height="15"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <span id="step3-error-msg"></span>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn btn--ghost" id="step3-back" type="button">
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+              Back
+            </button>
+            <button class="btn btn--primary" id="step3-next" type="button">
+              <span>Continue</span>
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────────────────────────────
+             STEP 4: BRANDING (OPTIONAL)
+        ───────────────────────────────────────────────────────────────────── -->
+        <div
+          class="step-panel"
+          data-panel="4"
+          id="panel-4"
+          role="tabpanel"
+          aria-labelledby="step-nav-4"
+        >
+          <header class="step-header">
+            <div class="step-badge">STEP 4 OF 5 · OPTIONAL</div>
+            <h2 class="step-title">Branding</h2>
+            <p class="step-desc">
+              Upload a profile photo. You can always update these in Settings later.
+            </p>
+          </header>
+
+          <div class="avatar-zone" id="avatar-zone">
+            <div class="avatar-preview" id="avatar-preview">
+              <img id="avatar-img" src="" alt="Avatar preview" style="display:none" />
+              <div class="avatar-placeholder" id="avatar-placeholder">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="32"
+                  height="32"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+            </div>
+            <div class="avatar-zone__body">
+              <div class="avatar-zone__title">Profile Photo</div>
+              <div class="avatar-zone__hint">PNG, JPG, or WebP · Max 5 MB</div>
+              <label
+                class="btn btn--secondary btn--sm"
+                for="avatar-file-input"
+                style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="13"
+                  height="13"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <polyline points="16 16 12 12 8 16" />
+                  <line x1="12" y1="12" x2="12" y2="21" />
+                  <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+                </svg>
+                Upload Photo
+              </label>
+              <input
+                type="file"
+                id="avatar-file-input"
+                accept="image/png,image/jpeg,image/webp"
+                style="display:none"
+              />
+            </div>
+            <div class="avatar-upload-status" id="avatar-upload-status" style="display:none">
+              <svg
+                class="spin"
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              Uploading…
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn btn--ghost" id="step4-back" type="button">
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+              Back
+            </button>
+            <div class="step-actions__right">
+              <button class="btn btn--ghost btn--sm" id="step4-skip" type="button">
+                Skip for now
+              </button>
+              <button class="btn btn--primary" id="step4-next" type="button">
+                <span>Review & Launch</span>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="14"
+                  height="14"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────────────────────────────────────────
+             STEP 5: REVIEW & LAUNCH
+        ───────────────────────────────────────────────────────────────────── -->
+        <div
+          class="step-panel"
+          data-panel="5"
+          id="panel-5"
+          role="tabpanel"
+          aria-labelledby="step-nav-5"
+        >
+          <header class="step-header">
+            <div class="step-badge">STEP 5 OF 5</div>
+            <h2 class="step-title">Ready to Launch</h2>
+            <p class="step-desc">Review your configuration below, then claim your publication.</p>
+          </header>
+
+          <!-- Summary card -->
+          <div class="summary-card" id="summary-card">
+            <div class="summary-row">
+              <span class="summary-label">Publication</span>
+              <span class="summary-value" id="sum-title">
+                —
+              </span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-row">
+              <span class="summary-label">Author</span>
+              <span class="summary-value" id="sum-author">
+                —
+              </span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-row">
+              <span class="summary-label">Admin Email</span>
+              <span class="summary-value" id="sum-email">
+                —
+              </span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-row">
+              <span class="summary-label">Domain</span>
+              <span class="summary-value" id="sum-domain">
+                —
+              </span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-row">
+              <span class="summary-label">Avatar</span>
+              <span class="summary-value" id="sum-avatar">
+                —
+              </span>
+            </div>
+          </div>
+
+          <!-- Final error box -->
+          <div class="alert alert--error" id="launch-error" style="display:none">
+            <svg
+              viewBox="0 0 24 24"
+              width="15"
+              height="15"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span id="launch-error-msg"></span>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn btn--ghost" id="step5-back" type="button">
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+              Back
+            </button>
+            <button class="btn btn--primary btn--launch" id="launch-btn" type="button">
+              <svg
+                viewBox="0 0 24 24"
+                width="15"
+                height="15"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M22 2L11 13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+              <span id="launch-text">Launch My Publication →</span>
+              <span id="launch-spinner" style="display:none; align-items:center; gap:6px;">
+                <svg
+                  class="spin"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  height="14"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                </svg>
+                Launching…
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- /step-container -->
+    </div>
+    <!-- /setup-shell -->
   </div>
+  <!-- /setup-root -->
 </BaseLayout>
 
 <script>
-  const form = document.getElementById('setup-form') as HTMLFormElement | null;
-  const errorBox = document.getElementById('error-message') as HTMLDivElement | null;
-  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement | null;
-  const btnText = submitBtn?.querySelector('.ui-button__text') as HTMLElement | null;
-  const btnSpinner = submitBtn?.querySelector('.ui-button__spinner') as HTMLElement | null;
+  // ============================================================
+  // Setup Wizard — Client-Side State Machine
+  // ============================================================
 
-  function showError(msg: string) {
-    if (!errorBox) return;
-    const msgEl = errorBox.querySelector('.ui-form-error__message');
-    if (msgEl) {
-      msgEl.textContent = msg;
-    } else {
-      errorBox.textContent = msg;
-    }
-    errorBox.style.display = 'flex';
+  // --- State ---
+  let currentStep = 1;
+  const TOTAL_STEPS = 5;
+
+  // Collected form data
+  const data: {
+    siteTitle: string;
+    authorName: string;
+    authorBio: string;
+    domain: string;
+    email: string;
+    password: string;
+    avatarUrl: string;
+  } = {
+    siteTitle: '',
+    authorName: '',
+    authorBio: '',
+    domain: '',
+    email: '',
+    password: '',
+    avatarUrl: '',
+  };
+
+  // --- DOM helpers ---
+  function $<T extends HTMLElement = HTMLElement>(id: string): T | null {
+    return document.getElementById(id) as T | null;
   }
 
-  function hideError() {
-    if (!errorBox) return;
-    errorBox.style.display = 'none';
+  // --- Step navigation ---
+  function goToStep(n: number) {
+    // Hide current
+    const currentPanel = document.querySelector('.step-panel--active') as HTMLElement | null;
+    if (currentPanel) {
+      currentPanel.classList.remove('step-panel--active');
+      currentPanel.classList.add('step-panel--exit');
+      setTimeout(() => currentPanel.classList.remove('step-panel--exit'), 350);
+    }
+
+    currentStep = n;
+
+    // Show new
+    const nextPanel = $(`panel-${n}`);
+    if (nextPanel) {
+      nextPanel.classList.add('step-panel--enter');
+      nextPanel.classList.add('step-panel--active');
+      setTimeout(() => nextPanel.classList.remove('step-panel--enter'), 350);
+    }
+
+    // Update stepper nav
+    document.querySelectorAll<HTMLElement>('.stepper__item').forEach((item) => {
+      const s = parseInt(item.dataset.step || '0');
+      item.classList.toggle('stepper__item--active', s === n);
+      item.classList.toggle('stepper__item--done', s < n);
+      item.classList.toggle('stepper__item--future', s > n);
+    });
+
+    // Update progress fill
+    const fill = $('stepper-fill');
+    if (fill) {
+      fill.style.width = `${((n - 1) / (TOTAL_STEPS - 1)) * 100}%`;
+    }
+
+    // Scroll to top of wizard
+    document.getElementById('setup-root')?.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function setLoading(loading: boolean) {
-    if (!submitBtn || !btnText || !btnSpinner) return;
-    submitBtn.disabled = loading;
-    btnText.style.display = loading ? 'none' : 'inline';
-    btnSpinner.style.display = loading ? 'inline-flex' : 'none';
+  // ─────────────────────────────────────────────────────────────
+  // STEP 1: Health check
+  // ─────────────────────────────────────────────────────────────
+  function setHealthCard(id: 'db' | 'storage', state: 'pending' | 'ok' | 'error', msg: string) {
+    const card = $(`health-${id}`);
+    const badgeEl = $(`${id}-badge`);
+    const statusEl = $(`${id}-status`);
+    const iconEl = card?.querySelector('.health-card__icon') as HTMLElement | null;
+
+    if (statusEl) statusEl.textContent = msg;
+
+    ['pending', 'ok', 'error'].forEach((s) => {
+      card?.classList.remove(`health-card--${s}`);
+      badgeEl?.classList.remove(`health-card__badge--${s}`);
+      iconEl?.classList.remove(`health-card__icon--${s}`);
+    });
+
+    card?.classList.add(`health-card--${state}`);
+    badgeEl?.classList.add(`health-card__badge--${state}`);
+    iconEl?.classList.add(`health-card__icon--${state}`);
+
+    if (badgeEl) {
+      if (state === 'pending') {
+        badgeEl.innerHTML = `<svg class="spin" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
+      } else if (state === 'ok') {
+        badgeEl.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+      } else {
+        badgeEl.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+      }
+    }
   }
 
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    hideError();
+  async function runHealthCheck() {
+    const nextBtn = $<HTMLButtonElement>('step1-next');
+    const errBox = $('health-error-box');
+    const errMsg = $('health-error-msg');
+    if (nextBtn) nextBtn.disabled = true;
+    if (errBox) errBox.style.display = 'none';
 
-    const siteTitle = (document.getElementById('siteTitle') as HTMLInputElement)?.value.trim();
-    const authorName = (document.getElementById('authorName') as HTMLInputElement)?.value.trim();
-    const email = (document.getElementById('email') as HTMLInputElement)?.value.trim();
-    const password = (document.getElementById('password') as HTMLInputElement)?.value;
-    const confirmPassword = (document.getElementById('confirmPassword') as HTMLInputElement)?.value;
-
-    if (!siteTitle || !authorName || !email || !password) {
-      showError('Please fill out all required fields.');
-      return;
-    }
-
-    if (password.length < 8) {
-      showError('Password must be at least 8 characters.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      showError('Passwords do not match.');
-      return;
-    }
-
-    setLoading(true);
+    setHealthCard('db', 'pending', 'Checking…');
+    setHealthCard('storage', 'pending', 'Checking…');
 
     try {
-      const response = await fetch('/api/auth/setup', {
+      const res = await fetch('/api/setup/health');
+      const json = await res.json();
+
+      setHealthCard(
+        'db',
+        json.db ? 'ok' : 'error',
+        json.db ? 'Connected' : json.errors?.db || 'Connection failed'
+      );
+      setHealthCard(
+        'storage',
+        json.storage ? 'ok' : 'error',
+        json.storage ? 'Reachable' : json.errors?.storage || 'Unreachable'
+      );
+
+      if (json.db && json.storage) {
+        if (nextBtn) nextBtn.disabled = false;
+      } else {
+        if (errBox) errBox.style.display = 'flex';
+        if (errMsg) {
+          const issues = [];
+          if (!json.db) issues.push('database');
+          if (!json.storage) issues.push('storage');
+          errMsg.textContent = `Could not connect to: ${issues.join(' and ')}. Check your environment variables and ensure services are running.`;
+        }
+      }
+    } catch (e: any) {
+      setHealthCard('db', 'error', 'Request failed');
+      setHealthCard('storage', 'error', 'Request failed');
+      if (errBox) errBox.style.display = 'flex';
+      if (errMsg) errMsg.textContent = 'Health check request failed. Is the server running?';
+    }
+  }
+
+  $('retry-health-btn')?.addEventListener('click', runHealthCheck);
+  $('step1-next')?.addEventListener('click', () => goToStep(2));
+
+  // Run health check on load
+  runHealthCheck();
+
+  // ─────────────────────────────────────────────────────────────
+  // STEP 2: Identity
+  // ─────────────────────────────────────────────────────────────
+  // Bio character counter
+  const bioInput = $<HTMLTextAreaElement>('authorBio');
+  const bioCounter = $('bio-counter');
+  bioInput?.addEventListener('input', () => {
+    const len = bioInput.value.length;
+    if (bioCounter) {
+      bioCounter.textContent = `${len} / 200`;
+      bioCounter.style.color = len > 180 ? '#ef4444' : '';
+    }
+  });
+
+  $('step2-back')?.addEventListener('click', () => goToStep(1));
+  $('step2-next')?.addEventListener('click', () => {
+    const title = $<HTMLInputElement>('siteTitle')?.value.trim() || '';
+    const author = $<HTMLInputElement>('authorName')?.value.trim() || '';
+    if (!title) {
+      $<HTMLInputElement>('siteTitle')?.focus();
+      return;
+    }
+    if (!author) {
+      $<HTMLInputElement>('authorName')?.focus();
+      return;
+    }
+    data.siteTitle = title;
+    data.authorName = author;
+    data.authorBio = $<HTMLTextAreaElement>('authorBio')?.value.trim() || '';
+    data.domain = $<HTMLInputElement>('domain')?.value.trim() || '';
+    goToStep(3);
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // STEP 3: Account
+  // ─────────────────────────────────────────────────────────────
+  function scorePassword(pw: string): { score: number; label: string } {
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (pw.length >= 12) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    const labels = ['Too short', 'Weak', 'Fair', 'Good', 'Strong', 'Very strong'];
+    return { score, label: labels[Math.min(score, labels.length - 1)] };
+  }
+
+  $<HTMLInputElement>('password')?.addEventListener('input', (e) => {
+    const pw = (e.target as HTMLInputElement).value;
+    const { score, label } = scorePassword(pw);
+    const fill = $('pw-fill');
+    const lbl = $('pw-label');
+    if (fill) {
+      fill.style.width = `${(score / 5) * 100}%`;
+      fill.dataset.score = String(score);
+    }
+    if (lbl) lbl.textContent = pw.length === 0 ? 'Enter password' : label;
+  });
+
+  // Toggle password visibility
+  function setupPasswordToggle(toggleId: string, inputId: string) {
+    const toggle = $(toggleId);
+    const input = $<HTMLInputElement>(inputId);
+    toggle?.addEventListener('click', () => {
+      if (!input) return;
+      const isText = input.type === 'text';
+      input.type = isText ? 'password' : 'text';
+      // Swap eye icons for the pw field
+      if (toggleId === 'toggle-pw') {
+        const open = $('eye-open');
+        const closed = $('eye-closed');
+        if (open) open.style.display = isText ? '' : 'none';
+        if (closed) closed.style.display = isText ? 'none' : '';
+      }
+    });
+  }
+  setupPasswordToggle('toggle-pw', 'password');
+  setupPasswordToggle('toggle-cpw', 'confirmPassword');
+
+  $('step3-back')?.addEventListener('click', () => goToStep(2));
+  $('step3-next')?.addEventListener('click', () => {
+    const email = $<HTMLInputElement>('email')?.value.trim() || '';
+    const pw = $<HTMLInputElement>('password')?.value || '';
+    const cpw = $<HTMLInputElement>('confirmPassword')?.value || '';
+    const matchErr = $('pw-match-error');
+    const errBox = $('step3-error');
+    const errMsg = $('step3-error-msg');
+
+    if (matchErr) matchErr.style.display = 'none';
+    if (errBox) errBox.style.display = 'none';
+
+    if (!email || !email.includes('@')) {
+      if (errMsg) errMsg.textContent = 'Please enter a valid email address.';
+      if (errBox) errBox.style.display = 'flex';
+      return;
+    }
+    if (pw.length < 8) {
+      if (errMsg) errMsg.textContent = 'Password must be at least 8 characters.';
+      if (errBox) errBox.style.display = 'flex';
+      return;
+    }
+    if (pw !== cpw) {
+      if (matchErr) matchErr.style.display = 'block';
+      return;
+    }
+    data.email = email;
+    data.password = pw;
+    goToStep(4);
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // STEP 4: Branding / Avatar Upload
+  // ─────────────────────────────────────────────────────────────
+  const avatarFileInput = $<HTMLInputElement>('avatar-file-input');
+  avatarFileInput?.addEventListener('change', async () => {
+    const file = avatarFileInput.files?.[0];
+    if (!file) return;
+
+    const statusEl = $('avatar-upload-status');
+    if (statusEl) statusEl.style.display = 'flex';
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const json = await res.json();
+      if (json.success && json.url) {
+        data.avatarUrl = json.url;
+        const img = $<HTMLImageElement>('avatar-img');
+        const placeholder = $('avatar-placeholder');
+        if (img) {
+          img.src = json.url;
+          img.style.display = 'block';
+        }
+        if (placeholder) placeholder.style.display = 'none';
+      }
+    } catch (_) {
+      // Silent fail — avatar is optional
+    } finally {
+      if (statusEl) statusEl.style.display = 'none';
+    }
+  });
+
+  $('step4-back')?.addEventListener('click', () => goToStep(3));
+  $('step4-skip')?.addEventListener('click', () => {
+    data.avatarUrl = '';
+    populateSummary();
+    goToStep(5);
+  });
+  $('step4-next')?.addEventListener('click', () => {
+    populateSummary();
+    goToStep(5);
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // STEP 5: Summary & Launch
+  // ─────────────────────────────────────────────────────────────
+  function populateSummary() {
+    const set = (id: string, val: string) => {
+      const el = $(id);
+      if (el) el.textContent = val || '—';
+    };
+    set('sum-title', data.siteTitle);
+    set('sum-author', data.authorName);
+    set('sum-email', data.email);
+    set('sum-domain', data.domain || 'Not set (update in Settings)');
+    set('sum-avatar', data.avatarUrl ? 'Uploaded ✓' : 'None (skipped)');
+  }
+
+  $('step5-back')?.addEventListener('click', () => goToStep(4));
+
+  $('launch-btn')?.addEventListener('click', async () => {
+    const btn = $<HTMLButtonElement>('launch-btn');
+    const launchText = $('launch-text');
+    const launchSpinner = $('launch-spinner');
+    const errBox = $('launch-error');
+    const errMsg = $('launch-error-msg');
+
+    if (errBox) errBox.style.display = 'none';
+    if (btn) btn.disabled = true;
+    if (launchText) launchText.style.display = 'none';
+    if (launchSpinner) launchSpinner.style.display = 'flex';
+
+    try {
+      const res = await fetch('/api/auth/setup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ siteTitle, authorName, email, password }),
+        body: JSON.stringify({
+          siteTitle: data.siteTitle,
+          authorName: data.authorName,
+          authorBio: data.authorBio,
+          domain: data.domain,
+          email: data.email,
+          password: data.password,
+          avatarUrl: data.avatarUrl || undefined,
+        }),
       });
 
-      const result = await response.json();
+      const result = await res.json();
 
-      if (!response.ok) {
-        showError(result.error || 'Failed to complete setup.');
-        setLoading(false);
+      if (!res.ok) {
+        if (errMsg) errMsg.textContent = result.error || 'Failed to complete setup.';
+        if (errBox) errBox.style.display = 'flex';
+        if (btn) btn.disabled = false;
+        if (launchText) launchText.style.display = '';
+        if (launchSpinner) launchSpinner.style.display = 'none';
         return;
       }
 
       window.location.href = result.redirect || '/admin';
-    } catch (err: any) {
-      showError('A network error occurred. Please try again.');
-      setLoading(false);
+    } catch (_) {
+      if (errMsg) errMsg.textContent = 'A network error occurred. Please try again.';
+      if (errBox) errBox.style.display = 'flex';
+      if (btn) btn.disabled = false;
+      if (launchText) launchText.style.display = '';
+      if (launchSpinner) launchSpinner.style.display = 'none';
     }
   });
 </script>
@@ -218,71 +1165,779 @@ if (alreadySetup) {
 <style lang="scss">
   @use '@/styles/abstracts' as ui;
 
-  .auth-wrapper {
+  // ─────────────────────────────────────────────────────────────
+  // Root & Background
+  // ─────────────────────────────────────────────────────────────
+  .setup-root {
     min-height: 100vh;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: var(--spacing-2xl, #{ui.$spacing-2xl}) var(--spacing-md, #{ui.$spacing-md});
+    padding: var(--spacing-3xl, #{ui.$spacing-3xl}) var(--spacing-md, #{ui.$spacing-md})
+      var(--spacing-5xl, #{ui.$spacing-5xl});
+    position: relative;
+    overflow: hidden;
     background-color: var(--bg-color, #{ui.$bg-light});
   }
 
-  // Seamless form canvas without background card, border, or shadow
-  .auth-card {
-    width: 100%;
-    max-width: 460px;
-    padding: var(--spacing-sm, #{ui.$spacing-sm}) 0;
+  .setup-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
 
-    &__header {
-      text-align: center;
-      margin-bottom: var(--spacing-lg, #{ui.$spacing-lg});
-    }
+    &__orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.07;
 
-    &__title {
-      @include ui.h2-heading-style;
-      margin-top: var(--spacing-sm, #{ui.$spacing-sm});
-      margin-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
-    }
+      &--1 {
+        width: 600px;
+        height: 600px;
+        background: ui.$primary-accent;
+        top: -200px;
+        right: -150px;
+      }
 
-    &__subtitle {
-      @include ui.description-text;
-      margin: 0 auto;
-      max-width: 90%;
+      &--2 {
+        width: 400px;
+        height: 400px;
+        background: ui.$secondary-accent;
+        bottom: -100px;
+        left: -100px;
+      }
     }
   }
 
-  .auth-brand {
+  // ─────────────────────────────────────────────────────────────
+  // Shell
+  // ─────────────────────────────────────────────────────────────
+  .setup-shell {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl, #{ui.$spacing-xl});
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Brand
+  // ─────────────────────────────────────────────────────────────
+  .setup-brand {
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-xs, #{ui.$spacing-xs});
     text-decoration: none;
     color: var(--text-primary, #{ui.$text-primary-light});
-    font-weight: ui.$font-weight-bold;
-    font-size: var(--font-size-lg, #{ui.$font-size-lg});
 
-    &__mark {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
+    &__logo {
+      width: 28px;
+      height: 28px;
       border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
-      background-color: var(--accent-color, #{ui.$primary-accent});
-      color: #ffffff;
-      font-size: var(--font-size-sm, #{ui.$font-size-sm});
-      font-family: var(--font-family-mono, #{ui.$font-family-mono});
-      font-weight: ui.$font-weight-bold;
+      object-fit: contain;
     }
 
     &__name {
       font-family: var(--font-family-serif, #{ui.$font-family-serif});
       font-size: var(--font-size-xl, #{ui.$font-size-xl});
+      font-weight: ui.$font-weight-semibold;
+      letter-spacing: ui.$letter-spacing-tighter;
     }
   }
 
-  .auth-form {
+  // ─────────────────────────────────────────────────────────────
+  // Stepper
+  // ─────────────────────────────────────────────────────────────
+  .stepper {
+    &__list {
+      display: flex;
+      justify-content: space-between;
+      list-style: none;
+      margin: 0 0 var(--spacing-xs, #{ui.$spacing-xs});
+      padding: 0;
+    }
+
+    &__item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+
+      &--active .stepper__dot {
+        background: ui.$primary-accent;
+        border-color: ui.$primary-accent;
+        transform: scale(1.2);
+        box-shadow: 0 0 0 4px rgba(7, 90, 170, 0.15);
+      }
+
+      &--active .stepper__label {
+        color: var(--text-primary, #{ui.$text-primary-light});
+        font-weight: ui.$font-weight-semibold;
+      }
+
+      &--done .stepper__dot {
+        background: ui.$primary-accent;
+        border-color: ui.$primary-accent;
+      }
+
+      &--done .stepper__dot::after {
+        content: '';
+        display: block;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #fff;
+      }
+
+      &--future .stepper__dot {
+        background: transparent;
+        border-color: var(--border-color, #{ui.$border-light});
+      }
+
+      &--future .stepper__label {
+        color: var(--text-muted, #{ui.$text-muted-light});
+      }
+    }
+
+    &__dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid var(--border-color, #{ui.$border-light});
+      background: var(--bg-color, #{ui.$bg-light});
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__label {
+      font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+      font-weight: ui.$font-weight-medium;
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      letter-spacing: ui.$letter-spacing-meta;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    &__track {
+      height: 2px;
+      background: var(--border-color, #{ui.$border-light});
+      border-radius: ui.$border-radius-full;
+      overflow: hidden;
+      margin-top: var(--spacing-xs, #{ui.$spacing-xs});
+    }
+
+    &__fill {
+      height: 100%;
+      width: 0%;
+      background: ui.$primary-accent;
+      border-radius: ui.$border-radius-full;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Step panels
+  // ─────────────────────────────────────────────────────────────
+  .step-container {
+    position: relative;
+  }
+
+  .step-panel {
+    display: none;
+    flex-direction: column;
+    gap: var(--spacing-lg, #{ui.$spacing-lg});
+    animation: none;
+
+    &--active {
+      display: flex;
+    }
+
+    &--enter {
+      animation: panel-enter 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    &--exit {
+      display: none;
+    }
+  }
+
+  @keyframes panel-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Step header
+  // ─────────────────────────────────────────────────────────────
+  .step-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+  }
+
+  .step-badge {
+    font-size: var(--font-size-2xs, #{ui.$font-size-2xs});
+    font-weight: ui.$font-weight-semibold;
+    letter-spacing: ui.$letter-spacing-category;
+    text-transform: uppercase;
+    color: ui.$primary-accent;
+  }
+
+  .step-title {
+    @include ui.h2-heading-style;
+    margin: 0;
+  }
+
+  .step-desc {
+    @include ui.description-text;
+    margin: 0;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Health Check Cards
+  // ─────────────────────────────────────────────────────────────
+  .health-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs, #{ui.$spacing-xs});
+  }
+
+  .health-card {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, #{ui.$spacing-sm});
+    padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+    background: var(--surface-color, #{ui.$surface-light});
+    border: 1px solid var(--border-color, #{ui.$border-light});
+    border-radius: var(--border-radius-lg, #{ui.$border-radius-lg});
+    transition:
+      border-color 0.2s,
+      background 0.2s;
+
+    &--ok {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.04);
+    }
+
+    &--error {
+      border-color: rgba(239, 68, 68, 0.3);
+      background: rgba(239, 68, 68, 0.04);
+    }
+
+    &__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+      flex-shrink: 0;
+      color: var(--text-muted, #{ui.$text-muted-light});
+      background: var(--tag-bg, #{ui.$tag-bg-light});
+      transition: all 0.2s;
+
+      &--ok {
+        color: ui.$success-color;
+        background: rgba(16, 185, 129, 0.1);
+      }
+
+      &--error {
+        color: ui.$error-color;
+        background: rgba(239, 68, 68, 0.1);
+      }
+    }
+
+    &__body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    &__name {
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-weight: ui.$font-weight-semibold;
+      color: var(--text-primary, #{ui.$text-primary-light});
+    }
+
+    &__status {
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      color: var(--text-muted, #{ui.$text-muted-light});
+      margin-top: 2px;
+      transition: color 0.2s;
+    }
+
+    &--ok &__status {
+      color: ui.$success-color;
+    }
+
+    &--error &__status {
+      color: ui.$error-color;
+    }
+
+    &__badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: all 0.2s;
+
+      &--pending {
+        color: var(--text-muted, #{ui.$text-muted-light});
+      }
+
+      &--ok {
+        color: ui.$success-color;
+        background: rgba(16, 185, 129, 0.12);
+      }
+
+      &--error {
+        color: ui.$error-color;
+        background: rgba(239, 68, 68, 0.1);
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Info boxes
+  // ─────────────────────────────────────────────────────────────
+  .info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-xs, #{ui.$spacing-xs});
+    padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+    border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    line-height: 1.5;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    &--error {
+      background: rgba(239, 68, 68, 0.07);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: ui.$error-color;
+    }
+
+    &--tip {
+      background: rgba(7, 90, 170, 0.06);
+      border: 1px solid rgba(7, 90, 170, 0.15);
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+
+      svg {
+        color: ui.$primary-accent;
+      }
+
+      strong {
+        color: var(--text-primary, #{ui.$text-primary-light});
+        font-weight: ui.$font-weight-semibold;
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Form elements
+  // ─────────────────────────────────────────────────────────────
+  .form-stack {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md, #{ui.$spacing-md});
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+  }
+
+  .form-label {
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    font-weight: ui.$font-weight-semibold;
+    color: var(--text-primary, #{ui.$text-primary-light});
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+  }
+
+  .required-dot {
+    color: ui.$error-color;
+    font-size: var(--font-size-base, #{ui.$font-size-base});
+    line-height: 1;
+  }
+
+  .char-counter {
+    margin-left: auto;
+    font-weight: ui.$font-weight-normal;
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    color: var(--text-muted, #{ui.$text-muted-light});
+    font-family: var(--font-family-mono, #{ui.$font-family-mono});
+    transition: color 0.15s;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+    background: var(--surface-color, #{ui.$surface-light});
+    border: 1px solid var(--border-color, #{ui.$border-light});
+    border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    color: var(--text-primary, #{ui.$text-primary-light});
+    outline: none;
+    box-sizing: border-box;
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+    -webkit-appearance: none;
+
+    &::placeholder {
+      color: var(--text-muted, #{ui.$text-muted-light});
+    }
+
+    &:focus {
+      border-color: ui.$primary-accent;
+      box-shadow: 0 0 0 3px rgba(7, 90, 170, 0.12);
+    }
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+
+  .form-helper {
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    color: var(--text-muted, #{ui.$text-muted-light});
+    margin: 0;
+    line-height: 1.4;
+
+    &--error {
+      color: ui.$error-color;
+    }
+  }
+
+  // Input with toggle button
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-wrap .form-input {
+    padding-right: 2.75rem;
+  }
+
+  .input-toggle {
+    position: absolute;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text-muted, #{ui.$text-muted-light});
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+
+    &:hover {
+      color: var(--text-primary, #{ui.$text-primary-light});
+    }
+  }
+
+  // Password strength meter
+  .pw-strength {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs, #{ui.$spacing-xs});
+    margin-top: 2px;
+
+    &__bar {
+      flex: 1;
+      height: 3px;
+      background: var(--border-color, #{ui.$border-light});
+      border-radius: ui.$border-radius-full;
+      overflow: hidden;
+    }
+
+    &__fill {
+      height: 100%;
+      width: 0%;
+      border-radius: ui.$border-radius-full;
+      transition:
+        width 0.25s ease,
+        background-color 0.25s ease;
+      background: ui.$error-color;
+
+      &[data-score='1'] {
+        background: ui.$error-color;
+      }
+      &[data-score='2'] {
+        background: ui.$warning-color;
+      }
+      &[data-score='3'] {
+        background: ui.$warning-color;
+      }
+      &[data-score='4'] {
+        background: ui.$success-color;
+      }
+      &[data-score='5'] {
+        background: ui.$success-color;
+      }
+    }
+
+    &__label {
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      color: var(--text-muted, #{ui.$text-muted-light});
+      white-space: nowrap;
+      min-width: 80px;
+      text-align: right;
+      font-family: var(--font-family-mono, #{ui.$font-family-mono});
+      font-size: 11px;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Alert
+  // ─────────────────────────────────────────────────────────────
+  .alert {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-xs, #{ui.$spacing-xs});
+    padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+    border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    &--error {
+      background: rgba(239, 68, 68, 0.07);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: ui.$error-color;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Avatar zone
+  // ─────────────────────────────────────────────────────────────
+  .avatar-zone {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg, #{ui.$spacing-lg});
+    padding: var(--spacing-lg, #{ui.$spacing-lg});
+    background: var(--surface-color, #{ui.$surface-light});
+    border: 1px dashed var(--border-color, #{ui.$border-light});
+    border-radius: var(--border-radius-lg, #{ui.$border-radius-lg});
+
+    &__body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs, #{ui.$spacing-xs});
+    }
+
+    &__title {
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-weight: ui.$font-weight-semibold;
+      color: var(--text-primary, #{ui.$text-primary-light});
+    }
+
+    &__hint {
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      color: var(--text-muted, #{ui.$text-muted-light});
+    }
+  }
+
+  .avatar-preview {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--tag-bg, #{ui.$tag-bg-light});
+    border: 2px solid var(--border-color, #{ui.$border-light});
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted, #{ui.$text-muted-light});
+  }
+
+  .avatar-upload-status {
+    align-items: center;
+    gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    color: var(--text-muted, #{ui.$text-muted-light});
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Summary card
+  // ─────────────────────────────────────────────────────────────
+  .summary-card {
+    background: var(--surface-color, #{ui.$surface-light});
+    border: 1px solid var(--border-color, #{ui.$border-light});
+    border-radius: var(--border-radius-lg, #{ui.$border-radius-lg});
+    overflow: hidden;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--spacing-md, #{ui.$spacing-md});
+    padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+  }
+
+  .summary-label {
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    font-weight: ui.$font-weight-semibold;
+    letter-spacing: ui.$letter-spacing-meta;
+    text-transform: uppercase;
+    color: var(--text-muted, #{ui.$text-muted-light});
+    flex-shrink: 0;
+  }
+
+  .summary-value {
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    color: var(--text-primary, #{ui.$text-primary-light});
+    text-align: right;
+    word-break: break-all;
+  }
+
+  .summary-divider {
+    height: 1px;
+    background: var(--border-subtle, #{ui.$border-subtle-light});
+    margin: 0;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Buttons
+  // ─────────────────────────────────────────────────────────────
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-weight: ui.$font-weight-semibold;
+    border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+    transition:
+      background 0.15s,
+      color 0.15s,
+      box-shadow 0.15s,
+      opacity 0.15s;
+    text-decoration: none;
+    white-space: nowrap;
+    padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    line-height: 1;
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    &--primary {
+      background: ui.$primary-accent;
+      color: #ffffff;
+      box-shadow: ui.$shadow-sm;
+
+      &:hover:not(:disabled) {
+        background: ui.$primary-accent-hover;
+      }
+    }
+
+    &--secondary {
+      background: var(--surface-color, #{ui.$surface-light});
+      color: var(--text-primary, #{ui.$text-primary-light});
+      border: 1px solid var(--border-color, #{ui.$border-light});
+
+      &:hover:not(:disabled) {
+        background: var(--tag-bg, #{ui.$tag-bg-light});
+      }
+    }
+
+    &--ghost {
+      background: transparent;
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+
+      &:hover:not(:disabled) {
+        background: var(--tag-bg, #{ui.$tag-bg-light});
+        color: var(--text-primary, #{ui.$text-primary-light});
+      }
+    }
+
+    &--sm {
+      padding: var(--spacing-2xs, #{ui.$spacing-2xs}) var(--spacing-sm, #{ui.$spacing-sm});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    }
+
+    &--launch {
+      padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-xl, #{ui.$spacing-xl});
+      font-size: var(--font-size-base, #{ui.$font-size-base});
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Step actions row
+  // ─────────────────────────────────────────────────────────────
+  .step-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--spacing-sm, #{ui.$spacing-sm});
+    border-top: 1px solid var(--border-subtle, #{ui.$border-subtle-light});
+
+    &__right {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm, #{ui.$spacing-sm});
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Spinner animation
+  // ─────────────────────────────────────────────────────────────
+  .spin {
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>

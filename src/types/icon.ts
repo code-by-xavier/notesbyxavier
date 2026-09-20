@@ -14,4 +14,17 @@ export type IconName =
   | 'cloud'
   | 'database'
   | 'user'
-  | 'external-link';
+  | 'external-link'
+  | 'help-circle'
+  | 'search'
+  | 'x'
+  | 'hash'
+  | 'link'
+  | 'book-open'
+  | 'image'
+  | 'upload'
+  | 'trash'
+  | 'eye'
+  | 'undo'
+  | 'redo'
+  | 'check';

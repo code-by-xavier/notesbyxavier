@@ -1,0 +1,164 @@
+---
+// File: src/components/settings/IdentityBrandingSection.astro
+// ============================================================
+// Notesby — Identity & Header Branding Section
+// Configures author profile name, publication title, bio,
+// avatar photo, and brand logo mark.
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+import type { ResolvedSiteSettings } from '@/lib/settings';
+
+interface Props {
+  settings: ResolvedSiteSettings;
+}
+
+const { settings } = Astro.props;
+const hasCustomLogo = Boolean(settings.customLogo);
+const currentLogoDisplay = settings.customLogo || settings.siteLogo;
+---
+
+<section class="settings-card">
+  <div class="settings-card__header">
+    <div class="settings-card__icon-wrap">
+      <Icon name="user" size={18} />
+    </div>
+    <div>
+      <h2 class="settings-card__title">Identity & Header Branding</h2>
+      <p class="settings-card__desc">
+        Author profile and header presentation across the publication.
+      </p>
+    </div>
+  </div>
+
+  <div class="settings-card__body">
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label for="authorName" class="form-label">
+          Author / Publisher Name
+        </label>
+        <input
+          type="text"
+          id="authorName"
+          name="authorName"
+          class="form-input"
+          value={settings.authorName}
+          placeholder="e.g. Xavier Lawrence"
+          required
+        />
+        <p class="form-help">
+          Displayed in the header next to the avatar, in essay bylines, and in about pages.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="siteTitle" class="form-label">
+          Publication Title
+        </label>
+        <input
+          type="text"
+          id="siteTitle"
+          name="siteTitle"
+          class="form-input"
+          value={settings.siteTitle}
+          placeholder="e.g. Notesby"
+          required
+        />
+        <p class="form-help">Site title rendered in page headers, RSS feeds, and home hero.</p>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="authorBio" class="form-label">
+        Author Tagline / Short Bio
+      </label>
+      <textarea
+        id="authorBio"
+        name="authorBio"
+        class="form-textarea form-textarea--short"
+        rows="2"
+        placeholder="Writer and researcher. Exploring ideas, culture, and long-form writing."
+      >{settings.authorBio}</textarea>
+      <p class="form-help">
+        Displayed prominently on the homepage hero under your name and in post footers.
+      </p>
+    </div>
+
+    <div class="media-upload-grid">
+      <!-- Avatar Upload -->
+      <div class="media-upload-card">
+        <span class="media-upload-label">Profile Avatar / Photo</span>
+        <div class="media-upload-preview-wrap media-upload-preview-wrap--square">
+          <img
+            id="avatar-preview"
+            src={settings.authorAvatar}
+            alt="Author Avatar"
+            class="media-upload-img media-upload-img--avatar"
+            onerror="this.onerror=null; this.src='/images/avatar.webp'"
+          />
+          <div id="avatar-loading" class="media-upload-loading" style="display: none;">
+            <div class="upload-mini-spinner"></div>
+          </div>
+        </div>
+        <input type="hidden" id="authorAvatar" name="authorAvatar" value={settings.authorAvatar} />
+        <input
+          type="file"
+          id="avatar-file-input"
+          accept="image/png,image/jpeg,image/webp,image/avif,image/gif"
+          class="visually-hidden"
+          style="display: none;"
+        />
+        <button type="button" id="upload-avatar-btn" class="media-upload-btn">
+          <Icon name="image" size={13} />
+          <span>Upload Photo</span>
+        </button>
+      </div>
+
+      <!-- Logo Upload -->
+      <div class="media-upload-card">
+        <span class="media-upload-label">Site Logo / Brand Mark</span>
+        <div class="media-upload-preview-wrap">
+          <img
+            id="logo-preview"
+            src={currentLogoDisplay}
+            alt="Site Logo"
+            class="media-upload-img media-upload-img--logo"
+            onerror="this.onerror=null; this.src='/images/notesby-logo-black.svg'"
+          />
+          <div id="logo-loading" class="media-upload-loading" style="display: none;">
+            <div class="upload-mini-spinner"></div>
+          </div>
+        </div>
+        <span id="logo-status-label" class="media-upload-subtext">
+          {hasCustomLogo ? 'Custom Logo Active' : 'Default Platform Logo'}
+        </span>
+        <input type="hidden" id="siteLogo" name="siteLogo" value={settings.customLogo || ''} />
+        <input
+          type="file"
+          id="logo-file-input"
+          accept="image/png,image/jpeg,image/webp,image/avif,image/gif,image/svg+xml"
+          class="visually-hidden"
+          style="display: none;"
+        />
+        <div class="media-btn-row">
+          <button type="button" id="upload-logo-btn" class="media-upload-btn">
+            <Icon name="image" size={13} />
+            <span id="upload-logo-btn-text">
+              {hasCustomLogo ? 'Change Custom Logo' : 'Upload Custom Logo'}
+            </span>
+          </button>
+          <button
+            type="button"
+            id="remove-logo-btn"
+            class="media-upload-btn media-upload-btn--danger"
+            title="Reset to Default Notesby Logo"
+            style={hasCustomLogo ? '' : 'display: none;'}
+          >
+            <Icon name="trash" size={12} />
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

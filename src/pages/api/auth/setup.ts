@@ -32,6 +32,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const data = await request.json();
     const siteTitle = (data.siteTitle || '').trim();
     const authorName = (data.authorName || '').trim();
+    const authorBio = (data.authorBio || '').trim() || null;
+    const domain = (data.domain || '').trim() || null;
+    const avatarUrl = (data.avatarUrl || '').trim() || null;
     const email = (data.email || '').trim().toLowerCase();
     const password = data.password || '';
 
@@ -84,6 +87,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         isSetupCompleted: true,
         siteTitle,
         authorName,
+        ...(authorBio ? { authorBio } : {}),
+        ...(domain ? { domain } : {}),
+        ...(avatarUrl ? { authorAvatar: avatarUrl } : {}),
       })
       .onConflictDoUpdate({
         target: siteSettings.id,
@@ -91,6 +97,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           isSetupCompleted: true,
           siteTitle,
           authorName,
+          ...(authorBio ? { authorBio } : {}),
+          ...(domain ? { domain } : {}),
+          ...(avatarUrl ? { authorAvatar: avatarUrl } : {}),
           updatedAt: new Date(),
         },
       });

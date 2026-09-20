@@ -5,25 +5,24 @@
 // ============================================================
 
 import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
+import { getAllFeedNotes } from '@/lib/notes';
 import { notesConfig } from '@config';
 import { ROUTES } from '@/links';
 
+export const prerender = false;
+
 export async function GET(context: { site: URL }) {
-  const notes = await getCollection('notes', ({ data }) => !data.draft);
-  const sortedNotes = notes.sort(
-    (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
-  );
+  const sortedNotes = await getAllFeedNotes();
 
   return rss({
     title: notesConfig.siteTitle,
     description: notesConfig.description,
     site: context.site || notesConfig.domain,
     items: sortedNotes.map((note) => ({
-      title: note.data.title,
-      pubDate: note.data.pubDate,
-      description: note.data.description,
-      link: ROUTES.NOTE(note.id.replace(/\.mdx?$/, '')),
+      title: note.title,
+      pubDate: new Date(note.pubDate),
+      description: note.description,
+      link: ROUTES.NOTE(note.slug),
     })),
     customData: `<language>en-us</language>`,
   });

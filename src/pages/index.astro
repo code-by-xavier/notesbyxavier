@@ -6,57 +6,51 @@
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import CategorySlider from '@/components/CategorySlider.astro';
-import { getCollection } from 'astro:content';
+import { getAllFeedNotes } from '@/lib/notes';
 import { notesConfig } from '@config';
+import { getSiteSettings } from '@/lib/settings';
 
-const allNotes = await getCollection('notes', ({ data }) => !data.draft);
-const sortedNotes = allNotes.sort(
-  (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
-);
+export const prerender = false;
+
+const settings = await getSiteSettings();
+const sortedNotes = await getAllFeedNotes();
 
 // Group notes by category
 const categoryMap = new Map<string, typeof sortedNotes>();
 
 sortedNotes.forEach((note) => {
-  const cat = note.data.category || 'Essays';
+  const cat = note.category || 'Essays';
   if (!categoryMap.has(cat)) {
     categoryMap.set(cat, []);
   }
   categoryMap.get(cat)!.push(note);
 });
 
-// Build ordered category list
+// Build ordered categories
 const configCategories = notesConfig.categories || [
-  {
-    name: 'Essays',
-    description: 'Long-form pieces, in-depth research, and detailed explorations.',
-  },
-  {
-    name: 'Op-Eds',
-    description: 'Commentary, critiques, and opinion pieces on current topics.',
-  },
-  {
-    name: 'Field Notes',
-    description: 'Brief thoughts, working logs, and everyday observations.',
-  },
+  { name: 'Essays', description: 'Long-form pieces and in-depth explorations.' },
+  { name: 'Op-Eds', description: 'Commentary, critiques, and opinion pieces.' },
+  { name: 'Field Notes', description: 'Working logs, brief thoughts, and dispatches.' },
 ];
 
-const orderedCategories: { name: string; description?: string; notes: typeof sortedNotes }[] = [];
+const orderedCategories: {
+  name: string;
+  description?: string;
+  notes: typeof sortedNotes;
+}[] = [];
 
 // 1. Add categories configured in notesConfig
-configCategories.forEach((cfgCat) => {
-  const notes = categoryMap.get(cfgCat.name);
-  if (notes && notes.length > 0) {
-    orderedCategories.push({
-      name: cfgCat.name,
-      description: cfgCat.description,
-      notes,
-    });
-    categoryMap.delete(cfgCat.name);
-  }
+configCategories.forEach((cat) => {
+  const notes = categoryMap.get(cat.name) || [];
+  orderedCategories.push({
+    name: cat.name,
+    description: cat.description,
+    notes,
+  });
+  categoryMap.delete(cat.name);
 });
 
-// 2. Add any remaining categories dynamically
+// 2. Add any other dynamic categories from the database
 categoryMap.forEach((notes, catName) => {
   orderedCategories.push({
     name: catName,
@@ -68,8 +62,8 @@ categoryMap.forEach((notes, catName) => {
 <BaseLayout>
   <section class="home-hero">
     <div class="home-hero__container">
-      <h1 class="home-hero__title">{notesConfig.siteTitle}</h1>
-      <p class="home-hero__bio">{notesConfig.authorBio}</p>
+      <h1 class="home-hero__title">{settings.siteTitle}</h1>
+      <p class="home-hero__bio">{settings.authorBio}</p>
     </div>
   </section>
 

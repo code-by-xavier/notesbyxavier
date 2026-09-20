@@ -1,0 +1,131 @@
+---
+// File: src/components/settings/LegalComplianceSection.astro
+// ============================================================
+// Notesby — Legal, Copyright & Policies Section
+// Configures legal company entity name, footer copyright text,
+// privacy policy, terms of service, AI crawler notice, and
+// displays the immutable platform attribution colophon.
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+import { LOCKED_COLOPHON_TEXT, type ResolvedSiteSettings } from '@/lib/settings';
+
+interface Props {
+  settings: ResolvedSiteSettings;
+}
+
+const { settings } = Astro.props;
+---
+
+<section class="settings-card">
+  <div class="settings-card__header">
+    <div class="settings-card__icon-wrap">
+      <Icon name="check" size={18} />
+    </div>
+    <div>
+      <h2 class="settings-card__title">Legal, Copyright & Policies</h2>
+      <p class="settings-card__desc">
+        Copyright ownership, legal entity definitions, and policy terms.
+      </p>
+    </div>
+  </div>
+
+  <div class="settings-card__body">
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label for="legalEntityName" class="form-label">
+          Legal Company / Entity Name
+        </label>
+        <input
+          type="text"
+          id="legalEntityName"
+          name="legalEntityName"
+          class="form-input"
+          value={settings.legalEntityName}
+          placeholder="e.g. notesbyxavier LLC"
+          required
+        />
+        <p class="form-help">
+          Referenced throughout your Privacy Policy, Terms of Service, and copyright notice.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="copyrightText" class="form-label">
+          Footer Copyright Notice
+        </label>
+        <input
+          type="text"
+          id="copyrightText"
+          name="copyrightText"
+          class="form-input"
+          value={settings.copyrightText}
+          placeholder="e.g. © 2026 notesbyxavier LLC. All rights reserved."
+          required
+        />
+        <p class="form-help">Exact text rendered in the global footer of every page.</p>
+      </div>
+    </div>
+
+    <!-- Locked Colophon Notice (Unchangeable per platform guidelines) -->
+    <div class="locked-colophon-box">
+      <div class="locked-colophon-header">
+        <span class="locked-badge">PLATFORM ATTRIBUTION (PROTECTED)</span>
+      </div>
+      <p class="locked-colophon-text">“{LOCKED_COLOPHON_TEXT}”</p>
+      <p class="locked-colophon-sub">
+        This attribution honors the open-source engineering of Notesby and the CLSTRE ecosystem and
+        remains permanently active in the footer.
+      </p>
+    </div>
+
+    <div class="form-group">
+      <label for="privacyPolicyText" class="form-label">
+        Custom Privacy Policy (Optional Markdown)
+      </label>
+      <textarea
+        id="privacyPolicyText"
+        name="privacyPolicyText"
+        class="form-textarea"
+        rows="4"
+        placeholder="Leave empty to use Notesby's built-in distraction-free, zero-cookie Privacy Policy template."
+      >{settings.privacyPolicyText || ''}</textarea>
+      <p class="form-help">
+        If empty, the clean default sovereign privacy pledge will be automatically displayed.
+      </p>
+    </div>
+
+    <div class="form-group">
+      <label for="termsOfServiceText" class="form-label">
+        Custom Terms of Service (Optional Markdown)
+      </label>
+      <textarea
+        id="termsOfServiceText"
+        name="termsOfServiceText"
+        class="form-textarea"
+        rows="4"
+        placeholder="Leave empty to use Notesby's standard editorial terms of service template."
+      >{settings.termsOfServiceText || ''}</textarea>
+      <p class="form-help">
+        If empty, the default editorial terms will be automatically displayed.
+      </p>
+    </div>
+
+    <div class="form-group">
+      <label for="aiPolicyText" class="form-label">
+        AI & Crawler Policy (Markdown supported)
+      </label>
+      <textarea
+        id="aiPolicyText"
+        name="aiPolicyText"
+        class="form-textarea"
+        rows="4"
+        placeholder="Author policy prohibiting unauthorized automated AI model training and scraper ingestion."
+      >{settings.aiPolicyText || ''}</textarea>
+      <p class="form-help">
+        Author policy prohibiting unauthorized automated AI model training and scraper ingestion.
+        Rendered on /ai-policy and linked in the global footer.
+      </p>
+    </div>
+  </div>
+</section>

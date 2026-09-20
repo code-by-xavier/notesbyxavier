@@ -8,7 +8,9 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import TableOfContents from '@/components/TableOfContents.astro';
 import type { HeadingItem } from '@/components/TableOfContents.astro';
+import Icon from '@/components/Icon.astro';
 import { notesConfig } from '@config';
+import { getSiteSettings } from '@/lib/settings';
 import { ROUTES } from '@/links';
 
 interface Props {
@@ -21,6 +23,7 @@ interface Props {
   coverImage?: string;
   coverImageAlt?: string;
   readingTime?: string;
+  keywords?: string[] | string;
 }
 
 const {
@@ -33,12 +36,10 @@ const {
   coverImage,
   coverImageAlt,
   readingTime = '10 min read',
+  keywords,
 } = Astro.props;
 
-const formattedDate = new Intl.DateTimeFormat('en-US', {
-  month: 'long',
-  year: 'numeric',
-}).format(new Date(pubDate));
+const settings = await getSiteSettings();
 ---
 
 <BaseLayout
@@ -48,22 +49,29 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
   pubDate={pubDate}
   updatedDate={updatedDate}
   image={coverImage}
+  keywords={keywords}
 >
   <div class="essay-layout">
     <div class="container essay-layout__container">
-      <!-- Left Sidebar: Contents TOC -->
+      <!-- Left: Table of Contents (Sticky sidebar for wide desktop screens) -->
       <TableOfContents headings={headings} />
 
-      <!-- Main Reading Column -->
-      <article class="essay-main">
+      <!-- Center: Main Reading Column -->
+      <article class="reading-container essay-article">
         <header class="essay-header">
+          <div class="essay-header__meta">
+            <time datetime={new Date(pubDate).toISOString()} class="essay-header__date">
+              {new Date(pubDate).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </time>
+            {readingTime && <span class="essay-header__reading-time">{readingTime}</span>}
+          </div>
+
           <h1 class="essay-header__title">{title}</h1>
           {subtitle && <p class="essay-header__subtitle">{subtitle}</p>}
-          <div class="essay-header__meta">
-            <time datetime={new Date(pubDate).toISOString()}>{formattedDate}</time>
-            <span class="essay-header__dot">·</span>
-            <span>{readingTime}</span>
-          </div>
         </header>
 
         <!-- Optional Header Cover Image -->
@@ -81,15 +89,16 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
         <!-- Footnote / Author Sign-off -->
         <footer class="essay-footer">
           <div class="essay-footer__author">
-            <div class="essay-footer__author-name">{notesConfig.authorName}</div>
-            <p class="essay-footer__author-bio">{notesConfig.authorBio}</p>
+            <div class="essay-footer__author-name">{settings.authorName}</div>
+            <p class="essay-footer__author-bio">{settings.postBottomCopy || settings.authorBio}</p>
           </div>
           <div class="essay-footer__actions">
             <a href={ROUTES.HOME} class="essay-footer__back-link">
               ← Read all notes
             </a>
             <a href={ROUTES.RSS} class="essay-footer__rss-link">
-              RSS Feed
+              <Icon name="rss" size={13} class="rss-icon" color="var(--rss-accent, #f97316)" />
+              <span>RSS Feed</span>
             </a>
           </div>
         </footer>
@@ -211,10 +220,25 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     }
 
     &__rss-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-3xs, #{ui.$spacing-3xs});
       color: var(--text-muted, #{ui.$text-muted-light});
+      transition: color ui.$transition-fast;
+
+      :global(.rss-icon),
+      .rss-icon {
+        color: var(--rss-accent, #{ui.$rss-accent}) !important;
+        transition: color ui.$transition-fast;
+      }
 
       &:hover {
         color: var(--text-primary, #{ui.$text-primary-light});
+
+        :global(.rss-icon),
+        .rss-icon {
+          color: var(--rss-accent-hover, #{ui.$rss-accent-hover}) !important;
+        }
       }
     }
   }

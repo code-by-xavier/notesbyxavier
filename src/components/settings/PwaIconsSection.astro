@@ -1,0 +1,105 @@
+---
+// File: src/components/settings/PwaIconsSection.astro
+// ============================================================
+// Notesby — PWA & Web App Icons Section
+// Manages favicon, apple touch icon, and displays dynamic
+// Web App Manifest status.
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+import type { ResolvedSiteSettings } from '@/lib/settings';
+
+interface Props {
+  settings: ResolvedSiteSettings;
+}
+
+const { settings } = Astro.props;
+---
+
+<section class="settings-card">
+  <div class="settings-card__header">
+    <div class="settings-card__icon-wrap">
+      <Icon name="cloud" size={18} />
+    </div>
+    <div>
+      <h2 class="settings-card__title">PWA & Web App Icons</h2>
+      <p class="settings-card__desc">
+        Browser favicon, mobile home screen icon, and dynamic Progressive Web App manifest.
+      </p>
+    </div>
+  </div>
+
+  <div class="settings-card__body">
+    <div class="pwa-badge-banner">
+      <span class="pwa-badge-dot"></span>
+      <span>
+        Dynamic PWA Manifest is active at <code>/manifest.webmanifest</code>
+      </span>
+    </div>
+
+    <div class="media-upload-grid">
+      <!-- Favicon Upload -->
+      <div class="media-upload-card">
+        <span class="media-upload-label">Favicon (.ico, .png, .svg, .webp)</span>
+        <div class="media-upload-preview-wrap media-upload-preview-wrap--square">
+          <img
+            id="favicon-preview"
+            src={settings.favicon}
+            alt="Favicon Preview"
+            class="media-upload-img media-upload-img--favicon"
+            onerror="this.onerror=null; this.src='/favicon.webp'"
+          />
+          <div id="favicon-loading" class="media-upload-loading" style="display: none;">
+            <div class="upload-mini-spinner"></div>
+          </div>
+        </div>
+        <input type="hidden" id="favicon" name="favicon" value={settings.favicon} />
+        <input
+          type="file"
+          id="favicon-file-input"
+          accept="image/png,image/x-icon,image/vnd.microsoft.icon,image/svg+xml,image/webp,image/jpeg"
+          class="visually-hidden"
+          style="display: none;"
+        />
+        <button type="button" id="upload-favicon-btn" class="media-upload-btn">
+          <Icon name="image" size={13} />
+          <span>Upload Favicon</span>
+        </button>
+      </div>
+
+      <!-- Apple Touch Icon Upload -->
+      <div class="media-upload-card">
+        <span class="media-upload-label">Apple Touch Icon (PWA Home Screen)</span>
+        <div class="media-upload-preview-wrap media-upload-preview-wrap--square">
+          <img
+            id="touchicon-preview"
+            src={settings.appleTouchIcon}
+            alt="Apple Touch Icon Preview"
+            class="media-upload-img media-upload-img--touchicon"
+            onerror="this.onerror=null; this.src='/images/notesby-logo-white.svg'"
+          />
+          <div id="touchicon-loading" class="media-upload-loading" style="display: none;">
+            <div class="upload-mini-spinner"></div>
+          </div>
+        </div>
+        <input
+          type="hidden"
+          id="appleTouchIcon"
+          name="appleTouchIcon"
+          value={settings.appleTouchIcon}
+        />
+        <input
+          type="file"
+          id="touchicon-file-input"
+          accept="image/png,image/webp,image/jpeg,image/svg+xml,image/avif"
+          class="visually-hidden"
+          style="display: none;"
+        />
+        <button type="button" id="upload-touchicon-btn" class="media-upload-btn">
+          <Icon name="image" size={13} />
+          <span>Upload PWA Icon</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

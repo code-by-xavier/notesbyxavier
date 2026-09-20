@@ -18,6 +18,10 @@
   --text-muted: #{$text-muted-light};
   --black: #1c1917;
   --white: #ffffff;
+  --color-white: #{$color-white};
+  --error-bg-subtle: #{$color-danger-light};
+  --portal-nav-max-width: #{$portal-nav-max-width};
+  --settings-bottom-padding: #{$settings-bottom-padding};
   --accent-color: #{$primary-accent};
   --accent-hover: #{$primary-accent-hover};
   --accent-light: #{$primary-accent-light};
@@ -163,6 +167,7 @@
   --code-bg: #{$code-bg-dark};
   --tag-bg: #{$tag-bg-dark};
   --tag-text: #{$tag-text-dark};
+  --error-bg-subtle: rgba(239, 68, 68, 0.15);
   --shadow-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(56, 189, 248, 0.25);
 }
 
@@ -347,4 +352,9 @@ a {
       opacity: 0.8;
     }
   }
+}
+
+// Global Accessibility Utilities
+.visually-hidden {
+  @include visually-hidden;
 }

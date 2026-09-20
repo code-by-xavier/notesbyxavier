@@ -21,3 +21,7 @@ Thumbs.db
 !.vscode/extensions.json
 !.vscode/settings.json
 .idea/
+
+# Sovereign Media Uploads
+public/uploads/*
+!public/uploads/.gitkeep

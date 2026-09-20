@@ -7,80 +7,96 @@
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { notesConfig } from '@config';
+import { getSiteSettings } from '@/lib/settings';
 import { ROUTES } from '@/links';
+import { marked } from 'marked';
+
+export const prerender = false;
+
+const settings = await getSiteSettings();
+const entityName = settings.legalEntityName || settings.authorName || settings.siteTitle;
+const customHtml = settings.termsOfServiceText
+  ? await marked.parse(settings.termsOfServiceText)
+  : null;
 ---
 
 <BaseLayout
-  title={`Terms of Service — ${notesConfig.siteTitle}`}
+  title={`Terms of Service — ${settings.siteTitle}`}
   description="Terms of service and publication usage guidelines."
 >
   <div class="reading-container legal-page">
     <h1 class="legal-page__title">Terms of Service</h1>
-    <p class="legal-page__meta">Last updated: September 19, 2026</p>
+    <p class="legal-page__meta">Operating Entity: {entityName} · Sovereign Cloud</p>
 
-    <div class="prose-editorial">
-      <p>
-        These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use of{' '}
-        <strong>{notesConfig.siteTitle}</strong> (&ldquo;the Publication&rdquo;), hosted and
-        operated via the Notesby sovereign publishing engine. By accessing or using this
-        publication, you agree to be bound by these Terms.
-      </p>
+    {customHtml ? (
+      <div class="prose-editorial" set:html={customHtml} />
+    ) : (
+      <div class="prose-editorial">
+        <p>
+          These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use of{' '}
+          <strong>{settings.siteTitle}</strong> (&ldquo;the Publication&rdquo;), hosted and operated
+          by <strong>{entityName}</strong> via the Notesby sovereign publishing engine. By accessing
+          or using this publication, you agree to be bound by these Terms.
+        </p>
 
-      <h2>1. Sovereign Content Ownership</h2>
-      <p>
-        All essays, field notes, op-eds, observations, and original media published here remain the
-        exclusive intellectual property of the author unless explicitly licensed otherwise. As an
-        open-source sovereign publishing system, Notesby is engineered so that authors retain 100%
-        unencumbered ownership of their thoughts, database entries, and media assets.
-      </p>
+        <h2>1. Sovereign Content Ownership</h2>
+        <p>
+          All essays, field notes, op-eds, observations, and original media published here remain
+          the exclusive intellectual property of the author unless explicitly licensed otherwise. As
+          an open-source sovereign publishing system, Notesby is engineered so that authors retain
+          100% unencumbered ownership of their thoughts, database entries, and media assets.
+        </p>
 
-      <h2>2. Permitted Use & Reader Conduct</h2>
-      <p>
-        You are welcome to read, reflect upon, cite, and reference public notes and essays with
-        appropriate attribution. You agree not to:
-      </p>
-      <ul>
-        <li>Engage in abusive automated crawling or scraping that impairs server stability.</li>
-        <li>Attempt unauthorized access to administrator endpoints, databases, or API routes.</li>
-        <li>Impersonate the author, publisher, or platform administrators.</li>
-        <li>Transmit malicious payloads, exploit scripts, or denial-of-service traffic.</li>
-      </ul>
+        <h2>2. Permitted Use & Reader Conduct</h2>
+        <p>
+          You are welcome to read, reflect upon, cite, and reference public notes and essays with
+          appropriate attribution. You agree not to:
+        </p>
+        <ul>
+          <li>Engage in abusive automated crawling or scraping that impairs server stability.</li>
+          <li>Attempt unauthorized access to administrator endpoints, databases, or API routes.</li>
+          <li>Impersonate the author, publisher, or platform administrators.</li>
+          <li>Transmit malicious payloads, exploit scripts, or denial-of-service traffic.</li>
+        </ul>
 
-      <h2>3. Security & Automated Abuse Prevention</h2>
-      <p>
-        To safeguard against automated spam, brute-force credential stuffing, and bot intrusions,
-        forms on this site may be protected by Google reCAPTCHA. Use of reCAPTCHA is subject to the{' '}
-        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
-          Google Privacy Policy
-        </a>{' '}
-        and{' '}
-        <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">
-          Google Terms of Service
-        </a>
-        .
-      </p>
+        <h2>3. Security & Automated Abuse Prevention</h2>
+        <p>
+          To safeguard against automated spam, brute-force credential stuffing, and bot intrusions,
+          forms on this site may be protected by Google reCAPTCHA. Use of reCAPTCHA is subject to
+          the{' '}
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+            Google Privacy Policy
+          </a>{' '}
+          and{' '}
+          <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">
+            Google Terms of Service
+          </a>
+          .
+        </p>
 
-      <h2>4. Open-Source Software License</h2>
-      <p>
-        The underlying platform code powering Notesby is released under the open-source MIT license.
-        The software is provided &ldquo;as is&rdquo;, without warranty of any kind, express or
-        implied, including but not limited to the warranties of merchantability, fitness for a
-        particular purpose, and non-infringement.
-      </p>
+        <h2>4. Open-Source Software License</h2>
+        <p>
+          The underlying platform code powering Notesby is released under the open-source MIT
+          license. The software is provided &ldquo;as is&rdquo;, without warranty of any kind,
+          express or implied, including but not limited to the warranties of merchantability,
+          fitness for a particular purpose, and non-infringement.
+        </p>
 
-      <h2>5. Privacy & Data Handling</h2>
-      <p>
-        We take a minimalist approach to data. We do not use third-party advertising trackers or
-        behavioral analytics scripts. Please review our <a href={ROUTES.PRIVACY}>Privacy Policy</a>{' '}
-        for full details on session cookies and security.
-      </p>
+        <h2>5. Privacy & Data Handling</h2>
+        <p>
+          We take a minimalist approach to data. We do not use third-party advertising trackers or
+          behavioral analytics scripts. Please review our{' '}
+          <a href={ROUTES.PRIVACY}>Privacy Policy</a> for full details on session cookies and
+          security.
+        </p>
 
-      <h2>6. Changes to These Terms</h2>
-      <p>
-        We may revise these Terms from time to time as features and infrastructure evolve. Any
-        updates will be published on this page with an updated revision date.
-      </p>
-    </div>
+        <h2>6. Changes to These Terms</h2>
+        <p>
+          We may revise these Terms from time to time as features and infrastructure evolve. Any
+          updates will be published on this page with an updated revision date.
+        </p>
+      </div>
+    )}
   </div>
 </BaseLayout>
 

@@ -204,7 +204,6 @@
   white-space: nowrap;
 }
 
-// Reusable Nav & Action Link Style
 @mixin nav-link-style {
   font-family: var(--font-family-base, #{v.$font-family-base});
   font-size: var(--font-size-sm, #{v.$font-size-sm});
@@ -213,7 +212,20 @@
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-2xs-plus, #{v.$spacing-2xs-plus});
+  line-height: 1;
   transition: color v.$transition-fast;
+
+  svg {
+    display: block;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  span {
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+  }
 
   &:hover {
     color: var(--text-primary, #{v.$text-primary-light});
