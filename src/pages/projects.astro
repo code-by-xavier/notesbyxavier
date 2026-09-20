@@ -266,18 +266,15 @@ import { notesConfig } from '@config';
     }
 
     &__logo-wrap {
-      display: inline-flex;
-      align-items: center;
-      margin-top: var(--spacing-sm, #{ui.$spacing-sm});
-      margin-bottom: var(--spacing-md, #{ui.$spacing-md});
-      height: 36px;
+      display: block;
+      margin-bottom: var(--spacing-xs, #{ui.$spacing-xs});
+      line-height: 1;
     }
 
     &__logo {
-      height: 32px;
+      display: block;
+      height: 28px;
       width: auto;
-      max-width: 180px;
-      object-fit: contain;
 
       &--dark {
         display: none;
