@@ -69,9 +69,9 @@
   color: var(--text-primary, #{ui.$text-primary-light});
 
   &__logo {
-    width: 28px;
-    height: 28px;
-    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    width: auto;
+    height: 34px;
+    max-width: 140px;
     object-fit: contain;
   }
 
@@ -441,6 +441,7 @@
     border-color 0.15s,
     box-shadow 0.15s;
   -webkit-appearance: none;
+  appearance: none;
 
   &::placeholder {
     color: var(--text-muted, #{ui.$text-muted-light});

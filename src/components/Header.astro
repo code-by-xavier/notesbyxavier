@@ -77,7 +77,7 @@ const currentPath = Astro.url.pathname;
             <span class="avatar-fallback">{initials}</span>
           )}
         </div>
-        <span class="site-header__name">{authorName}</span>
+        {!siteLogo && <span class="site-header__name">{authorName}</span>}
       </a>
     </div>
 

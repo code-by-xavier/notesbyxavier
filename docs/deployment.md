@@ -2,6 +2,8 @@
 
 Notesby is engineered for sovereign cloud ownership, specifically optimized for **Google Cloud Platform (GCP)** while maintaining complete portability to run on any container host or VPS.
 
+> 💡 **Looking for the command cheatsheet and operations lifecycle?** See the [Deployment Lifecycle & Command Cheatsheet](file:///home/dev/PROJECTS/notesbyxavier/docs/deployment-cheatsheet.md).
+
 ---
 
 ## ⚡ Option A — 1-Click Google Cloud Shell Deploy (Recommended)

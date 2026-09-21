@@ -287,13 +287,13 @@ gcloud run deploy "$SERVICE_NAME" \
   --platform="managed" \
   --allow-unauthenticated \
   --port=8080 \
-  --memory="256Mi" \
+  --memory="512Mi" \
   --cpu="1" \
   --min-instances=0 \
   --max-instances=3 \
   --add-cloudsql-instances="${DB_CONNECTION_NAME}" \
   --update-secrets="DATABASE_URL=notesby-database-url:latest,SESSION_SECRET=notesby-session-secret:latest,GCS_BUCKET_NAME=notesby-gcs-bucket:latest" \
-  --set-env-vars="NODE_ENV=production,HOST=0.0.0.0,PORT=8080,NOTESBY_SETUP_COMPLETED=false" \
+  --set-env-vars="NODE_ENV=production,HOST=0.0.0.0,NOTESBY_SETUP_COMPLETED=false" \
   --quiet
 
 LIVE_URL=$(gcloud run services describe "$SERVICE_NAME" \
