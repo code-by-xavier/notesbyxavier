@@ -14,8 +14,11 @@ const srcDir = fileURLToPath(new URL('./src', import.meta.url));
 const configPath = fileURLToPath(new URL('./notes.config.ts', import.meta.url));
 
 export default defineConfig({
-  site: 'https://example.com',
+  site: process.env.PUBLIC_SITE_URL || 'https://notesbyxavier.com',
   output: 'static',
+  security: {
+    checkOrigin: false,
+  },
   adapter: node({
     mode: 'standalone',
   }),

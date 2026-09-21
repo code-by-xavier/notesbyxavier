@@ -152,8 +152,15 @@ export function initSettingsClient() {
         body: formData,
       });
 
-      const data = await res.json();
-      if (res.ok && data.url) {
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch {
+        const text = await res.text().catch(() => '');
+        throw new Error(text || `Server returned status ${res.status}`);
+      }
+
+      if (res.ok && data?.url) {
         if (hiddenInput) hiddenInput.value = data.url;
         if (previewImg) {
           previewImg.onerror = () => {
@@ -172,13 +179,13 @@ export function initSettingsClient() {
           `${assetLabel} uploaded successfully. Remember to click Save Changes to persist.`
         );
       } else {
-        showPortalNotification('error', 'Upload Failed', data.error || 'Upload failed.');
+        showPortalNotification('error', 'Upload Failed', data?.error || 'Upload failed.');
         if (previewImg && hiddenInput?.value) {
           previewImg.src = hiddenInput.value;
         }
       }
-    } catch {
-      showPortalNotification('error', 'Network Error', 'Network error while uploading asset.');
+    } catch (err: any) {
+      showPortalNotification('error', 'Upload Error', err?.message || 'Failed to upload asset.');
       if (previewImg && hiddenInput?.value) {
         previewImg.src = hiddenInput.value;
       }

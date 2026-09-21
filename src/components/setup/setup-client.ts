@@ -302,7 +302,13 @@ export function initSetupWizard() {
 
     try {
       const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      const json = await res.json();
+      let json: any = null;
+      try {
+        json = await res.json();
+      } catch {
+        const text = await res.text().catch(() => '');
+        throw new Error(text || `Server returned status ${res.status}`);
+      }
       if (res.ok && json.success && json.url) {
         data.avatarUrl = json.url;
         if (img) img.src = json.url;

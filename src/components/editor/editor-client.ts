@@ -746,8 +746,15 @@ export function initZenEditor() {
         body: formData,
       });
 
-      const uploadData = await uploadRes.json();
-      if (uploadRes.ok && uploadData.url) {
+      let uploadData: any = null;
+      try {
+        uploadData = await uploadRes.json();
+      } catch {
+        const text = await uploadRes.text().catch(() => '');
+        throw new Error(text || `Server returned status ${uploadRes.status}`);
+      }
+
+      if (uploadRes.ok && uploadData?.url) {
         if (isReplacement) {
           if (coverOverlayStatus) coverOverlayStatus.textContent = 'Finalizing...';
         } else {
