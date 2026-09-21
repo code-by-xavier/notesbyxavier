@@ -118,7 +118,7 @@ Notesby includes an automated preparation workflow:
 pnpm run prepare:upstream
 ```
 
-### What `pnpm run prepare:upstream` does automatically:
+### What `pnpm run prepare:upstream` does automatically
 
 1. Creates/resets an isolated `upstream-syncing` branch from your current code.
 2. Automatically removes site-specific personal files:
@@ -132,7 +132,7 @@ pnpm run prepare:upstream
 5. Runs the full 8-phase `pnpm validate` suite to guarantee zero upstream regressions.
 6. Commits the clean engine changes and safely returns you to your working branch (`main` or `develop`).
 
-### Pushing to Upstream:
+### Pushing to Upstream
 
 After running the script, push the verified `upstream-syncing` branch to the master repository:
 
