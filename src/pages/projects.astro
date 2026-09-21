@@ -9,18 +9,24 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Icon from '@/components/Icon.astro';
 import { projects } from '@/data/projects';
 import { notesConfig } from '@config';
+import { getSiteSettings } from '@/lib/settings';
+
+export const prerender = false;
+
+const settings = await getSiteSettings();
+const authorName = settings.authorName || notesConfig.authorName;
 ---
 
 <BaseLayout
   title="Projects & Architecture"
-  description="Systems, platforms, and open-source infrastructure designed and built by Xavier Lawrence."
+  description={`Systems, platforms, and open-source infrastructure designed and built by ${authorName}.`}
 >
   <div class="projects-page">
     <section class="projects-hero">
       <div class="container">
         <h1 class="projects-hero__title">Projects & Architecture</h1>
         <p class="projects-hero__subtitle">
-          Platforms and open-source software designed and built by {notesConfig.authorName}.
+          Platforms and open-source software designed and built by {authorName}.
         </p>
 
         <div class="projects-hero__philosophy">

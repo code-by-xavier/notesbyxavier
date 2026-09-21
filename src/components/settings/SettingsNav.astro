@@ -16,18 +16,25 @@ const settings = await getSiteSettings();
   <div class="portal-nav__container">
     <a href={ROUTES.ADMIN.ROOT} class="portal-brand" aria-label="Go to Dashboard">
       {settings.customLogo ? (
-        <img src={settings.customLogo} alt={settings.siteTitle} class="portal-brand__logo" />
+        <img
+          src={settings.customLogo}
+          alt={settings.siteTitle}
+          class="portal-brand__logo"
+          onerror="this.onerror=null; this.src='/images/notesby-logo-light.png';"
+        />
       ) : (
         <>
           <img
             src={settings.siteLogo}
             alt="Notesby"
             class="portal-brand__logo portal-brand__logo--light"
+            onerror="this.onerror=null; this.src='/images/notesby-logo-light.png';"
           />
           <img
             src={settings.siteLogoDark}
             alt="Notesby"
             class="portal-brand__logo portal-brand__logo--dark"
+            onerror="this.onerror=null; this.src='/images/notesby-logo-dark.png';"
           />
         </>
       )}
