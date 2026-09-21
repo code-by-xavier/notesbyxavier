@@ -1,7 +1,7 @@
 {
-  "name": "notesbyxavier",
+  "name": "notesby",
   "version": "1.2.0",
-  "description": "Essays, architectural blueprints, and personal notes by Xavier Lawrence.",
+  "description": "An open-source, minimalist static publishing engine where every post is a note. Built for distraction-free reading, editorial essays, and sovereign cloud deployment.",
   "type": "module",
   "scripts": {
     "setup:env": "tsx ./scripts/setup-env.ts",
