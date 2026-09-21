@@ -207,8 +207,14 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --member="serviceAccount:${CLOUDRUN_SA}" \
   --role="roles/cloudsql.client"
 
-# Grant Cloud Run SA access to GCS
-gsutil iam ch "serviceAccount:${CLOUDRUN_SA}:roles/storage.objectAdmin" "gs://${GCS_BUCKET}"
+# Grant Cloud Run SA access to GCS (both project-level and bucket-level)
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${CLOUDRUN_SA}" \
+  --role="roles/storage.objectAdmin"
+
+gcloud storage buckets add-iam-policy-binding "gs://${GCS_BUCKET}" \
+  --member="serviceAccount:${CLOUDRUN_SA}" \
+  --role="roles/storage.objectAdmin"
 
 # Grant Cloud Build SA permissions to deploy to Cloud Run
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \

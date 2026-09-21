@@ -74,7 +74,37 @@ Configure the following environment variables in your Cloud Run service:
 | `GCS_BUCKET_NAME` | `notesby-media`                                                          | Production GCS bucket name        |
 | `GCP_PROJECT_ID`  | `your-gcp-project-id`                                                    | GCP Project ID                    |
 
-### Step 2: Build and Deploy to Cloud Run
+### Step 2: Service Account IAM Permissions
+
+Grant the Cloud Run runtime service account the necessary permissions to access Cloud SQL, Secret Manager, and Google Cloud Storage:
+
+```bash
+export PROJECT_ID="your-gcp-project-id"
+export PROJECT_NUMBER=$(gcloud projects describe "${PROJECT_ID}" --format="value(projectNumber)")
+export CLOUDRUN_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+export GCS_BUCKET="your-gcs-bucket-name"
+
+# Cloud SQL client
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${CLOUDRUN_SA}" \
+  --role="roles/cloudsql.client"
+
+# Secret Manager access
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${CLOUDRUN_SA}" \
+  --role="roles/secretmanager.secretAccessor"
+
+# Google Cloud Storage Object Admin (Project & Bucket level)
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${CLOUDRUN_SA}" \
+  --role="roles/storage.objectAdmin"
+
+gcloud storage buckets add-iam-policy-binding "gs://${GCS_BUCKET}" \
+  --member="serviceAccount:${CLOUDRUN_SA}" \
+  --role="roles/storage.objectAdmin"
+```
+
+### Step 3: Build and Deploy to Cloud Run
 
 ```bash
 export PROJECT_ID="your-gcp-project-id"
@@ -97,7 +127,7 @@ gcloud run deploy ${SERVICE_NAME} \
   --max-instances 5
 ```
 
-### Step 3: Map Custom Domain
+### Step 4: Map Custom Domain
 
 ```bash
 gcloud beta run domain-mappings create \

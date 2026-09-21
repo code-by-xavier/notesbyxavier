@@ -18,7 +18,7 @@ interface Props {
 
 const { isEssay = false } = Astro.props;
 const settings = await getSiteSettings();
-const avatarUrl = settings.authorAvatar;
+const avatarUrl = settings.authorAvatar || settings.siteLogo || '/images/avatar.webp';
 const siteLogo = settings.siteLogo;
 const siteLogoDark = settings.siteLogoDark;
 const authorName = settings.authorName;
@@ -41,34 +41,8 @@ const currentPath = Astro.url.pathname;
             <Icon name="arrow-left" size={16} />
           </span>
         )}
-        <div
-          class:list={['site-header__avatar', { 'site-header__avatar--logo': Boolean(siteLogo) }]}
-        >
-          {siteLogo ? (
-            siteLogo === siteLogoDark ? (
-              <img
-                src={siteLogo}
-                alt={settings.siteTitle}
-                class="avatar-img avatar-img--logo"
-                onerror="this.onerror=null; this.src='/images/notesby-logo-black.svg';"
-              />
-            ) : (
-              <>
-                <img
-                  src={siteLogo}
-                  alt={settings.siteTitle}
-                  class="avatar-img avatar-img--logo avatar-img--logo-light"
-                  onerror="this.onerror=null; this.src='/images/notesby-logo-black.svg';"
-                />
-                <img
-                  src={siteLogoDark}
-                  alt={settings.siteTitle}
-                  class="avatar-img avatar-img--logo avatar-img--logo-dark"
-                  onerror="this.onerror=null; this.src='/images/notesby-logo-white.svg';"
-                />
-              </>
-            )
-          ) : avatarUrl ? (
+        <div class="site-header__avatar">
+          {avatarUrl ? (
             <>
               <img
                 src={avatarUrl}
@@ -84,7 +58,7 @@ const currentPath = Astro.url.pathname;
             <span class="avatar-fallback">{initials}</span>
           )}
         </div>
-        {!siteLogo && <span class="site-header__name">{authorName}</span>}
+        <span class="site-header__name">{authorName}</span>
       </a>
     </div>
 
