@@ -108,6 +108,44 @@ git push origin main
 
 ---
 
+## Method 3: Pushing Engine Upgrades Back to Upstream (Excluding Personal Portfolio)
+
+When developing core engine improvements, modular components, or bug fixes in your personal publication, you will want to contribute those fixes back to the master upstream repository (`CLSTRE-ORG/Notesby`) **without** publishing your personal portfolio pages, bespoke data, or author identity.
+
+Notesby includes an automated preparation workflow:
+
+```bash
+pnpm run prepare:upstream
+```
+
+### What `pnpm run prepare:upstream` does automatically:
+
+1. Creates/resets an isolated `upstream-syncing` branch from your current code.
+2. Automatically removes site-specific personal files:
+   - `src/pages/projects.astro` (personal portfolio page)
+   - `src/data/projects.ts` (personal project records)
+   - `src/content/notes/first-note.mdx` (personal starter note)
+3. Sanitizes `notes.config.ts`:
+   - Strips the `/projects` navigation link.
+   - Restores open-source template defaults (`Jane Doe`, `https://example.com`, etc.).
+4. Sets `package.json` name to `"notesby"`.
+5. Runs the full 8-phase `pnpm validate` suite to guarantee zero upstream regressions.
+6. Commits the clean engine changes and safely returns you to your working branch (`main` or `develop`).
+
+### Pushing to Upstream:
+
+After running the script, push the verified `upstream-syncing` branch to the master repository:
+
+```bash
+# Push to upstream main
+git push upstream upstream-syncing:main
+
+# Or push to upstream develop / feature branch for review
+git push upstream upstream-syncing:develop
+```
+
+---
+
 ## Frequently Asked Questions
 
 ### Will pulling updates overwrite my existing notes?
