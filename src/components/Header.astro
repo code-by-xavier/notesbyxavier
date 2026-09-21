@@ -46,18 +46,25 @@ const currentPath = Astro.url.pathname;
         >
           {siteLogo ? (
             siteLogo === siteLogoDark ? (
-              <img src={siteLogo} alt={settings.siteTitle} class="avatar-img avatar-img--logo" />
+              <img
+                src={siteLogo}
+                alt={settings.siteTitle}
+                class="avatar-img avatar-img--logo"
+                onerror="this.onerror=null; this.src='/images/notesby-logo-black.svg';"
+              />
             ) : (
               <>
                 <img
                   src={siteLogo}
                   alt={settings.siteTitle}
                   class="avatar-img avatar-img--logo avatar-img--logo-light"
+                  onerror="this.onerror=null; this.src='/images/notesby-logo-black.svg';"
                 />
                 <img
                   src={siteLogoDark}
                   alt={settings.siteTitle}
                   class="avatar-img avatar-img--logo avatar-img--logo-dark"
+                  onerror="this.onerror=null; this.src='/images/notesby-logo-white.svg';"
                 />
               </>
             )
