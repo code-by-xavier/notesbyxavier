@@ -2,7 +2,7 @@
 
 Notesby is engineered for sovereign cloud ownership, specifically optimized for **Google Cloud Platform (GCP)** while maintaining complete portability to run on any container host or VPS.
 
-> 💡 **Looking for the command cheatsheet and operations lifecycle?** See the [Deployment Lifecycle & Command Cheatsheet](file:///home/dev/PROJECTS/notesbyxavier/docs/deployment-cheatsheet.md).
+> 💡 **Looking for the command cheatsheet and operations lifecycle?** See the [Deployment Lifecycle & Command Cheatsheet](./deployment-guide.md).
 
 ---
 
@@ -12,7 +12,7 @@ The fastest path to a live Notesby publication. No software to install — every
 
 ### How it works
 
-1. Click the **"Deploy to Google Cloud"** button on [clstre.com](https://clstre.com) or [notesbyxavier.com](https://notesbyxavier.com).
+1. Click the **"Deploy to Google Cloud"** button on [clstre.com](https://clstre.com).
 2. Google Cloud Shell opens in your browser, already authenticated.
 3. The `scripts/setup-gcp.sh` script runs interactively and provisions:
    - **Cloud SQL** (`db-f1-micro` PostgreSQL) — ~$7/mo

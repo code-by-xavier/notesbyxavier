@@ -56,6 +56,7 @@ try {
     'src/pages/projects.astro',
     'src/data/projects.ts',
     'src/content/notes/first-note.mdx',
+    'docs/deployment-cheatsheet.md', // Personal project-specific cheatsheet — downstream only
   ];
 
   for (const relPath of filesToRemove) {
