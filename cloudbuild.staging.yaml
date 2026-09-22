@@ -1,29 +1,30 @@
-# File: cloudbuild.yaml
+# File: cloudbuild.staging.yaml
 # ============================================================
-# Notesby — Production Cloud Build Pipeline
-# Deploys Notesby to Google Cloud Run with Cloud SQL.
+# Notesby — Staging Cloud Build Pipeline
+# Deploys Notesby to Google Cloud Run using Supabase for DB.
+#
+# No Cloud SQL sidecar required — Supabase uses a direct TLS
+# TCP connection via the standard postgresql:// URL.
 #
 # REQUIRED: Override these substitutions in your Cloud Build
 # trigger configuration. Never commit personal values here.
-# Override via: gcloud builds submit --substitutions=_SERVICE_NAME=mysite,...
 #
-# Secret Manager naming convention: PROD_<SECRET_NAME>
-#   PROD_DATABASE_URL    — postgresql://user:pass@/db?host=/cloudsql/CONN
-#   PROD_SESSION_SECRET  — random 32-byte hex
-#   PROD_GCS_BUCKET_NAME — your GCS media bucket name
+# Secret Manager naming convention: STAGING_<SECRET_NAME>
+#   STAGING_DATABASE_URL    — your Supabase postgres:// connection string
+#   STAGING_SESSION_SECRET  — random 32-byte hex
+#   STAGING_GCS_BUCKET_NAME — your GCS staging bucket name (or same as prod)
 # ============================================================
 options:
   logging: CLOUD_LOGGING_ONLY
 timeout: '1800s'
 
 substitutions:
-  _ENV: 'PROD'
+  _ENV: 'STAGING'
   _REGION: 'US-CENTRAL1'
-  _SERVICE_NAME: 'MY-NOTESBY-SITE'
-  _DB_INSTANCE: 'MY-NOTESBY-DB'
+  _SERVICE_NAME: 'MY-NOTESBY-STAGING'
 
 steps:
-  # Step 1: Build the production container image
+  # Step 1: Build the staging container image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Build Image'
     args:
@@ -43,7 +44,7 @@ steps:
       - '--all-tags'
     waitFor: ['Build Image']
 
-  # Step 3: Deploy to Cloud Run (Production — Cloud SQL Auth Proxy sidecar)
+  # Step 3: Deploy to Cloud Run (Staging — Supabase, no Cloud SQL proxy)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'Deploy to Cloud Run'
     entrypoint: gcloud
@@ -56,18 +57,17 @@ steps:
       - '--platform=managed'
       - '--allow-unauthenticated'
       - '--port=8080'
-      - '--memory=512Mi'
+      - '--memory=256Mi'
       - '--cpu=1'
       - '--min-instances=0'
-      - '--max-instances=3'
-      # Secrets injected from Secret Manager with PROD_ prefix
+      - '--max-instances=2'
+      # Secrets injected from Secret Manager with STAGING_ prefix
+      # DATABASE_URL resolves to Supabase postgres:// connection string
       - '--update-secrets=DATABASE_URL=${_ENV}_DATABASE_URL:latest,SESSION_SECRET=${_ENV}_SESSION_SECRET:latest,GCS_BUCKET_NAME=${_ENV}_GCS_BUCKET_NAME:latest'
-      # Cloud SQL Auth Proxy sidecar — connects via Unix socket (required for Cloud SQL)
-      - '--add-cloudsql-instances=$PROJECT_ID:${_REGION}:${_DB_INSTANCE}'
       - '--set-env-vars=NODE_ENV=production,HOST=0.0.0.0'
     waitFor: ['Push Image']
 
-  # Step 4: Print live publication URL
+  # Step 4: Print staging URL
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'Print URL'
     entrypoint: bash
@@ -79,11 +79,12 @@ steps:
           --format="value(status.url)")
         echo ""
         echo "╔══════════════════════════════════════════════════╗"
-        echo "║  🚀  Notesby deployed to PRODUCTION!             ║"
+        echo "║  🧪  Notesby deployed to STAGING!                ║"
         echo "╚══════════════════════════════════════════════════╝"
         echo ""
-        echo "  Publication URL : $${SERVICE_URL}"
-        echo "  Setup Wizard    : $${SERVICE_URL}/setup"
+        echo "  Staging URL  : $${SERVICE_URL}"
+        echo "  Setup Wizard : $${SERVICE_URL}/setup"
+        echo "  DB Backend   : Supabase (STAGING_DATABASE_URL)"
         echo ""
     waitFor: ['Deploy to Cloud Run']
 

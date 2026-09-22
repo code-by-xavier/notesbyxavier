@@ -44,7 +44,7 @@ export const ROUTES = {
 
 export const EXTERNAL_LINKS = {
   CLSTRE: 'https://clstre.com',
-  AUTHOR: 'https://notesbyxavier.com',
+  AUTHOR: 'https://clstre.com',
   REPOSITORY: 'https://github.com/CLSTRE-ORG/Notesby',
   ISSUES: 'https://github.com/CLSTRE-ORG/Notesby/issues',
   SUPPORT_EMAIL: 'mailto:support@clstre.com',

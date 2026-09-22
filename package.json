@@ -63,10 +63,10 @@
     "typescript": "^5.7.3"
   },
   "author": "Xavier Lawrence <XLawrence@clstre.com> (https://notesbyxavier.com)",
-  "homepage": "https://github.com/code-by-xavier/notesbyxavier",
+  "homepage": "https://github.com/code-by-xavier/",
   "bugs": {
-    "url": "https://github.com/code-by-xavier/notesbyxavier/issues",
-    "email": "XLawrence@clstre.com"
+    "url": "https://github.com/CLSTRE-ORG/Notesby/issues",
+    "email": "support@clstre.com"
   },
   "license": "MIT",
   "packageManager": "pnpm@10.30.1",
