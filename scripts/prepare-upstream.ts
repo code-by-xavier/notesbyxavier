@@ -3,7 +3,7 @@
 // Notesby — Sovereign Upstream Sync Preparation Script
 // Prepares a clean 'upstream-syncing' branch with all engine fixes
 // and modularization, while strictly excluding personal content,
-// personal identity, and the site-specific projects showcase page.
+// personal identity, deployment cheatsheets, and bespoke pages.
 // ============================================================
 
 import { execSync } from 'node:child_process';
@@ -51,12 +51,14 @@ try {
   runSilent('git checkout -B upstream-syncing');
 
   // 4. Remove site-specific personal files
-  console.log('🧹 Stripping site-specific portfolio and personal notes...');
+  console.log('🧹 Stripping personal files, cheatsheets, and sync scripts...');
   const filesToRemove = [
     'src/pages/projects.astro',
     'src/data/projects.ts',
     'src/content/notes/first-note.mdx',
-    'docs/deployment-cheatsheet.md', // Personal project-specific cheatsheet — downstream only
+    'docs/deployment-cheatsheet.md',
+    'public/images/xavier-avatar.webp',
+    'scripts/prepare-upstream.ts',
   ];
 
   for (const relPath of filesToRemove) {
@@ -87,13 +89,46 @@ try {
       /description:\s*'[^']+'/,
       "description: 'A personal publication featuring essays, op-eds, and field notes.'"
     );
+    configContent = configContent.replace(
+      /siteLogo:\s*'[^']+'/,
+      "siteLogo: '/images/notesby-logo-black.svg'"
+    );
+    configContent = configContent.replace(
+      /siteLogoDark:\s*'[^']+'/,
+      "siteLogoDark: '/images/notesby-logo-white.svg'"
+    );
 
     fs.writeFileSync(configPath, configContent, 'utf-8');
     run('git add notes.config.ts', true);
     console.log('  ✓ Cleaned notes.config.ts (removed /projects nav link & genericized defaults)');
   }
 
-  // 6. Sanitize package.json (name & description)
+  // 6. Sanitize astro.config.mjs (generic fallback domain)
+  console.log('🌐 Sanitizing astro.config.mjs fallback domain...');
+  const astroConfigPath = path.join(process.cwd(), 'astro.config.mjs');
+  if (fs.existsSync(astroConfigPath)) {
+    let astroContent = fs.readFileSync(astroConfigPath, 'utf-8');
+    astroContent = astroContent.replace(
+      /site:\s*process\.env\.PUBLIC_SITE_URL\s*\|\|\s*'[^']+'/,
+      "site: process.env.PUBLIC_SITE_URL || 'https://example.com'"
+    );
+    fs.writeFileSync(astroConfigPath, astroContent, 'utf-8');
+    run('git add astro.config.mjs', true);
+    console.log('  ✓ Genericized astro.config.mjs domain fallback');
+  }
+
+  // 7. Sanitize src/links.ts (ecosystem brand link)
+  console.log('🔗 Sanitizing src/links.ts external author link...');
+  const linksPath = path.join(process.cwd(), 'src/links.ts');
+  if (fs.existsSync(linksPath)) {
+    let linksContent = fs.readFileSync(linksPath, 'utf-8');
+    linksContent = linksContent.replace(/AUTHOR:\s*'[^']+'/, "AUTHOR: 'https://clstre.com'");
+    fs.writeFileSync(linksPath, linksContent, 'utf-8');
+    run('git add src/links.ts', true);
+    console.log('  ✓ Set EXTERNAL_LINKS.AUTHOR to https://clstre.com');
+  }
+
+  // 8. Sanitize package.json (name, description, repo links, and strip prepare:upstream)
   console.log('📦 Genericizing package.json for open-source engine...');
   const pkgPath = path.join(process.cwd(), 'package.json');
   if (fs.existsSync(pkgPath)) {
@@ -101,23 +136,31 @@ try {
     pkg.name = 'notesby';
     pkg.description =
       'An open-source, minimalist static publishing engine where every post is a note. Built for distraction-free reading, editorial essays, and sovereign cloud deployment.';
+    pkg.homepage = 'https://github.com/code-by-xavier/';
+    if (pkg.bugs) {
+      pkg.bugs.url = 'https://github.com/CLSTRE-ORG/Notesby/issues';
+      pkg.bugs.email = 'support@clstre.com';
+    }
+    if (pkg.scripts && pkg.scripts['prepare:upstream']) {
+      delete pkg.scripts['prepare:upstream'];
+    }
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf-8');
     run('git add package.json', true);
-    console.log('  ✓ Set package.json name to "notesby"');
+    console.log('  ✓ Genericized package.json and stripped prepare:upstream');
   }
 
-  // 7. Format staged changes
+  // 9. Format staged changes
   runSilent('pnpm run format');
   runSilent('git add -A');
 
-  // 8. Validate upstream engine integrity
+  // 10. Validate upstream engine integrity
   console.log('\n🛡️  Running full platform validation on upstream-syncing branch...');
   run('pnpm run validate');
 
-  // 9. Commit clean upstream changes
+  // 11. Commit clean upstream changes
   console.log('\n💾 Committing upstream engine changes...');
   run(
-    'git commit -m "chore(upstream): prepare engine sync excluding site-specific portfolio and personal notes"',
+    'git commit -m "chore(upstream): prepare engine sync excluding personal portfolio, cheatsheet, and downstream config"',
     true
   );
 
