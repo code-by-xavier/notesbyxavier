@@ -5,6 +5,8 @@
 // Provides contextual instructions, field hints, and portal navigation tips.
 // ============================================================
 
+import Icon from '@/components/Icon.astro';
+
 interface Props {
   variant?: 'default' | 'info' | 'warning' | 'muted' | 'tip';
   id?: string;
@@ -26,62 +28,10 @@ const { variant = 'default', id, icon = false, class: className = '', ...rest } 
   ]}
   {...rest}
 >
-  {icon && variant === 'info' && (
-    <svg
-      class="ui-helper-text__icon"
-      viewBox="0 0 24 24"
-      width="14"
-      height="14"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="16" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12.01" y2="8" />
-    </svg>
-  )}
-  {icon && variant === 'tip' && (
-    <svg
-      class="ui-helper-text__icon"
-      viewBox="0 0 24 24"
-      width="14"
-      height="14"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path d="M12 2v1" />
-      <path d="M12 21v1" />
-      <path d="M4.93 4.93l.7.7" />
-      <path d="M18.36 18.36l.7.7" />
-      <path d="M2 12h1" />
-      <path d="M21 12h1" />
-      <path d="M4.93 19.07l.7-.7" />
-      <path d="M18.36 5.64l.7-.7" />
-      <circle cx="12" cy="12" r="4" />
-    </svg>
-  )}
+  {icon && variant === 'info' && <Icon name="help-circle" size={14} class="ui-helper-text__icon" />}
+  {icon && variant === 'tip' && <Icon name="sun" size={14} class="ui-helper-text__icon" />}
   {icon && variant === 'warning' && (
-    <svg
-      class="ui-helper-text__icon"
-      viewBox="0 0 24 24"
-      width="14"
-      height="14"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-      <line x1="12" y1="9" x2="12" y2="13" />
-      <line x1="12" y1="17" x2="12.01" y2="17" />
-    </svg>
+    <Icon name="alert-triangle" size={14} class="ui-helper-text__icon" />
   )}
   <span class="ui-helper-text__content">
     <slot />

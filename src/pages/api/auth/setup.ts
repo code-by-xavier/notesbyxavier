@@ -6,7 +6,7 @@
 // ============================================================
 
 import type { APIRoute } from 'astro';
-import { db } from '@/db';
+import { db, ensureSchema } from '@/db';
 import { users, siteSettings } from '@/db/schema';
 import {
   hashPassword,
@@ -21,6 +21,7 @@ export const prerender = false;
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
+    await ensureSchema();
     const alreadySetup = await isSetupCompleted();
     if (alreadySetup) {
       return new Response(

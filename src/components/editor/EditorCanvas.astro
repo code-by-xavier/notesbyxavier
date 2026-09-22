@@ -1,0 +1,308 @@
+---
+// File: src/components/editor/EditorCanvas.astro
+// ============================================================
+// Notesby — Zen Studio Editor Canvas Pane
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+import type { Note } from '@/db/schema';
+
+interface Props {
+  note: Note;
+  initialContentHtml: string;
+}
+
+const { note, initialContentHtml } = Astro.props;
+---
+
+<main class="zen-canvas-wrapper">
+  <div class="zen-canvas">
+    <!-- 1. Interactive True-to-Life Writing Canvas Pane -->
+    <div class="zen-write-pane" id="write-pane">
+      <!-- Live Title Input -->
+      <textarea
+        id="note-title"
+        class="zen-title-input"
+        placeholder="Note title..."
+        rows="1"
+        autocomplete="off"
+        spellcheck="true"
+      >{note.title === 'Untitled Note' ? '' : note.title}</textarea>
+
+      <!-- Live Subtitle Input (Optional) -->
+      <textarea
+        id="note-subtitle"
+        class="zen-subtitle-input"
+        placeholder="Subtitle or core thesis (optional)..."
+        rows="1"
+        autocomplete="off"
+        spellcheck="true"
+      >{note.subtitle || ''}</textarea>
+
+      <!-- Headline Cover Image Area -->
+      <div class="zen-cover-area" id="cover-area">
+        <input
+          type="file"
+          id="cover-file-input"
+          accept="image/png,image/jpeg,image/webp,image/avif,image/gif"
+          class="visually-hidden"
+          style="display: none;"
+        />
+
+        <div
+          id="cover-preview-wrapper"
+          class="zen-cover-preview"
+          style={note.coverImage ? '' : 'display: none;'}
+        >
+          <img
+            id="cover-preview-img"
+            src={note.coverImage || ''}
+            alt="Headline Cover Image"
+            class="zen-cover-img"
+          />
+          <!-- Smooth Replacement Loading Overlay -->
+          <div
+            id="cover-overlay-loading"
+            class="zen-cover-overlay-loading"
+            style="display: none;"
+            aria-live="polite"
+          >
+            <div class="zen-upload-spinner" aria-hidden="true"></div>
+            <div class="zen-upload-info">
+              <span class="zen-upload-title" id="cover-overlay-status">
+                Uploading replacement...
+              </span>
+              <span class="zen-upload-meta" id="cover-overlay-meta"></span>
+            </div>
+            <div class="zen-upload-progress-track">
+              <div class="zen-upload-progress-bar"></div>
+            </div>
+          </div>
+
+          <div class="zen-cover-actions">
+            <button type="button" id="change-cover-btn" class="zen-cover-action-btn">
+              <Icon name="image" size={13} />
+              <span>Change Cover</span>
+            </button>
+            <button
+              type="button"
+              id="remove-cover-btn"
+              class="zen-cover-action-btn zen-cover-action-btn--danger"
+            >
+              <Icon name="trash" size={13} />
+              <span>Remove</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Initial Cover Uploading Card -->
+        <div
+          id="cover-uploading-card"
+          class="zen-cover-uploading-card"
+          style="display: none;"
+          aria-live="polite"
+        >
+          <div id="cover-loading-bg" class="zen-cover-loading-bg" aria-hidden="true"></div>
+          <div class="zen-cover-loading-content">
+            <div class="zen-upload-spinner" aria-hidden="true"></div>
+            <div class="zen-upload-info">
+              <span class="zen-upload-title" id="cover-upload-status">
+                Uploading cover image...
+              </span>
+              <span class="zen-upload-meta" id="cover-upload-meta"></span>
+            </div>
+            <div class="zen-upload-progress-track">
+              <div class="zen-upload-progress-bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          id="add-cover-btn"
+          class="zen-add-cover-btn"
+          style={note.coverImage ? 'display: none;' : ''}
+        >
+          <Icon name="image" size={15} />
+          <span>Add Cover Image</span>
+        </button>
+      </div>
+
+      <!-- Formatting Toolbar for Quick True-to-Life Formatting -->
+      <div
+        class="zen-editor-toolbar"
+        id="editor-toolbar"
+        role="toolbar"
+        aria-label="Text Formatting"
+      >
+        <!-- Undo & Redo Actions -->
+        <button
+          type="button"
+          class="zen-format-btn"
+          id="undo-btn"
+          data-command="undo"
+          title="Undo (Cmd/Ctrl + Z)"
+          aria-label="Undo"
+        >
+          <Icon name="undo" size={14} />
+        </button>
+        <button
+          type="button"
+          class="zen-format-btn"
+          id="redo-btn"
+          data-command="redo"
+          title="Redo (Cmd/Ctrl + Shift + Z)"
+          aria-label="Redo"
+        >
+          <Icon name="redo" size={14} />
+        </button>
+        <span class="zen-toolbar-divider"></span>
+
+        <button
+          type="button"
+          class="zen-format-btn"
+          data-command="formatBlock"
+          data-value="h2"
+          title="Section Heading (H2)"
+        >
+          <span class="zen-format-badge">H2</span>
+        </button>
+        <button
+          type="button"
+          class="zen-format-btn"
+          data-command="formatBlock"
+          data-value="h3"
+          title="Sub-heading (H3)"
+        >
+          <span class="zen-format-badge">H3</span>
+        </button>
+        <span class="zen-toolbar-divider"></span>
+        <button type="button" class="zen-format-btn" data-command="bold" title="Bold (Cmd+B)">
+          <strong>B</strong>
+        </button>
+        <button type="button" class="zen-format-btn" data-command="italic" title="Italic (Cmd+I)">
+          <em>I</em>
+        </button>
+        <button
+          type="button"
+          class="zen-format-btn"
+          id="link-btn"
+          title="Insert / Edit Link (Cmd/Ctrl + K)"
+          aria-label="Insert Link"
+        >
+          <Icon name="link" size={13} />
+        </button>
+        <span class="zen-toolbar-divider"></span>
+        <button
+          type="button"
+          class="zen-format-btn"
+          data-command="formatBlock"
+          data-value="blockquote"
+          title="Editorial Blockquote"
+        >
+          <Icon name="book-open" size={13} />
+          <span>Quote</span>
+        </button>
+        <button
+          type="button"
+          class="zen-format-btn"
+          data-command="insertUnorderedList"
+          title="Bulleted List"
+        >
+          <span>• List</span>
+        </button>
+        <button
+          type="button"
+          class="zen-format-btn"
+          data-command="insertOrderedList"
+          title="Numbered List"
+        >
+          <span>1. List</span>
+        </button>
+        <button
+          type="button"
+          class="zen-format-btn"
+          data-command="insertHorizontalRule"
+          title="Divider Line"
+        >
+          <span>—</span>
+        </button>
+      </div>
+
+      <!-- True-to-Life Editorial Content Canvas -->
+      <div
+        id="note-content"
+        class="zen-content-editable prose-editorial"
+        contenteditable="true"
+        spellcheck="true"
+        role="textbox"
+        aria-multiline="true"
+        data-placeholder="Start writing... Click H2 above, type '/' on a new line, or type ## for headings..."
+        set:html={initialContentHtml}
+      />
+    </div>
+
+    <!-- 2. Reader-Fidelity 1:1 Live Preview Pane -->
+    <article class="zen-preview-pane" id="preview-pane" style="display: none;">
+      <header class="zen-preview-header">
+        <h1 class="zen-preview-title" id="preview-title">
+          {note.title || 'Untitled Note'}
+        </h1>
+        <p
+          class="zen-preview-subtitle"
+          id="preview-subtitle"
+          style={note.subtitle ? '' : 'display: none;'}
+        >
+          {note.subtitle || ''}
+        </p>
+        <div class="zen-preview-meta">
+          <span id="preview-reading-time">{note.readingTime || '1 min read'}</span>
+        </div>
+      </header>
+
+      <figure
+        class="zen-preview-cover"
+        id="preview-cover-figure"
+        style={note.coverImage ? '' : 'display: none;'}
+      >
+        <img
+          id="preview-cover-img"
+          src={note.coverImage || ''}
+          alt="Cover Image"
+          class="zen-preview-cover-img"
+        />
+      </figure>
+
+      <div class="prose-editorial zen-preview-body" id="preview-body"></div>
+    </article>
+  </div>
+
+  <!-- Floating Slash Command Palette -->
+  <div id="slash-menu" class="zen-slash-menu" style="display: none;">
+    <div class="zen-slash-menu__header">Formatting Commands</div>
+    <button type="button" class="zen-slash-item" data-action="h2">
+      <span class="zen-slash-item__key">/h2</span>
+      <span class="zen-slash-item__label">Section Heading (H2)</span>
+    </button>
+    <button type="button" class="zen-slash-item" data-action="h3">
+      <span class="zen-slash-item__key">/h3</span>
+      <span class="zen-slash-item__label">Sub-heading (H3)</span>
+    </button>
+    <button type="button" class="zen-slash-item" data-action="quote">
+      <span class="zen-slash-item__key">/quote</span>
+      <span class="zen-slash-item__label">Editorial Blockquote</span>
+    </button>
+    <button type="button" class="zen-slash-item" data-action="list">
+      <span class="zen-slash-item__key">/list</span>
+      <span class="zen-slash-item__label">Bulleted List</span>
+    </button>
+    <button type="button" class="zen-slash-item" data-action="divider">
+      <span class="zen-slash-item__key">/divider</span>
+      <span class="zen-slash-item__label">Horizontal Divider</span>
+    </button>
+    <button type="button" class="zen-slash-item" data-action="link">
+      <span class="zen-slash-item__key">/link</span>
+      <span class="zen-slash-item__label">Insert Link (Cmd+K)</span>
+    </button>
+  </div>
+</main>

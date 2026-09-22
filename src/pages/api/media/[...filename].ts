@@ -85,5 +85,16 @@ export const GET: APIRoute = async ({ params }) => {
     }
   }
 
-  return new Response('Asset Not Found', { status: 404 });
+  // 3. Graceful fallback for missing or stale media (e.g. from container restarts)
+  // Instead of breaking <img> tags with a 404, redirect to the corresponding default asset
+  const isAvatar = filename.toLowerCase().includes('avatar');
+  const fallbackAsset = isAvatar ? '/images/avatar.webp' : '/images/notesby-logo-light.png';
+
+  return new Response(null, {
+    status: 307,
+    headers: {
+      Location: fallbackAsset,
+      'Cache-Control': 'no-cache',
+    },
+  });
 };

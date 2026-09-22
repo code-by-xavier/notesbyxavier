@@ -4,7 +4,7 @@
 // Notesby — Sovereign Studio Portal Toast Notifications
 // Floating responsive toast for instant feedback on saves, uploads,
 // resets, and errors without disruptive browser alert dialogs.
-// ============================================================
+import Icon from '@/components/Icon.astro';
 ---
 
 <div id="portal-toast-container" class="portal-toast-container" aria-live="polite" role="region">
@@ -20,19 +20,7 @@
       class="portal-toast__close"
       aria-label="Dismiss notification"
     >
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
+      <Icon name="x" size={14} />
     </button>
   </div>
 </div>

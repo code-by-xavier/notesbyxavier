@@ -36,6 +36,7 @@
     "lint": "prettier --check .",
     "format": "prettier --write .",
     "validate": "tsx ./scripts/validate.ts",
+    "prepare:upstream": "tsx ./scripts/prepare-upstream.ts",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -62,10 +63,10 @@
     "typescript": "^5.7.3"
   },
   "author": "Xavier Lawrence <XLawrence@clstre.com> (https://notesbyxavier.com)",
-  "homepage": "https://github.com/CLSTRE-ORG/Notesby",
+  "homepage": "https://github.com/code-by-xavier/notesbyxavier",
   "bugs": {
-    "url": "https://github.com/CLSTRE-ORG/Notesby/issues",
-    "email": "notesby.support@clstre.com"
+    "url": "https://github.com/code-by-xavier/notesbyxavier/issues",
+    "email": "XLawrence@clstre.com"
   },
   "license": "MIT",
   "packageManager": "pnpm@10.30.1",

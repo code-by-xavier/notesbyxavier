@@ -49,20 +49,6 @@ export async function ensureBucket(): Promise<boolean> {
       console.log(`📦 [GCS Storage] Created bucket: "${bucketName}"`);
     }
 
-    // Attempt to set public read permissions so uploaded media can be viewed worldwide
-    try {
-      await bucket.iam.setPolicy({
-        bindings: [
-          {
-            role: 'roles/storage.objectViewer',
-            members: ['allUsers'],
-          },
-        ],
-      });
-    } catch {
-      // Ignored if bucket enforces fine-grained ACLs or domain-restricted sharing
-    }
-
     isBucketVerified = true;
     return true;
   } catch (err: any) {
@@ -93,7 +79,7 @@ export function getPublicUrl(filename: string): string {
 
 /**
  * Upload a media file buffer to Google Cloud Storage (or local emulator).
- * Falls back to public/uploads/ if GCS is unavailable.
+ * Falls back to local media endpoint if GCS is unavailable.
  */
 export async function uploadMedia(
   data: Buffer | ArrayBuffer,
@@ -116,19 +102,12 @@ export async function uploadMedia(
       },
     });
 
-    // Also attempt object-level public access in case bucket uses ACLs
-    try {
-      await file.makePublic();
-    } catch {
-      // Ignored if uniform bucket level access is enabled
-    }
-
     const publicUrl = getPublicUrl(filename);
     console.log(`✅ [GCS Storage] Uploaded "${filename}" (${buffer.length} bytes) -> ${publicUrl}`);
     return publicUrl;
   } catch (err: any) {
     console.warn(
-      `⚠️  [GCS Storage] Upload failed (${err.message}). Falling back to local filesystem (public/uploads)...`
+      `⚠️  [GCS Storage] Upload failed (${err.message}). Falling back to local media endpoint (/api/media)...`
     );
 
     // Fallback: Save to local public/uploads directory
@@ -140,6 +119,6 @@ export async function uploadMedia(
     const localFilePath = path.join(uploadsDir, filename);
     fs.writeFileSync(localFilePath, buffer);
 
-    return `/uploads/${filename}`;
+    return `/api/media/${filename}`;
   }
 }

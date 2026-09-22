@@ -16,8 +16,8 @@ export const LOCKED_COLOPHON_TEXT =
 export const DEFAULT_AI_POLICY =
   'This publication strictly prohibits the unauthorized scraping, harvesting, or ingestion of our essays, notes, and research for training artificial intelligence models or generative AI systems without prior explicit written license.';
 
-export const DEFAULT_SITE_LOGO_LIGHT = '/images/notesby-logo-black.svg';
-export const DEFAULT_SITE_LOGO_DARK = '/images/notesby-logo-white.svg';
+export const DEFAULT_SITE_LOGO_LIGHT = '/images/notesby-logo-light.png';
+export const DEFAULT_SITE_LOGO_DARK = '/images/notesby-logo-dark.png';
 
 export interface ResolvedSiteSettings {
   siteTitle: string;

@@ -5,6 +5,10 @@
 // AJAX saving to PUT /api/settings, and portal toast notifications.
 // ============================================================
 
+import checkSvg from '@/assets/icons/check.svg?raw';
+import alertSvg from '@/assets/icons/alert.svg?raw';
+import helpCircleSvg from '@/assets/icons/help-circle.svg?raw';
+
 let toastTimeout: ReturnType<typeof setTimeout> | null = null;
 
 export function showPortalNotification(
@@ -25,10 +29,16 @@ export function showPortalNotification(
     toastTimeout = null;
   }
 
+  const formatIcon = (raw: string) =>
+    raw
+      .replace(/width="[^"]*"/, 'width="18"')
+      .replace(/height="[^"]*"/, 'height="18"')
+      .replace(/stroke-width="[^"]*"/, 'stroke-width="2.5"');
+
   const icons = {
-    success: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
-    error: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
-    info: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
+    success: formatIcon(checkSvg),
+    error: formatIcon(alertSvg),
+    info: formatIcon(helpCircleSvg),
   };
 
   iconEl.innerHTML = icons[type] || icons.info;
@@ -142,8 +152,15 @@ export function initSettingsClient() {
         body: formData,
       });
 
-      const data = await res.json();
-      if (res.ok && data.url) {
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch {
+        const text = await res.text().catch(() => '');
+        throw new Error(text || `Server returned status ${res.status}`);
+      }
+
+      if (res.ok && data?.url) {
         if (hiddenInput) hiddenInput.value = data.url;
         if (previewImg) {
           previewImg.onerror = () => {
@@ -162,13 +179,13 @@ export function initSettingsClient() {
           `${assetLabel} uploaded successfully. Remember to click Save Changes to persist.`
         );
       } else {
-        showPortalNotification('error', 'Upload Failed', data.error || 'Upload failed.');
+        showPortalNotification('error', 'Upload Failed', data?.error || 'Upload failed.');
         if (previewImg && hiddenInput?.value) {
           previewImg.src = hiddenInput.value;
         }
       }
-    } catch {
-      showPortalNotification('error', 'Network Error', 'Network error while uploading asset.');
+    } catch (err: any) {
+      showPortalNotification('error', 'Upload Error', err?.message || 'Failed to upload asset.');
       if (previewImg && hiddenInput?.value) {
         previewImg.src = hiddenInput.value;
       }
@@ -194,7 +211,7 @@ export function initSettingsClient() {
 
   const logoStatusLabel = document.getElementById('logo-status-label');
   const uploadLogoBtnText = document.getElementById('upload-logo-btn-text');
-  const DEFAULT_LOGO_FALLBACK = '/images/notesby-logo-black.svg';
+  const DEFAULT_LOGO_FALLBACK = '/images/notesby-logo-light.png';
 
   uploadLogoBtn?.addEventListener('click', () => logoFileInput?.click());
   logoFileInput?.addEventListener('change', () => {

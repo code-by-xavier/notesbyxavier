@@ -1,0 +1,63 @@
+---
+// File: src/components/setup/SetupStepBranding.astro
+// ============================================================
+// Notesby — Setup Step 4: Branding (Optional)
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+---
+
+<div class="step-panel" data-panel="4" id="panel-4" role="tabpanel" aria-labelledby="step-nav-4">
+  <header class="step-header">
+    <div class="step-badge">STEP 4 OF 5 · OPTIONAL</div>
+    <h2 class="step-title">Branding</h2>
+    <p class="step-desc">Upload a profile photo. You can always update these in Settings later.</p>
+  </header>
+
+  <div class="avatar-zone" id="avatar-zone">
+    <div class="avatar-preview" id="avatar-preview">
+      <img id="avatar-img" src="" alt="Avatar preview" style="display:none" />
+      <div class="avatar-placeholder" id="avatar-placeholder">
+        <Icon name="user" size={32} strokeWidth={1.5} />
+      </div>
+    </div>
+    <div class="avatar-zone__body">
+      <div class="avatar-zone__title">Profile Photo</div>
+      <div class="avatar-zone__hint">PNG, JPG, or WebP · Max 5 MB</div>
+      <label
+        class="btn btn--secondary btn--sm"
+        for="avatar-file-input"
+        style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;"
+      >
+        <Icon name="upload" size={13} strokeWidth={2.5} />
+        Upload Photo
+      </label>
+      <input
+        type="file"
+        id="avatar-file-input"
+        accept="image/png,image/jpeg,image/webp"
+        style="display:none"
+      />
+    </div>
+    <div class="avatar-upload-status" id="avatar-upload-status" style="display:none">
+      <Icon name="loader" size={14} strokeWidth={2.5} class="spin" />
+      Uploading…
+    </div>
+  </div>
+
+  <div class="step-actions">
+    <button class="btn btn--ghost" id="step4-back" type="button">
+      <Icon name="arrow-left" size={14} strokeWidth={2.5} />
+      Back
+    </button>
+    <div class="step-actions__right">
+      <button class="btn btn--ghost btn--sm" id="step4-skip" type="button">
+        Skip for now
+      </button>
+      <button class="btn btn--primary" id="step4-next" type="button">
+        <span>Review & Launch</span>
+        <Icon name="arrow-right" size={14} strokeWidth={2.5} />
+      </button>
+    </div>
+  </div>
+</div>

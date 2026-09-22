@@ -1,0 +1,113 @@
+---
+// File: src/components/editor/EditorHeader.astro
+// ============================================================
+// Notesby — Zen Studio Editor Action Toolbar
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+import { ROUTES } from '@/links';
+import type { Note } from '@/db/schema';
+
+interface Props {
+  note: Note;
+  categories: string[];
+  isPublished: boolean;
+}
+
+const { note, categories, isPublished } = Astro.props;
+---
+
+<header class="zen-toolbar">
+  <div class="zen-toolbar__left">
+    <a href={ROUTES.ADMIN.ROOT} class="zen-back-link" title="Return to Dashboard">
+      <Icon name="arrow-left" size={16} />
+      <span class="zen-back-text">Dashboard</span>
+    </a>
+
+    <div class="zen-save-status zen-save-status--saved" id="save-status">
+      <span class="zen-save-dot"></span>
+      <span class="zen-save-text">Saved to cloud</span>
+    </div>
+  </div>
+
+  <div class="zen-toolbar__center">
+    <!-- Segmented View Switcher: Editor Canvas vs Reader Preview -->
+    <div class="zen-mode-toggle" id="mode-toggle" role="tablist" aria-label="Editor View Mode">
+      <button
+        type="button"
+        class="zen-mode-btn is-active"
+        id="mode-write-btn"
+        role="tab"
+        aria-selected="true"
+        title="Editor Canvas"
+      >
+        <Icon name="pen" size={12} />
+        <span>Editor</span>
+      </button>
+      <button
+        type="button"
+        class="zen-mode-btn"
+        id="mode-preview-btn"
+        role="tab"
+        aria-selected="false"
+        title="Reader View (Cmd/Ctrl + P)"
+      >
+        <Icon name="eye" size={13} />
+        <span>Reader View</span>
+      </button>
+    </div>
+
+    <span class="zen-stats" id="stats-counter">
+      {note.readingTime}
+    </span>
+  </div>
+
+  <div class="zen-toolbar__right">
+    <!-- Category Selector -->
+    <div class="zen-category-wrapper">
+      <label for="note-category" class="visually-hidden">
+        Category
+      </label>
+      <select id="note-category" class="zen-select">
+        {categories.map((cat) => (
+          <option value={cat} selected={cat === note.category}>
+            {cat}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <!-- Writing Guide Trigger Button -->
+    <button
+      type="button"
+      id="open-guide-btn"
+      class="zen-icon-btn"
+      title="Writing Guide & Syntax Reference (Press ?)"
+      aria-label="Open Writing Guide"
+    >
+      <Icon name="book-open" size={16} />
+    </button>
+
+    <!-- Publish Toggle / Update Button -->
+    <button
+      type="button"
+      id="publish-btn"
+      class:list={[
+        'zen-publish-btn',
+        {
+          'zen-publish-btn--published': isPublished && !note.hasUnpublishedChanges,
+          'zen-publish-btn--unsaved': isPublished && note.hasUnpublishedChanges,
+        },
+      ]}
+      data-status={note.status}
+    >
+      <span class="zen-publish-text">
+        {isPublished
+          ? note.hasUnpublishedChanges
+            ? 'Publish changes'
+            : 'Published'
+          : 'Publish Note'}
+      </span>
+    </button>
+  </div>
+</header>

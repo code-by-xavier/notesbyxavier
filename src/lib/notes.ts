@@ -104,11 +104,16 @@ export async function listNotesByAuthor(authorId: string): Promise<Note[]> {
  * List all published notes for public readership
  */
 export async function listPublishedNotes(): Promise<Note[]> {
-  return db
-    .select()
-    .from(notes)
-    .where(eq(notes.status, 'published'))
-    .orderBy(desc(notes.publishedAt), desc(notes.createdAt));
+  try {
+    return await db
+      .select()
+      .from(notes)
+      .where(eq(notes.status, 'published'))
+      .orderBy(desc(notes.publishedAt), desc(notes.createdAt));
+  } catch (err) {
+    console.warn('[Notesby] Could not query published notes from database:', err);
+    return [];
+  }
 }
 
 /**

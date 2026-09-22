@@ -3,7 +3,7 @@
 // ============================================================
 // Notesby — Header Component
 // Responsive navigation, author branding, avatar, RSS syndication,
-// and accessible theme toggle.
+// mobile drawer, and accessible theme toggle.
 // ============================================================
 
 import ThemeToggle from '@/components/ThemeToggle.astro';
@@ -18,7 +18,7 @@ interface Props {
 
 const { isEssay = false } = Astro.props;
 const settings = await getSiteSettings();
-const avatarUrl = settings.authorAvatar;
+const avatarUrl = settings.authorAvatar || settings.siteLogo || '/images/avatar.webp';
 const siteLogo = settings.siteLogo;
 const siteLogoDark = settings.siteLogoDark;
 const authorName = settings.authorName;
@@ -28,9 +28,10 @@ const initials = authorName
   .join('')
   .toUpperCase()
   .slice(0, 2);
+const currentPath = Astro.url.pathname;
 ---
 
-<header class="site-header">
+<header class="site-header" id="site-header">
   <div class="site-header__container">
     <!-- Left: Author Brand / Return link -->
     <div class="site-header__left">
@@ -40,27 +41,8 @@ const initials = authorName
             <Icon name="arrow-left" size={16} />
           </span>
         )}
-        <div
-          class:list={['site-header__avatar', { 'site-header__avatar--logo': Boolean(siteLogo) }]}
-        >
-          {siteLogo ? (
-            siteLogo === siteLogoDark ? (
-              <img src={siteLogo} alt={settings.siteTitle} class="avatar-img avatar-img--logo" />
-            ) : (
-              <>
-                <img
-                  src={siteLogo}
-                  alt={settings.siteTitle}
-                  class="avatar-img avatar-img--logo avatar-img--logo-light"
-                />
-                <img
-                  src={siteLogoDark}
-                  alt={settings.siteTitle}
-                  class="avatar-img avatar-img--logo avatar-img--logo-dark"
-                />
-              </>
-            )
-          ) : avatarUrl ? (
+        <div class="site-header__avatar">
+          {avatarUrl ? (
             <>
               <img
                 src={avatarUrl}
@@ -83,35 +65,81 @@ const initials = authorName
     <!-- Center: Clean spacing (empty to let content breathe) -->
     <div class="site-header__center"></div>
 
-    <!-- Right: Mobile Notes link + Desktop Navigation + Theme Toggle -->
+    <!-- Right: Desktop Navigation + Theme Toggle + Mobile Menu Button -->
     <div class="site-header__right">
-      <!-- Visible strictly on mobile: quick link to main notes feed -->
-      <a href={ROUTES.HOME} class="site-header__mobile-link" aria-label="Go to main notes">
-        Notes
-      </a>
-
       <!-- Desktop Navigation -->
       <nav class="site-header__nav" aria-label="Main Navigation">
-        {notesConfig.navLinks.map((link) => (
+        {notesConfig.navLinks.map((link) => {
+          const isActive =
+            link.href === '/' ? currentPath === '/' : currentPath.startsWith(link.href);
+          return (
+            <a
+              href={link.href}
+              class:list={[
+                'site-header__link',
+                { 'site-header__link--active': isActive },
+                { 'site-header__link--rss': link.isRss },
+              ]}
+              target={link.external ? '_blank' : undefined}
+              rel={link.external ? 'noopener noreferrer' : undefined}
+            >
+              {link.isRss && (
+                <Icon name="rss" size={13} class="rss-icon" color="var(--rss-accent, #f97316)" />
+              )}
+              <span>{link.label}</span>
+            </a>
+          );
+        })}
+      </nav>
+
+      <ThemeToggle />
+
+      <!-- Mobile Menu Toggle Button -->
+      <button
+        type="button"
+        class="site-header__menu-btn"
+        id="mobile-menu-btn"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+      >
+        <Icon name="menu" size={22} class="menu-icon menu-icon--open" />
+        <Icon name="x" size={22} class="menu-icon menu-icon--close" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Dropdown Navigation Drawer -->
+  <div class="site-header__drawer" id="mobile-menu-drawer" aria-hidden="true">
+    <nav class="site-header__drawer-nav" aria-label="Mobile Navigation">
+      {notesConfig.navLinks.map((link) => {
+        const isActive =
+          link.href === '/' ? currentPath === '/' : currentPath.startsWith(link.href);
+        return (
           <a
             href={link.href}
-            class:list={['site-header__link', { 'site-header__link--rss': link.isRss }]}
+            class:list={[
+              'site-header__drawer-link',
+              { 'site-header__drawer-link--active': isActive },
+              { 'site-header__drawer-link--rss': link.isRss },
+            ]}
             target={link.external ? '_blank' : undefined}
             rel={link.external ? 'noopener noreferrer' : undefined}
           >
+            <span class="drawer-label">{link.label}</span>
             {link.isRss && (
               <Icon name="rss" size={13} class="rss-icon" color="var(--rss-accent, #f97316)" />
             )}
-            <span>{link.label}</span>
+            {link.external && <Icon name="external-link" size={14} class="external-icon" />}
           </a>
-        ))}
-      </nav>
-      <ThemeToggle />
-    </div>
+        );
+      })}
+    </nav>
   </div>
 </header>
 
 <style lang="scss">
+  @use '../styles/abstracts' as ui;
+
   .site-header {
     width: 100%;
     height: var(--header-height, #{ui.$header-height});
@@ -252,30 +280,6 @@ const initials = authorName
       flex-shrink: 0;
     }
 
-    // Mobile link to main notes feed
-    &__mobile-link {
-      font-family: var(--font-family-base, #{ui.$font-family-base});
-      font-size: var(--font-size-sm, #{ui.$font-size-sm});
-      font-weight: ui.$font-weight-semibold;
-      color: var(--text-secondary, #{ui.$text-secondary-light});
-      padding: var(--mobile-link-padding-y, #{ui.$mobile-link-padding-y})
-        var(--mobile-link-padding-x, #{ui.$mobile-link-padding-x});
-      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
-      background-color: var(--surface-color, #{ui.$surface-light});
-      border: var(--border-width-base, #{ui.$border-width-base}) solid
-        var(--border-color, #{ui.$border-light});
-      transition: all ui.$transition-fast;
-
-      &:hover {
-        color: var(--text-primary, #{ui.$text-primary-light});
-        border-color: var(--accent-color, #{ui.$primary-accent});
-      }
-
-      @include ui.media-breakpoint-up(sm) {
-        display: none;
-      }
-    }
-
     &__nav {
       display: none;
       align-items: center;
@@ -288,6 +292,11 @@ const initials = authorName
 
     &__link {
       @include ui.nav-link-style;
+
+      &--active {
+        color: var(--accent-color);
+        font-weight: 600;
+      }
 
       &--rss {
         :global(.rss-icon),
@@ -302,5 +311,174 @@ const initials = authorName
         }
       }
     }
+
+    // Mobile Menu Button
+    &__menu-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      padding: 6px;
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      cursor: pointer;
+      transition: all ui.$transition-fast;
+
+      &:hover {
+        color: var(--text-primary, #{ui.$text-primary-light});
+        border-color: var(--accent-color, #{ui.$primary-accent});
+      }
+
+      :global(.menu-icon--close) {
+        display: none !important;
+      }
+
+      &.is-open {
+        background-color: var(--surface-color, #{ui.$surface-light});
+        color: var(--text-primary, #{ui.$text-primary-light});
+
+        :global(.menu-icon--open) {
+          display: none !important;
+        }
+
+        :global(.menu-icon--close) {
+          display: block !important;
+        }
+      }
+
+      @include ui.media-breakpoint-up(sm) {
+        display: none;
+      }
+    }
+
+    // Mobile Drawer
+    &__drawer {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: var(--bg-color, #{ui.$bg-light});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.12);
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transform: translateY(-6px);
+      transition:
+        max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.2s ease,
+        transform 0.2s ease;
+      pointer-events: none;
+
+      &.is-open {
+        max-height: 380px;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+
+      @include ui.media-breakpoint-up(sm) {
+        display: none !important;
+      }
+    }
+
+    &__drawer-nav {
+      padding: var(--spacing-unit, #{ui.$spacing-unit}) var(--spacing-lg, #{ui.$spacing-lg});
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+    }
+
+    &__drawer-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-xs, #{ui.$spacing-xs}) var(--spacing-sm, #{ui.$spacing-sm});
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-nav, #{ui.$font-size-nav});
+      font-weight: ui.$font-weight-medium;
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      text-decoration: none;
+      transition: all ui.$transition-fast;
+
+      &:hover {
+        background-color: var(--surface-color, #{ui.$surface-light});
+        color: var(--text-primary, #{ui.$text-primary-light});
+      }
+
+      &--active {
+        background-color: var(--surface-color, #{ui.$surface-light});
+        color: var(--accent-color, #{ui.$primary-accent});
+        font-weight: ui.$font-weight-semibold;
+      }
+
+      .external-icon {
+        color: var(--text-muted, #{ui.$text-muted-light});
+      }
+    }
   }
 </style>
+
+<script>
+  function setupMobileMenu() {
+    const btn = document.getElementById('mobile-menu-btn');
+    const drawer = document.getElementById('mobile-menu-drawer');
+    const header = document.getElementById('site-header');
+
+    if (!btn || !drawer) return;
+
+    const menuBtn: HTMLElement = btn;
+    const menuDrawer: HTMLElement = drawer;
+
+    function toggleMenu() {
+      const isOpen = menuBtn.classList.toggle('is-open');
+      menuDrawer.classList.toggle('is-open');
+      menuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      menuDrawer.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    }
+
+    function closeMenu() {
+      menuBtn.classList.remove('is-open');
+      menuDrawer.classList.remove('is-open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuDrawer.setAttribute('aria-hidden', 'true');
+    }
+
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    // Close when clicking anywhere outside header
+    document.addEventListener('click', (e) => {
+      if (header && !header.contains(e.target as Node)) {
+        closeMenu();
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeMenu();
+      }
+    });
+
+    // Close when clicking drawer links
+    const links = menuDrawer.querySelectorAll('a');
+    links.forEach((link) => {
+      link.addEventListener('click', () => {
+        closeMenu();
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupMobileMenu);
+  } else {
+    setupMobileMenu();
+  }
+</script>

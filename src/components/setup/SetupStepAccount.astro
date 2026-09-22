@@ -1,0 +1,130 @@
+---
+// File: src/components/setup/SetupStepAccount.astro
+// ============================================================
+// Notesby — Setup Step 3: Master Admin Account
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+---
+
+<div class="step-panel" data-panel="3" id="panel-3" role="tabpanel" aria-labelledby="step-nav-3">
+  <header class="step-header">
+    <div class="step-badge">STEP 3 OF 5</div>
+    <h2 class="step-title">Master Admin Account</h2>
+    <p class="step-desc">
+      Create your sovereign credential. This is the only login for your Notesby Studio.
+    </p>
+  </header>
+
+  <div class="form-stack">
+    <div class="form-field">
+      <label class="form-label" for="email">
+        Admin Email{' '}
+        <span class="required-dot" aria-hidden="true">
+          *
+        </span>
+      </label>
+      <input
+        class="form-input"
+        type="email"
+        id="email"
+        name="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+        required
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="password">
+        Master Password{' '}
+        <span class="required-dot" aria-hidden="true">
+          *
+        </span>
+      </label>
+      <div class="input-wrap">
+        <input
+          class="form-input"
+          type="password"
+          id="password"
+          name="password"
+          placeholder="At least 8 characters"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        />
+        <button
+          class="input-toggle"
+          type="button"
+          aria-label="Toggle password visibility"
+          id="toggle-pw"
+        >
+          <span id="eye-open">
+            <Icon name="eye" size={16} strokeWidth={2} />
+          </span>
+          <span id="eye-closed" style="display:none">
+            <Icon name="eye-off" size={16} strokeWidth={2} />
+          </span>
+        </button>
+      </div>
+      <!-- Password strength meter -->
+      <div class="pw-strength" id="pw-strength" aria-label="Password strength">
+        <div class="pw-strength__bar">
+          <div class="pw-strength__fill" id="pw-fill"></div>
+        </div>
+        <span class="pw-strength__label" id="pw-label">
+          Enter password
+        </span>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="confirmPassword">
+        Confirm Password{' '}
+        <span class="required-dot" aria-hidden="true">
+          *
+        </span>
+      </label>
+      <div class="input-wrap">
+        <input
+          class="form-input"
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          placeholder="Repeat your password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        />
+        <button
+          class="input-toggle"
+          type="button"
+          aria-label="Toggle confirm password visibility"
+          id="toggle-cpw"
+        >
+          <Icon name="eye" size={16} strokeWidth={2} />
+        </button>
+      </div>
+      <p class="form-helper form-helper--error" id="pw-match-error" style="display:none">
+        Passwords do not match.
+      </p>
+    </div>
+
+    <!-- Global error -->
+    <div class="alert alert--error" id="step3-error" style="display:none">
+      <Icon name="alert" size={15} strokeWidth={2} />
+      <span id="step3-error-msg"></span>
+    </div>
+  </div>
+
+  <div class="step-actions">
+    <button class="btn btn--ghost" id="step3-back" type="button">
+      <Icon name="arrow-left" size={14} strokeWidth={2.5} />
+      Back
+    </button>
+    <button class="btn btn--primary" id="step3-next" type="button">
+      <span>Continue</span>
+      <Icon name="arrow-right" size={14} strokeWidth={2.5} />
+    </button>
+  </div>
+</div>
