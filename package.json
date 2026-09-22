@@ -36,7 +36,6 @@
     "lint": "prettier --check .",
     "format": "prettier --write .",
     "validate": "tsx ./scripts/validate.ts",
-    "prepare:upstream": "tsx ./scripts/prepare-upstream.ts",
     "prepare": "husky"
   },
   "lint-staged": {

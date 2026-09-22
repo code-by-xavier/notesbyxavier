@@ -211,7 +211,7 @@ export function initSettingsClient() {
 
   const logoStatusLabel = document.getElementById('logo-status-label');
   const uploadLogoBtnText = document.getElementById('upload-logo-btn-text');
-  const DEFAULT_LOGO_FALLBACK = '/images/notesby-logo-light.png';
+  const DEFAULT_LOGO_FALLBACK = '/images/notesby-logo-black.svg';
 
   uploadLogoBtn?.addEventListener('click', () => logoFileInput?.click());
   logoFileInput?.addEventListener('change', () => {
