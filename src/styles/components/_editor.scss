@@ -181,6 +181,81 @@
   }
 }
 
+// Publish & Unpublish Toolbar Actions
+.zen-publish-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zen-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--border-radius-full, #{ui.-radius-full});
+  background-color: rgba(16, 185, 129, 0.1);
+  border: var(--border-width-base, #{ui.-width-base}) solid rgba(16, 185, 129, 0.25);
+  color: var(--success-color, #{ui.-color});
+  font-size: var(--font-size-2xs, #{ui.-size-2xs});
+  font-weight: ui.-weight-semibold;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.zen-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--success-color, #{ui.-color});
+  box-shadow: 0 0 6px var(--success-color, #{ui.-color});
+  animation: liveDotPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes liveDotPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.85);
+  }
+}
+
+.zen-unpublish-btn {
+  @include ui.button-base;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: var(--font-size-xs, #{ui.-size-xs});
+  font-weight: ui.-weight-medium;
+  border-radius: var(--border-radius-sm, #{ui.-radius-sm});
+  background-color: var(--surface-color, #{ui.-light});
+  border: var(--border-width-base, #{ui.-width-base}) solid var(--border-color, #{ui.-light});
+  color: var(--text-secondary, #{ui.-secondary-light});
+  cursor: pointer;
+  transition: all ui.-fast;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: rgba(220, 38, 38, 0.08);
+    border-color: rgba(220, 38, 38, 0.25);
+    color: var(--error-color, #{ui.-color});
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
 .zen-publish-btn {
   @include ui.button-base;
   display: inline-flex;

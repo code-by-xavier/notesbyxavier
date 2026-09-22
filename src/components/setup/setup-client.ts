@@ -8,7 +8,6 @@ export function initSetupWizard() {
   // ============================================================
 
   // --- State ---
-  let currentStep = 1;
   const TOTAL_STEPS = 5;
 
   // Collected form data
@@ -44,8 +43,6 @@ export function initSetupWizard() {
       currentPanel.classList.add('step-panel--exit');
       setTimeout(() => currentPanel.classList.remove('step-panel--exit'), 350);
     }
-
-    currentStep = n;
 
     // Show new
     const nextPanel = $(`panel-${n}`);

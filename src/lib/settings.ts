@@ -71,11 +71,11 @@ export async function getSiteSettings(): Promise<ResolvedSiteSettings> {
     siteTitle: dbSettings?.siteTitle || notesConfig.siteTitle,
     authorName: dbSettings?.authorName || notesConfig.authorName,
     authorBio: dbSettings?.authorBio || notesConfig.authorBio,
-    authorAvatar: dbSettings?.authorAvatar || notesConfig.authorAvatar || '/images/avatar.webp',
+    authorAvatar: dbSettings?.authorAvatar || notesConfig.authorAvatar || '',
     siteLogo,
     siteLogoDark,
     customLogo,
-    favicon: dbSettings?.favicon || notesConfig.favicon || '/favicon.webp',
+    favicon: dbSettings?.favicon || notesConfig.favicon || '/images/notesby-logo-black.svg',
     appleTouchIcon:
       dbSettings?.appleTouchIcon ||
       customLogo ||

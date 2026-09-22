@@ -222,7 +222,7 @@ export function initSettingsClient() {
         logoInput,
         logoLoading,
         'Custom site logo',
-        (url) => {
+        () => {
           if (removeLogoBtn) removeLogoBtn.style.display = 'inline-flex';
           if (logoStatusLabel) logoStatusLabel.textContent = 'Custom Logo Active';
           if (uploadLogoBtnText) uploadLogoBtnText.textContent = 'Change Custom Logo';
@@ -310,5 +310,15 @@ export function initSettingsClient() {
       saveBtn.disabled = false;
       if (saveBtnText) saveBtnText.textContent = 'Save Changes';
     }
+  });
+
+  // Fallback image error handling
+  document.querySelectorAll<HTMLImageElement>('img[data-fallback]').forEach((img) => {
+    img.addEventListener('error', () => {
+      const fallback = img.getAttribute('data-fallback');
+      if (fallback && img.src !== fallback) {
+        img.src = fallback;
+      }
+    });
   });
 }

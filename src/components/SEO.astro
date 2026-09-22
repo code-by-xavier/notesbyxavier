@@ -66,8 +66,9 @@ const jsonLd = generateJsonLd({
 <link rel="canonical" href={canonicalUrl} />
 
 <!-- Favicon, Touch Icons & Web App Manifest -->
-<link rel="icon" href={settings.favicon || '/favicon.webp'} />
-<link rel="apple-touch-icon" href={settings.appleTouchIcon || '/favicon.webp'} />
+<link rel="icon" type="image/svg+xml" href={settings.favicon || '/images/notesby-logo-black.svg'} />
+<link rel="icon" href={settings.favicon || '/images/notesby-logo-black.svg'} />
+<link rel="apple-touch-icon" href={settings.appleTouchIcon || '/images/notesby-logo-black.svg'} />
 <link rel="manifest" href="/manifest.webmanifest" />
 
 <!-- Open Graph (Facebook, LinkedIn, iMessage) -->

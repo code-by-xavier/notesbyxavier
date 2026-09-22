@@ -18,7 +18,10 @@ interface Props {
 
 const { isEssay = false } = Astro.props;
 const settings = await getSiteSettings();
-const avatarUrl = settings.authorAvatar || settings.siteLogo || '/images/avatar.webp';
+const avatarUrl =
+  settings.authorAvatar && settings.authorAvatar !== '/images/avatar-placeholder.svg'
+    ? settings.authorAvatar
+    : '';
 const siteLogo = settings.siteLogo;
 const siteLogoDark = settings.siteLogoDark;
 const authorName = settings.authorName;

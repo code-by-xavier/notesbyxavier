@@ -47,7 +47,7 @@ const { settings } = Astro.props;
             src={settings.favicon}
             alt="Favicon Preview"
             class="media-upload-img media-upload-img--favicon"
-            onerror="this.onerror=null; this.src='/favicon.webp'"
+            data-fallback="/images/notesby-logo-black.svg"
           />
           <div id="favicon-loading" class="media-upload-loading" style="display: none;">
             <div class="upload-mini-spinner"></div>
@@ -76,7 +76,7 @@ const { settings } = Astro.props;
             src={settings.appleTouchIcon}
             alt="Apple Touch Icon Preview"
             class="media-upload-img media-upload-img--touchicon"
-            onerror="this.onerror=null; this.src='/images/notesby-logo-white.svg'"
+            data-fallback="/images/notesby-logo-white.svg"
           />
           <div id="touchicon-loading" class="media-upload-loading" style="display: none;">
             <div class="upload-mini-spinner"></div>

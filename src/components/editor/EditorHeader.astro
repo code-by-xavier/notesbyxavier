@@ -88,26 +88,48 @@ const { note, categories, isPublished } = Astro.props;
       <Icon name="book-open" size={16} />
     </button>
 
-    <!-- Publish Toggle / Update Button -->
-    <button
-      type="button"
-      id="publish-btn"
-      class:list={[
-        'zen-publish-btn',
-        {
-          'zen-publish-btn--published': isPublished && !note.hasUnpublishedChanges,
-          'zen-publish-btn--unsaved': isPublished && note.hasUnpublishedChanges,
-        },
-      ]}
-      data-status={note.status}
-    >
-      <span class="zen-publish-text">
-        {isPublished
-          ? note.hasUnpublishedChanges
-            ? 'Publish changes'
-            : 'Published'
-          : 'Publish Note'}
+    <!-- Publish & Unpublish Actions Group -->
+    <div class="zen-publish-group" id="publish-group">
+      <span
+        id="published-status-badge"
+        class="zen-live-badge"
+        style={isPublished ? '' : 'display: none;'}
+        title="This note is currently live on your site"
+      >
+        <span class="zen-live-dot"></span>
+        <span>Live</span>
       </span>
-    </button>
+
+      <button
+        type="button"
+        id="unpublish-btn"
+        class="zen-unpublish-btn"
+        style={isPublished ? '' : 'display: none;'}
+        title="Unpublish note and revert to draft"
+      >
+        <Icon name="eye-off" size={13} />
+        <span>Unpublish</span>
+      </button>
+
+      <button
+        type="button"
+        id="publish-btn"
+        class:list={[
+          'zen-publish-btn',
+          {
+            'zen-publish-btn--unsaved': isPublished && note.hasUnpublishedChanges,
+          },
+        ]}
+        data-status={note.status}
+      >
+        <span class="zen-publish-text">
+          {isPublished
+            ? note.hasUnpublishedChanges
+              ? 'Publish changes'
+              : 'Published'
+            : 'Publish Note'}
+        </span>
+      </button>
+    </div>
   </div>
 </header>
