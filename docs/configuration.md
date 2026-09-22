@@ -36,7 +36,7 @@ Access the sovereign settings dashboard from your admin bar or at `/admin/settin
 
 ### D. SEO & Social Profiles
 
-- **Canonical Domain**: Your production web address (e.g. `https://notesbyxavier.com`).
+- **Canonical Domain**: Your production web address (e.g. `https://example.com`).
 - **Meta Description**: Search engine summary indexed by Google and shared on social cards.
 - **Social Profiles**: Links for X (Twitter), LinkedIn, GitHub, and contact email rendered in page footers and headers.
 

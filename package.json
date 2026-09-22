@@ -1,7 +1,7 @@
 {
-  "name": "notesbyxavier",
+  "name": "notesby",
   "version": "1.2.0",
-  "description": "Essays, architectural blueprints, and personal notes by Xavier Lawrence.",
+  "description": "An open-source, minimalist static publishing engine where every post is a note. Built for distraction-free reading, editorial essays, and sovereign cloud deployment.",
   "type": "module",
   "scripts": {
     "setup:env": "tsx ./scripts/setup-env.ts",
@@ -36,7 +36,6 @@
     "lint": "prettier --check .",
     "format": "prettier --write .",
     "validate": "tsx ./scripts/validate.ts",
-    "prepare:upstream": "tsx ./scripts/prepare-upstream.ts",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -63,10 +62,10 @@
     "typescript": "^5.7.3"
   },
   "author": "Xavier Lawrence <XLawrence@clstre.com> (https://notesbyxavier.com)",
-  "homepage": "https://github.com/code-by-xavier/notesbyxavier",
+  "homepage": "https://github.com/code-by-xavier/",
   "bugs": {
-    "url": "https://github.com/code-by-xavier/notesbyxavier/issues",
-    "email": "XLawrence@clstre.com"
+    "url": "https://github.com/CLSTRE-ORG/Notesby/issues",
+    "email": "support@clstre.com"
   },
   "license": "MIT",
   "packageManager": "pnpm@10.30.1",

@@ -231,7 +231,24 @@ const userNotes = await listNotesByAuthor(user.id);
                           year: 'numeric',
                         }).format(new Date(n.updatedAt))}
                       </td>
-                      <td class="text-right">
+                      <td class="text-right portal-table__actions">
+                        <button
+                          type="button"
+                          class:list={[
+                            'portal-table__action-btn',
+                            `portal-table__action-btn--${n.status === 'published' ? 'unpublish' : 'publish'}`,
+                          ]}
+                          data-note-id={n.id}
+                          data-note-title={n.title}
+                          data-status={n.status}
+                          title={
+                            n.status === 'published'
+                              ? 'Unpublish note and revert to draft'
+                              : 'Publish note to live site'
+                          }
+                        >
+                          {n.status === 'published' ? 'Unpublish' : 'Publish'}
+                        </button>
                         <a href={ROUTES.ADMIN.EDIT_NOTE(n.id)} class="portal-table__edit-btn">
                           Edit
                         </a>
@@ -248,6 +265,110 @@ const userNotes = await listNotesByAuthor(user.id);
   </div>
   <WritingGuideModal />
 </BaseLayout>
+
+<script>
+  // Toast Notification helper for Admin Dashboard
+  function showPortalNotification(
+    type: 'success' | 'error' | 'info',
+    title: string,
+    message?: string
+  ) {
+    const toast = document.getElementById('portal-toast');
+    const titleEl = document.getElementById('portal-toast-title');
+    const msgEl = document.getElementById('portal-toast-msg');
+    const closeBtn = document.getElementById('portal-toast-close');
+
+    if (!toast || !titleEl) return;
+
+    titleEl.textContent = title;
+    if (msgEl) {
+      msgEl.textContent = message || '';
+      msgEl.style.display = message ? 'block' : 'none';
+    }
+    toast.className = 'portal-toast portal-toast--' + type;
+    toast.style.display = 'flex';
+
+    const dismiss = () => {
+      const el = document.getElementById('portal-toast');
+      if (!el) return;
+      el.classList.add('portal-toast--hiding');
+      setTimeout(() => {
+        el.style.display = 'none';
+        el.classList.remove('portal-toast--hiding');
+      }, 250);
+    };
+
+    if (closeBtn) closeBtn.onclick = dismiss;
+    setTimeout(dismiss, 4000);
+  }
+  (window as any).showPortalNotification = showPortalNotification;
+
+  // Wire up inline publish / unpublish toggles in notes management table
+  document.querySelectorAll<HTMLButtonElement>('.portal-table__action-btn').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const button = e.currentTarget as HTMLButtonElement;
+      const noteId = button.getAttribute('data-note-id');
+      const currentStatus = button.getAttribute('data-status');
+      const noteTitle = button.getAttribute('data-note-title') || 'Note';
+      const targetAction = currentStatus === 'published' ? 'unpublish' : 'publish';
+
+      if (currentStatus === 'published') {
+      }
+
+      button.disabled = true;
+      const origText = button.textContent;
+      button.textContent = targetAction === 'unpublish' ? 'Unpublishing...' : 'Publishing...';
+
+      try {
+        const res = await fetch('/api/notes/' + noteId + '/publish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: targetAction }),
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          const newStatus = data.status;
+          button.setAttribute('data-status', newStatus);
+          button.className =
+            'portal-table__action-btn portal-table__action-btn--' +
+            (newStatus === 'published' ? 'unpublish' : 'publish');
+          button.textContent = newStatus === 'published' ? 'Unpublish' : 'Publish';
+          button.title =
+            newStatus === 'published'
+              ? 'Unpublish note and revert to draft'
+              : 'Publish note to live site';
+
+          // Update row status pill
+          const row = button.closest('tr');
+          const statusCell = row ? row.querySelector('.portal-status-pill') : null;
+          if (statusCell) {
+            statusCell.className = 'portal-status-pill portal-status-pill--' + newStatus;
+            statusCell.textContent = newStatus;
+          }
+          const modifiedPill = row ? row.querySelector('.portal-status-pill--modified') : null;
+          if (modifiedPill) modifiedPill.remove();
+
+          showPortalNotification(
+            'success',
+            newStatus === 'published' ? 'Note Published' : 'Note Unpublished',
+            newStatus === 'published'
+              ? '"' + noteTitle + '" is now live on your site.'
+              : '"' + noteTitle + '" has been reverted to draft.'
+          );
+        } else {
+          alert(data.error || 'Failed to update note status');
+          button.textContent = origText;
+        }
+      } catch (err: any) {
+        alert(err.message || 'Network error');
+        button.textContent = origText;
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+</script>
 
 <style lang="scss">
   @use '@/styles/abstracts' as ui;
@@ -714,6 +835,53 @@ const userNotes = await listNotesByAuthor(user.id);
     &__date {
       color: var(--text-muted, #{ui.$text-muted-light});
       font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    }
+
+    &__actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: flex-end;
+      white-space: nowrap;
+    }
+
+    &__action-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-weight: ui.$font-weight-medium;
+      border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid transparent;
+      cursor: pointer;
+      transition: all ui.$transition-fast;
+
+      &--publish {
+        background-color: rgba(7, 90, 170, 0.08);
+        border-color: rgba(7, 90, 170, 0.2);
+        color: var(--accent-color, #{ui.$primary-accent});
+
+        &:hover:not(:disabled) {
+          background-color: var(--accent-color, #{ui.$primary-accent});
+          color: #ffffff;
+        }
+      }
+
+      &--unpublish {
+        background-color: rgba(220, 38, 38, 0.06);
+        border-color: rgba(220, 38, 38, 0.2);
+        color: var(--error-color, #{ui.$error-color});
+
+        &:hover:not(:disabled) {
+          background-color: var(--error-color, #{ui.$error-color});
+          color: #ffffff;
+        }
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
     }
 
     &__edit-btn {

@@ -43,7 +43,7 @@ const currentLogoDisplay = settings.customLogo || settings.siteLogo;
           name="authorName"
           class="form-input"
           value={settings.authorName}
-          placeholder="e.g. Xavier Lawrence"
+          placeholder="e.g. Jane Doe"
           required
         />
         <p class="form-help">
@@ -94,7 +94,7 @@ const currentLogoDisplay = settings.customLogo || settings.siteLogo;
             src={settings.authorAvatar}
             alt="Author Avatar"
             class="media-upload-img media-upload-img--avatar"
-            onerror="this.onerror=null; this.src='/images/avatar.webp'"
+            data-fallback="/images/avatar-placeholder.svg"
           />
           <div id="avatar-loading" class="media-upload-loading" style="display: none;">
             <div class="upload-mini-spinner"></div>
@@ -123,7 +123,7 @@ const currentLogoDisplay = settings.customLogo || settings.siteLogo;
             src={currentLogoDisplay}
             alt="Site Logo"
             class="media-upload-img media-upload-img--logo"
-            onerror="this.onerror=null; this.src='/images/notesby-logo-black.svg'"
+            data-fallback="/images/notesby-logo-black.svg"
           />
           <div id="logo-loading" class="media-upload-loading" style="display: none;">
             <div class="upload-mini-spinner"></div>

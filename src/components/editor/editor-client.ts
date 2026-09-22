@@ -29,6 +29,8 @@ export function initZenEditor() {
 
   const publishBtn = document.getElementById('publish-btn') as HTMLButtonElement | null;
   const publishText = publishBtn?.querySelector('.zen-publish-text');
+  const unpublishBtn = document.getElementById('unpublish-btn') as HTMLButtonElement | null;
+  const publishedBadge = document.getElementById('published-status-badge') as HTMLElement | null;
   const saveStatusEl = document.getElementById('save-status');
   const saveTextEl = saveStatusEl?.querySelector('.zen-save-text');
   const statsCounter = document.getElementById('stats-counter');
@@ -179,14 +181,20 @@ export function initZenEditor() {
     if (!publishBtn || !publishText) return;
 
     if (currentStatus === 'published') {
+      if (publishedBadge) publishedBadge.style.display = 'inline-flex';
+      if (unpublishBtn) unpublishBtn.style.display = 'inline-flex';
+
       if (hasUnpublishedChanges) {
+        publishBtn.style.display = 'inline-flex';
         publishBtn.className = 'zen-publish-btn zen-publish-btn--unsaved';
         publishText.textContent = 'Publish changes';
       } else {
-        publishBtn.className = 'zen-publish-btn zen-publish-btn--published';
-        publishText.textContent = 'Published';
+        publishBtn.style.display = 'none';
       }
     } else {
+      if (publishedBadge) publishedBadge.style.display = 'none';
+      if (unpublishBtn) unpublishBtn.style.display = 'none';
+      publishBtn.style.display = 'inline-flex';
       publishBtn.className = 'zen-publish-btn';
       publishText.textContent = 'Publish Note';
     }
@@ -861,6 +869,44 @@ export function initZenEditor() {
     }, 280);
   });
 
+  // Dedicated Unpublish Action
+  unpublishBtn?.addEventListener('click', async () => {
+    const confirmUnpublish = confirm(
+      'This note is live on your publication. Do you want to unpublish it and revert to a draft?'
+    );
+
+    unpublishBtn.disabled = true;
+    const span = unpublishBtn.querySelector('span');
+    const origText = span?.textContent || 'Unpublish';
+    if (span) span.textContent = 'Unpublishing...';
+
+    try {
+      const res = await fetch('/api/notes/' + noteId + '/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'unpublish' }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        currentStatus = 'draft';
+        hasUnpublishedChanges = false;
+        editorRoot?.setAttribute('data-has-unpublished-changes', 'false');
+        setSaveStatus('saved');
+        const saveTextEl = document.getElementById('save-status')?.querySelector('.zen-save-text');
+        if (saveTextEl) saveTextEl.textContent = 'Reverted to draft';
+        updatePublishBtnUI();
+      } else {
+        alert(data.error || 'Failed to unpublish note');
+        if (span) span.textContent = origText;
+      }
+    } catch (err: any) {
+      alert(err.message || 'Network error');
+      if (span) span.textContent = origText;
+    } finally {
+      unpublishBtn.disabled = false;
+    }
+  });
+
   // Publish / Update Action
   publishBtn?.addEventListener('click', async () => {
     // 1. If currently published with unpublished changes: publish changes immediately
@@ -872,7 +918,7 @@ export function initZenEditor() {
       await performSave();
 
       try {
-        const res = await fetch(`/api/notes/${noteId}/publish`, {
+        const res = await fetch('/api/notes/' + noteId + '/publish', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'publish' }),
@@ -895,41 +941,7 @@ export function initZenEditor() {
       return;
     }
 
-    // 2. If currently published and no changes: prompt to unpublish
-    if (currentStatus === 'published' && !hasUnpublishedChanges) {
-      const confirmUnpublish = confirm(
-        'This note is live on your site. Do you want to unpublish it and revert to a draft?'
-      );
-      if (!confirmUnpublish) return;
-
-      publishBtn.disabled = true;
-      if (publishText) publishText.textContent = 'Updating...';
-
-      try {
-        const res = await fetch(`/api/notes/${noteId}/publish`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'unpublish' }),
-        });
-        const data = await res.json();
-        if (res.ok) {
-          currentStatus = data.status;
-          hasUnpublishedChanges = false;
-          editorRoot?.setAttribute('data-has-unpublished-changes', 'false');
-          setSaveStatus('saved');
-          updatePublishBtnUI();
-        } else {
-          if (publishText) publishText.textContent = 'Error';
-        }
-      } catch {
-        if (publishText) publishText.textContent = 'Error';
-      } finally {
-        publishBtn.disabled = false;
-      }
-      return;
-    }
-
-    // 3. If draft: publish note
+    // 2. If draft: publish note
     if (currentStatus === 'draft') {
       publishBtn.disabled = true;
       if (publishText) publishText.textContent = 'Publishing...';
@@ -938,7 +950,7 @@ export function initZenEditor() {
       await performSave();
 
       try {
-        const res = await fetch(`/api/notes/${noteId}/publish`, {
+        const res = await fetch('/api/notes/' + noteId + '/publish', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'publish' }),
