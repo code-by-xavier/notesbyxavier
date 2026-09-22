@@ -11,7 +11,6 @@ import Icon from '@/components/Icon.astro';
 import WritingGuideModal from '@/components/WritingGuideModal.astro';
 import PortalToast from '@/components/PortalToast.astro';
 import { listNotesByAuthor } from '@/lib/notes';
-import { getSiteSettings } from '@/lib/settings';
 import { ROUTES } from '@/links';
 
 export const prerender = false;
@@ -22,7 +21,6 @@ if (!user) {
 }
 
 const userNotes = await listNotesByAuthor(user.id);
-const settings = await getSiteSettings();
 ---
 
 <BaseLayout title="Studio Portal — Notesby" hideNav={true} hideFooter={true}>
@@ -32,29 +30,16 @@ const settings = await getSiteSettings();
     <header class="portal-nav">
       <div class="portal-nav__container">
         <a href={ROUTES.ADMIN.ROOT} class="portal-brand" aria-label="Go to Dashboard">
-          {settings.customLogo ? (
-            <img
-              src={settings.customLogo}
-              alt={settings.siteTitle}
-              class="portal-brand__logo"
-              onerror="this.onerror=null; this.src='/images/notesby-logo-light.png';"
-            />
-          ) : (
-            <>
-              <img
-                src={settings.siteLogo}
-                alt="Notesby"
-                class="portal-brand__logo portal-brand__logo--light"
-                onerror="this.onerror=null; this.src='/images/notesby-logo-light.png';"
-              />
-              <img
-                src={settings.siteLogoDark}
-                alt="Notesby"
-                class="portal-brand__logo portal-brand__logo--dark"
-                onerror="this.onerror=null; this.src='/images/notesby-logo-dark.png';"
-              />
-            </>
-          )}
+          <img
+            src="/images/notesby-logo-black.svg"
+            alt="Notesby"
+            class="portal-brand__logo portal-brand__logo--light"
+          />
+          <img
+            src="/images/notesby-logo-white.svg"
+            alt="Notesby"
+            class="portal-brand__logo portal-brand__logo--dark"
+          />
           <span class="portal-brand__name">Studio</span>
         </a>
 
