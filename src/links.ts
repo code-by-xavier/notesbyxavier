@@ -10,6 +10,7 @@ export const ROUTES = {
   // Public Reader Pages
   HOME: '/',
   ABOUT: '/about',
+  PROJECTS: '/projects',
   TERMS: '/terms',
   PRIVACY: '/privacy',
   AI_POLICY: '/ai-policy',
