@@ -117,15 +117,18 @@ try {
     console.log('  ✓ Genericized astro.config.mjs domain fallback');
   }
 
-  // 7. Sanitize src/links.ts (ecosystem brand link)
-  console.log('🔗 Sanitizing src/links.ts external author link...');
+  // 7. Sanitize src/links.ts (ecosystem brand link + personal routes)
+  console.log('🔗 Sanitizing src/links.ts (author link + personal PROJECTS route)...');
   const linksPath = path.join(process.cwd(), 'src/links.ts');
   if (fs.existsSync(linksPath)) {
     let linksContent = fs.readFileSync(linksPath, 'utf-8');
+    // Strip personal PROJECTS route — only lives in downstream notesbyxavier
+    linksContent = linksContent.replace(/\s*PROJECTS:\s*'\/projects',?\n?/g, '\n');
+    // Reset author link to generic ecosystem URL
     linksContent = linksContent.replace(/AUTHOR:\s*'[^']+'/, "AUTHOR: 'https://clstre.com'");
     fs.writeFileSync(linksPath, linksContent, 'utf-8');
     run('git add src/links.ts', true);
-    console.log('  ✓ Set EXTERNAL_LINKS.AUTHOR to https://clstre.com');
+    console.log('  ✓ Removed ROUTES.PROJECTS and set EXTERNAL_LINKS.AUTHOR to https://clstre.com');
   }
 
   // 8. Sanitize package.json (name, description, repo links, and strip prepare:upstream)
