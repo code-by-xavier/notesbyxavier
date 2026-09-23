@@ -10,6 +10,10 @@ export const ROUTES = {
   // Public Reader Pages
   HOME: '/',
   ABOUT: '/about',
+
+  // ⚠️  DOWNSTREAM-ONLY — DO NOT REMOVE ON UPSTREAM MERGE
+  // This route does not exist in the upstream engine (Notesby).
+  // If you see a merge conflict here, always keep this line.
   PROJECTS: '/projects',
   TERMS: '/terms',
   PRIVACY: '/privacy',
