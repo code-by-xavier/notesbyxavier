@@ -1,9 +1,9 @@
 // File: scripts/prepare-upstream.ts
 // ============================================================
-// Notesby — Sovereign Upstream Sync Preparation Script
-// Prepares a clean 'upstream-syncing' branch with all engine fixes
-// and modularization, while strictly excluding personal content,
-// personal identity, deployment cheatsheets, and bespoke pages.
+// Notesby — Upstream Sync Preparation Script
+// Prepares a clean 'upstream-syncing' branch from your downstream fork,
+// stripping site-specific files, routes, and config before pushing
+// engine improvements back to the shared upstream repository.
 // ============================================================
 
 import { execSync } from 'node:child_process';
@@ -50,14 +50,14 @@ try {
   console.log('🔄 Checking out or creating "upstream-syncing" branch...');
   runSilent('git checkout -B upstream-syncing');
 
-  // 4. Remove site-specific personal files
-  console.log('🧹 Stripping personal files, cheatsheets, and sync scripts...');
+  // 4. Remove site-specific downstream files
+  console.log('🧹 Stripping site-specific files, cheatsheets, and sync scripts...');
   const filesToRemove = [
     'src/pages/projects.astro',
     'src/data/projects.ts',
     'src/content/notes/first-note.mdx',
     'docs/deployment-cheatsheet.md',
-    'public/images/xavier-avatar.webp',
+    'public/images/avatar.webp',
     'scripts/prepare-upstream.ts',
   ];
 
@@ -75,13 +75,13 @@ try {
   if (fs.existsSync(configPath)) {
     let configContent = fs.readFileSync(configPath, 'utf-8');
 
-    // Remove the Projects navigation link
+    // Strip downstream-only nav links not part of the engine
     configContent = configContent.replace(
       /\s*\{\s*label:\s*'Projects',\s*href:\s*'\/projects'\s*\},?\n?/g,
       '\n'
     );
 
-    // Reset author name, site title, and domain to generic template defaults
+    // Reset to generic template defaults
     configContent = configContent.replace(/siteTitle:\s*'[^']+'/, "siteTitle: 'Notesby'");
     configContent = configContent.replace(/authorName:\s*'[^']+'/, "authorName: 'Jane Doe'");
     configContent = configContent.replace(/domain:\s*'[^']+'/, "domain: 'https://example.com'");
@@ -100,7 +100,7 @@ try {
 
     fs.writeFileSync(configPath, configContent, 'utf-8');
     run('git add notes.config.ts', true);
-    console.log('  ✓ Cleaned notes.config.ts (removed /projects nav link & genericized defaults)');
+    console.log('  ✓ Sanitized notes.config.ts');
   }
 
   // 6. Sanitize astro.config.mjs (generic fallback domain)
@@ -117,18 +117,18 @@ try {
     console.log('  ✓ Genericized astro.config.mjs domain fallback');
   }
 
-  // 7. Sanitize src/links.ts (ecosystem brand link + personal routes)
-  console.log('🔗 Sanitizing src/links.ts (author link + personal PROJECTS route)...');
+  // 7. Sanitize src/links.ts — strip downstream-only routes and reset external links
+  console.log('🔗 Sanitizing src/links.ts...');
   const linksPath = path.join(process.cwd(), 'src/links.ts');
   if (fs.existsSync(linksPath)) {
     let linksContent = fs.readFileSync(linksPath, 'utf-8');
-    // Strip personal PROJECTS route — only lives in downstream notesbyxavier
+    // Strip downstream-only routes not part of the engine
     linksContent = linksContent.replace(/\s*PROJECTS:\s*'\/projects',?\n?/g, '\n');
-    // Reset author link to generic ecosystem URL
+    // Reset to generic ecosystem defaults
     linksContent = linksContent.replace(/AUTHOR:\s*'[^']+'/, "AUTHOR: 'https://clstre.com'");
     fs.writeFileSync(linksPath, linksContent, 'utf-8');
     run('git add src/links.ts', true);
-    console.log('  ✓ Removed ROUTES.PROJECTS and set EXTERNAL_LINKS.AUTHOR to https://clstre.com');
+    console.log('  ✓ Sanitized src/links.ts');
   }
 
   // 8. Sanitize package.json (name, description, repo links, and strip prepare:upstream)
@@ -139,7 +139,7 @@ try {
     pkg.name = 'notesby';
     pkg.description =
       'An open-source, minimalist static publishing engine where every post is a note. Built for distraction-free reading, editorial essays, and sovereign cloud deployment.';
-    pkg.homepage = 'https://github.com/code-by-xavier/';
+    pkg.homepage = 'https://github.com/CLSTRE-ORG/Notesby';
     if (pkg.bugs) {
       pkg.bugs.url = 'https://github.com/CLSTRE-ORG/Notesby/issues';
       pkg.bugs.email = 'support@clstre.com';
@@ -163,7 +163,7 @@ try {
   // 11. Commit clean upstream changes
   console.log('\n💾 Committing upstream engine changes...');
   run(
-    'git commit -m "chore(upstream): prepare engine sync excluding personal portfolio, cheatsheet, and downstream config"',
+    'git commit -m "chore(upstream): prepare engine sync — strip downstream-only files and reset config to engine defaults"',
     true
   );
 
