@@ -92,6 +92,15 @@ export async function ensureSchema() {
         linkedin_url varchar(255),
         github_url varchar(255),
         contact_email varchar(255),
+        subscription_enabled boolean DEFAULT true,
+        subscription_section_headline varchar(255),
+        subscription_section_subtext text,
+        subscription_section_cta_label varchar(100),
+        subscription_popup_enabled boolean DEFAULT true,
+        subscription_popup_headline varchar(255),
+        subscription_popup_subtext text,
+        subscription_confirmed_headline varchar(255),
+        subscription_confirmed_subtext text,
         updated_at timestamp DEFAULT now() NOT NULL
       );
       CREATE TABLE IF NOT EXISTS notes (
@@ -117,6 +126,12 @@ export async function ensureSchema() {
         published_cover_image text,
         created_at timestamp DEFAULT now() NOT NULL,
         updated_at timestamp DEFAULT now() NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS subscribers (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        email varchar(255) NOT NULL UNIQUE,
+        source varchar(20) DEFAULT 'section' NOT NULL,
+        created_at timestamp DEFAULT now() NOT NULL
       );
     `);
     schemaInitialized = true;

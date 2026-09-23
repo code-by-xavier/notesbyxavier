@@ -1,0 +1,287 @@
+---
+// File: src/components/settings/SubscriptionSection.astro
+// ============================================================
+// Notesby — Email Subscription Settings Section
+// Allows publishers to configure subscription copy, toggle
+// the section and popup, and customize the confirmation page.
+// ============================================================
+
+import Icon from '@/components/Icon.astro';
+import type { ResolvedSiteSettings } from '@/lib/settings';
+
+interface Props {
+  settings: ResolvedSiteSettings;
+}
+
+const { settings } = Astro.props;
+---
+
+<section class="settings-card" id="subscription-settings">
+  <div class="settings-card__header">
+    <div class="settings-card__icon-wrap">
+      <Icon name="mail" size={18} />
+    </div>
+    <div>
+      <h2 class="settings-card__title">Email Subscription</h2>
+      <p class="settings-card__desc">
+        Configure the subscription section, popup copy, and confirmation page messaging. Social
+        links on the confirmation page come from the <strong>SEO &amp; Social Profiles</strong>{' '}
+        section above.
+      </p>
+    </div>
+  </div>
+
+  <div class="settings-card__body">
+    <!-- Section Toggle -->
+    <div class="form-group form-group--toggle">
+      <div class="toggle-label-wrap">
+        <label for="subscriptionEnabled" class="form-label form-label--inline">
+          Enable subscription section &amp; popup
+        </label>
+        <p class="form-help">Disabling this hides all subscribe UI from your public site.</p>
+      </div>
+      <label class="toggle-switch" aria-label="Enable email subscription">
+        <input
+          type="checkbox"
+          id="subscriptionEnabled"
+          name="subscriptionEnabled"
+          class="toggle-switch__input"
+          checked={settings.subscriptionEnabled}
+        />
+        <span class="toggle-switch__track"></span>
+      </label>
+    </div>
+
+    <hr class="settings-divider" />
+
+    <!-- Inline Section Copy -->
+    <h3 class="settings-subheading">Inline Section</h3>
+    <p class="form-help" style="margin-bottom: var(--spacing-lg);">
+      Shown at the bottom of the home page and each post.
+    </p>
+
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label for="subscriptionSectionHeadline" class="form-label">
+          Section Headline
+        </label>
+        <input
+          type="text"
+          id="subscriptionSectionHeadline"
+          name="subscriptionSectionHeadline"
+          class="form-input"
+          value={settings.subscriptionSectionHeadline}
+          placeholder="Stay in the loop."
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="subscriptionSectionCtaLabel" class="form-label">
+          CTA Button Label
+        </label>
+        <input
+          type="text"
+          id="subscriptionSectionCtaLabel"
+          name="subscriptionSectionCtaLabel"
+          class="form-input"
+          value={settings.subscriptionSectionCtaLabel}
+          placeholder="Subscribe"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="subscriptionSectionSubtext" class="form-label">
+        Section Subtext
+      </label>
+      <textarea
+        id="subscriptionSectionSubtext"
+        name="subscriptionSectionSubtext"
+        class="form-textarea form-textarea--short"
+        rows="2"
+        placeholder="No noise. Just essays and ideas worth reading — straight to your inbox."
+      >{settings.subscriptionSectionSubtext}</textarea>
+    </div>
+
+    <hr class="settings-divider" />
+
+    <!-- Popup Copy -->
+    <div class="form-group form-group--toggle">
+      <div class="toggle-label-wrap">
+        <label for="subscriptionPopupEnabled" class="form-label form-label--inline">
+          Enable exit-intent popup
+        </label>
+        <p class="form-help">
+          Exit-intent on desktop, 70% scroll-depth on mobile. Once per session.
+        </p>
+      </div>
+      <label class="toggle-switch" aria-label="Enable subscription popup">
+        <input
+          type="checkbox"
+          id="subscriptionPopupEnabled"
+          name="subscriptionPopupEnabled"
+          class="toggle-switch__input"
+          checked={settings.subscriptionPopupEnabled}
+        />
+        <span class="toggle-switch__track"></span>
+      </label>
+    </div>
+
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label for="subscriptionPopupHeadline" class="form-label">
+          Popup Headline
+        </label>
+        <input
+          type="text"
+          id="subscriptionPopupHeadline"
+          name="subscriptionPopupHeadline"
+          class="form-input"
+          value={settings.subscriptionPopupHeadline}
+          placeholder="Before you go…"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="subscriptionPopupSubtext" class="form-label">
+        Popup Subtext
+      </label>
+      <textarea
+        id="subscriptionPopupSubtext"
+        name="subscriptionPopupSubtext"
+        class="form-textarea form-textarea--short"
+        rows="2"
+        placeholder="Get the next essay delivered to your inbox. Join readers who think deeply."
+      >{settings.subscriptionPopupSubtext}</textarea>
+    </div>
+
+    <hr class="settings-divider" />
+
+    <!-- Confirmation Page Copy -->
+    <h3 class="settings-subheading">
+      Confirmation Page <code>/subscribe/confirmed</code>
+    </h3>
+    <p class="form-help" style="margin-bottom: var(--spacing-lg);">
+      Shown after a reader subscribes. Use this URL in Google Tag Manager to track conversions.
+    </p>
+
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label for="subscriptionConfirmedHeadline" class="form-label">
+          Confirmed Headline
+        </label>
+        <input
+          type="text"
+          id="subscriptionConfirmedHeadline"
+          name="subscriptionConfirmedHeadline"
+          class="form-input"
+          value={settings.subscriptionConfirmedHeadline}
+          placeholder="You're in. ✦"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="subscriptionConfirmedSubtext" class="form-label">
+        Confirmed Subtext
+      </label>
+      <textarea
+        id="subscriptionConfirmedSubtext"
+        name="subscriptionConfirmedSubtext"
+        class="form-textarea form-textarea--short"
+        rows="2"
+        placeholder="The next essay lands in your inbox. Follow along on social in the meantime."
+      >{settings.subscriptionConfirmedSubtext}</textarea>
+      <p class="form-help">
+        Social media links shown below this come from the <strong>SEO &amp; Social Profiles</strong>{' '}
+        section.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style lang="scss">
+  .settings-subheading {
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    font-weight: ui.$font-weight-semibold;
+    color: var(--text-primary, #{ui.$text-primary-light});
+    margin: 0 0 var(--spacing-2xs, #{ui.$spacing-2xs}) 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .settings-divider {
+    border: none;
+    border-top: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+    margin: var(--spacing-xl, #{ui.$spacing-xl}) 0;
+  }
+
+  .form-group--toggle {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-lg, #{ui.$spacing-lg});
+  }
+
+  .toggle-label-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .form-label--inline {
+    margin-bottom: var(--spacing-3xs, #{ui.$spacing-3xs});
+  }
+
+  .toggle-switch {
+    flex-shrink: 0;
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    margin-top: 2px;
+    cursor: pointer;
+
+    &__input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+
+      &:checked + .toggle-switch__track {
+        background: var(--accent-color, #{ui.$primary-accent});
+
+        &::after {
+          transform: translateX(20px);
+        }
+      }
+
+      &:focus + .toggle-switch__track {
+        box-shadow: 0 0 0 2px rgba(7, 90, 170, 0.25);
+      }
+    }
+
+    &__track {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: var(--border-color, #{ui.$border-light});
+      transition: background 0.2s ease;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s ease;
+      }
+    }
+  }
+</style>

@@ -1,0 +1,260 @@
+---
+// File: src/components/SubscribeSection.astro
+// ============================================================
+// Notesby — Email Subscription Section
+// Inline editorial subscribe block shown on home page + post pages.
+// Submits to POST /api/subscribe and redirects to /subscribe/confirmed.
+// ============================================================
+
+import type { ResolvedSiteSettings } from '@/lib/settings';
+import { ROUTES } from '@/links';
+
+interface Props {
+  settings: ResolvedSiteSettings;
+  class?: string;
+}
+
+const { settings, class: className } = Astro.props;
+
+if (!settings.subscriptionEnabled) return;
+---
+
+<section class:list={['subscribe-section', className]} aria-label="Subscribe to newsletter">
+  <div class="subscribe-section__container">
+    <div class="subscribe-section__copy">
+      <h2 class="subscribe-section__headline">{settings.subscriptionSectionHeadline}</h2>
+      <p class="subscribe-section__subtext">{settings.subscriptionSectionSubtext}</p>
+    </div>
+
+    <form
+      id="subscribe-section-form"
+      class="subscribe-section__form"
+      novalidate
+      aria-label="Email subscription form"
+    >
+      <div class="subscribe-section__field">
+        <label for="subscribe-section-email" class="sr-only">
+          Email address
+        </label>
+        <input
+          type="email"
+          id="subscribe-section-email"
+          name="email"
+          class="subscribe-section__input"
+          placeholder="Your email address"
+          autocomplete="email"
+          required
+          aria-required="true"
+        />
+        <button type="submit" id="subscribe-section-btn" class="subscribe-section__btn">
+          <span class="subscribe-section__btn-text">{settings.subscriptionSectionCtaLabel}</span>
+          <span class="subscribe-section__btn-spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+      <p
+        id="subscribe-section-error"
+        class="subscribe-section__error"
+        role="alert"
+        aria-live="polite"
+      ></p>
+    </form>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById('subscribe-section-form') as HTMLFormElement | null;
+  const emailInput = document.getElementById('subscribe-section-email') as HTMLInputElement | null;
+  const btn = document.getElementById('subscribe-section-btn') as HTMLButtonElement | null;
+  const btnText = btn?.querySelector('.subscribe-section__btn-text') as HTMLElement | null;
+  const spinner = btn?.querySelector('.subscribe-section__btn-spinner') as HTMLElement | null;
+  const errorEl = document.getElementById('subscribe-section-error') as HTMLElement | null;
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = emailInput?.value.trim() ?? '';
+    if (!email) return;
+
+    // Loading state
+    if (btn) btn.disabled = true;
+    if (btnText) btnText.style.opacity = '0';
+    if (spinner) spinner.style.display = 'block';
+    if (errorEl) errorEl.textContent = '';
+
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'section' }),
+      });
+      const data = await res.json();
+
+      if (data.success && data.redirect) {
+        window.location.href = data.redirect;
+      } else {
+        if (errorEl) errorEl.textContent = data.error || 'Something went wrong.';
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.style.opacity = '1';
+        if (spinner) spinner.style.display = 'none';
+      }
+    } catch {
+      if (errorEl) errorEl.textContent = 'Network error. Please try again.';
+      if (btn) btn.disabled = false;
+      if (btnText) btnText.style.opacity = '1';
+      if (spinner) spinner.style.display = 'none';
+    }
+  });
+</script>
+
+<style lang="scss">
+  .subscribe-section {
+    padding: var(--spacing-5xl, #{ui.$spacing-5xl}) 0;
+    border-top: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+
+    &__container {
+      @include ui.container;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-2xl, #{ui.$spacing-2xl});
+
+      @include ui.media-breakpoint-up(md) {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--spacing-4xl, #{ui.$spacing-4xl});
+      }
+    }
+
+    &__copy {
+      flex: 1;
+      min-width: 0;
+    }
+
+    &__headline {
+      font-family: var(--font-family-headings, #{ui.$font-family-headings});
+      font-size: var(--h2-font-size, #{ui.$h2-font-size});
+      font-weight: ui.$font-weight-semibold;
+      color: var(--text-primary, #{ui.$text-primary-light});
+      margin: 0 0 var(--spacing-xs, #{ui.$spacing-xs}) 0;
+      letter-spacing: var(--letter-spacing-heading, #{ui.$letter-spacing-heading});
+    }
+
+    &__subtext {
+      @include ui.description-text;
+      margin: 0;
+      max-width: 44ch;
+      line-height: var(--line-height-prose, #{ui.$line-height-prose});
+    }
+
+    &__form {
+      flex-shrink: 0;
+      width: 100%;
+
+      @include ui.media-breakpoint-up(md) {
+        width: auto;
+        min-width: 340px;
+        max-width: 420px;
+      }
+    }
+
+    &__field {
+      display: flex;
+      gap: 0;
+      border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+      overflow: hidden;
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      transition:
+        border-color ui.$transition-fast,
+        box-shadow ui.$transition-fast;
+
+      &:focus-within {
+        border-color: var(--accent-color, #{ui.$primary-accent});
+        box-shadow: 0 0 0 3px rgba(7, 90, 170, 0.12);
+      }
+    }
+
+    &__input {
+      flex: 1;
+      min-width: 0;
+      padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      color: var(--text-primary, #{ui.$text-primary-light});
+      background: var(--bg-secondary, #{ui.$bg-secondary-light});
+      border: none;
+      outline: none;
+      line-height: 1.5;
+
+      &::placeholder {
+        color: var(--text-muted, #{ui.$text-muted-light});
+      }
+    }
+
+    &__btn {
+      position: relative;
+      flex-shrink: 0;
+      padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-lg, #{ui.$spacing-lg});
+      background: var(--accent-color, #{ui.$primary-accent});
+      color: #fff;
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-weight: ui.$font-weight-medium;
+      border: none;
+      cursor: pointer;
+      transition: background ui.$transition-fast;
+      white-space: nowrap;
+
+      &:hover:not(:disabled) {
+        background: var(--accent-hover, #{ui.$primary-accent-hover});
+      }
+
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+    }
+
+    &__btn-text {
+      transition: opacity ui.$transition-fast;
+    }
+
+    &__btn-spinner {
+      display: none;
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: subscribe-spin 0.7s linear infinite;
+    }
+
+    &__error {
+      margin-top: var(--spacing-xs, #{ui.$spacing-xs});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      color: var(--error-color, #e53e3e);
+      min-height: 1.2em;
+    }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  @keyframes subscribe-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>

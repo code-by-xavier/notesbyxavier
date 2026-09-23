@@ -44,6 +44,16 @@ export interface ResolvedSiteSettings {
   linkedinUrl: string;
   githubUrl: string;
   contactEmail: string;
+  // Email Subscription
+  subscriptionEnabled: boolean;
+  subscriptionSectionHeadline: string;
+  subscriptionSectionSubtext: string;
+  subscriptionSectionCtaLabel: string;
+  subscriptionPopupEnabled: boolean;
+  subscriptionPopupHeadline: string;
+  subscriptionPopupSubtext: string;
+  subscriptionConfirmedHeadline: string;
+  subscriptionConfirmedSubtext: string;
 }
 
 export async function getSiteSettings(): Promise<ResolvedSiteSettings> {
@@ -100,5 +110,38 @@ export async function getSiteSettings(): Promise<ResolvedSiteSettings> {
     linkedinUrl: dbSettings?.linkedinUrl || notesConfig.socials.linkedin || 'https://linkedin.com',
     githubUrl: dbSettings?.githubUrl || notesConfig.socials.github || '',
     contactEmail: dbSettings?.contactEmail || notesConfig.socials.email || 'hello@example.com',
+    // Email Subscription
+    subscriptionEnabled:
+      dbSettings?.subscriptionEnabled ?? notesConfig.emailSubscription?.enabled ?? true,
+    subscriptionSectionHeadline:
+      dbSettings?.subscriptionSectionHeadline ||
+      notesConfig.emailSubscription?.sectionHeadline ||
+      'Stay in the loop.',
+    subscriptionSectionSubtext:
+      dbSettings?.subscriptionSectionSubtext ||
+      notesConfig.emailSubscription?.sectionSubtext ||
+      'No noise. Just essays and ideas worth reading — straight to your inbox.',
+    subscriptionSectionCtaLabel:
+      dbSettings?.subscriptionSectionCtaLabel ||
+      notesConfig.emailSubscription?.sectionCtaLabel ||
+      'Subscribe',
+    subscriptionPopupEnabled:
+      dbSettings?.subscriptionPopupEnabled ?? notesConfig.emailSubscription?.popupEnabled ?? true,
+    subscriptionPopupHeadline:
+      dbSettings?.subscriptionPopupHeadline ||
+      notesConfig.emailSubscription?.popupHeadline ||
+      'Before you go…',
+    subscriptionPopupSubtext:
+      dbSettings?.subscriptionPopupSubtext ||
+      notesConfig.emailSubscription?.popupSubtext ||
+      'Get the next essay delivered to your inbox.',
+    subscriptionConfirmedHeadline:
+      dbSettings?.subscriptionConfirmedHeadline ||
+      notesConfig.emailSubscription?.confirmedHeadline ||
+      "You're in. ✦",
+    subscriptionConfirmedSubtext:
+      dbSettings?.subscriptionConfirmedSubtext ||
+      notesConfig.emailSubscription?.confirmedSubtext ||
+      'The next essay lands in your inbox. Follow along on social.',
   };
 }

@@ -7,6 +7,7 @@
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import TableOfContents from '@/components/TableOfContents.astro';
+import SubscribeSection from '@/components/SubscribeSection.astro';
 import type { HeadingItem } from '@/components/TableOfContents.astro';
 import Icon from '@/components/Icon.astro';
 import { getSiteSettings } from '@/lib/settings';
@@ -91,6 +92,9 @@ const settings = await getSiteSettings();
             <div class="essay-footer__author-name">{settings.authorName}</div>
             <p class="essay-footer__author-bio">{settings.postBottomCopy || settings.authorBio}</p>
           </div>
+
+          <SubscribeSection settings={settings} class="essay-subscribe" />
+
           <div class="essay-footer__actions">
             <a href={ROUTES.HOME} class="essay-footer__back-link">
               ← Read all notes

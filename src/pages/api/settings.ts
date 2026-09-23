@@ -66,6 +66,41 @@ export const PUT: APIRoute = async ({ request, locals }) => {
       linkedinUrl: typeof body.linkedinUrl === 'string' ? body.linkedinUrl.trim() : undefined,
       githubUrl: typeof body.githubUrl === 'string' ? body.githubUrl.trim() : undefined,
       contactEmail: typeof body.contactEmail === 'string' ? body.contactEmail.trim() : undefined,
+      // Email Subscription Copy
+      subscriptionEnabled:
+        typeof body.subscriptionEnabled === 'boolean' ? body.subscriptionEnabled : undefined,
+      subscriptionSectionHeadline:
+        typeof body.subscriptionSectionHeadline === 'string'
+          ? body.subscriptionSectionHeadline.trim()
+          : undefined,
+      subscriptionSectionSubtext:
+        typeof body.subscriptionSectionSubtext === 'string'
+          ? body.subscriptionSectionSubtext.trim()
+          : undefined,
+      subscriptionSectionCtaLabel:
+        typeof body.subscriptionSectionCtaLabel === 'string'
+          ? body.subscriptionSectionCtaLabel.trim()
+          : undefined,
+      subscriptionPopupEnabled:
+        typeof body.subscriptionPopupEnabled === 'boolean'
+          ? body.subscriptionPopupEnabled
+          : undefined,
+      subscriptionPopupHeadline:
+        typeof body.subscriptionPopupHeadline === 'string'
+          ? body.subscriptionPopupHeadline.trim()
+          : undefined,
+      subscriptionPopupSubtext:
+        typeof body.subscriptionPopupSubtext === 'string'
+          ? body.subscriptionPopupSubtext.trim()
+          : undefined,
+      subscriptionConfirmedHeadline:
+        typeof body.subscriptionConfirmedHeadline === 'string'
+          ? body.subscriptionConfirmedHeadline.trim()
+          : undefined,
+      subscriptionConfirmedSubtext:
+        typeof body.subscriptionConfirmedSubtext === 'string'
+          ? body.subscriptionConfirmedSubtext.trim()
+          : undefined,
       updatedAt: new Date(),
     };
 

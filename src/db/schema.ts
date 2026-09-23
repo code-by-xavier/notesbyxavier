@@ -1,7 +1,7 @@
 // File: src/db/schema.ts
 // ============================================================
 // Notesby — Relational Database Schema (PostgreSQL)
-// Defines users, sessions, siteSettings, and notes models.
+// Defines users, sessions, siteSettings, notes, and subscribers models.
 // ============================================================
 
 import { pgTable, uuid, varchar, text, timestamp, boolean, integer } from 'drizzle-orm/pg-core';
@@ -59,6 +59,16 @@ export const siteSettings = pgTable('site_settings', {
   linkedinUrl: varchar('linkedin_url', { length: 255 }),
   githubUrl: varchar('github_url', { length: 255 }),
   contactEmail: varchar('contact_email', { length: 255 }),
+  // Email Subscription Copy
+  subscriptionEnabled: boolean('subscription_enabled').default(true),
+  subscriptionSectionHeadline: varchar('subscription_section_headline', { length: 255 }),
+  subscriptionSectionSubtext: text('subscription_section_subtext'),
+  subscriptionSectionCtaLabel: varchar('subscription_section_cta_label', { length: 100 }),
+  subscriptionPopupEnabled: boolean('subscription_popup_enabled').default(true),
+  subscriptionPopupHeadline: varchar('subscription_popup_headline', { length: 255 }),
+  subscriptionPopupSubtext: text('subscription_popup_subtext'),
+  subscriptionConfirmedHeadline: varchar('subscription_confirmed_headline', { length: 255 }),
+  subscriptionConfirmedSubtext: text('subscription_confirmed_subtext'),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
@@ -92,6 +102,16 @@ export const notes = pgTable('notes', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+/**
+ * Subscribers Table — Email List Opt-ins
+ */
+export const subscribers = pgTable('subscribers', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  source: varchar('source', { length: 20 }).default('section').notNull(), // 'section' | 'popup'
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Session = typeof sessions.$inferSelect;
@@ -99,3 +119,5 @@ export type NewSession = typeof sessions.$inferInsert;
 export type SiteSettings = typeof siteSettings.$inferSelect;
 export type Note = typeof notes.$inferSelect;
 export type NewNote = typeof notes.$inferInsert;
+export type Subscriber = typeof subscribers.$inferSelect;
+export type NewSubscriber = typeof subscribers.$inferInsert;

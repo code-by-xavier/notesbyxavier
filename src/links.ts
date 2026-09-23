@@ -15,6 +15,7 @@ export const ROUTES = {
   AI_POLICY: '/ai-policy',
   RSS: '/rss.xml',
   NOTE: (slug: string) => `/notes/${slug}/`,
+  SUBSCRIBE_CONFIRMED: '/subscribe/confirmed',
 
   // Sovereign Studio & Admin
   ADMIN: {
@@ -39,6 +40,9 @@ export const ROUTES = {
     NOTE: (id: string | number) => `/api/notes/${id}`,
     PUBLISH_NOTE: (id: string | number) => `/api/notes/${id}/publish`,
     UPLOAD: '/api/upload',
+    SUBSCRIBE: '/api/subscribe',
+    SUBSCRIBERS: '/api/subscribers',
+    SUBSCRIBERS_EXPORT: '/api/subscribers/export',
   },
 } as const;
 

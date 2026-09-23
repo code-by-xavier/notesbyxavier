@@ -1,0 +1,455 @@
+---
+// File: src/components/SubscribePopup.astro
+// ============================================================
+// Notesby — Exit-Intent / Scroll-Depth Subscription Popup
+// Shown once per session. Never re-shown after subscribing.
+// Trigger: exit-intent on desktop, 70% scroll-depth on mobile.
+// ============================================================
+
+import type { ResolvedSiteSettings } from '@/lib/settings';
+
+interface Props {
+  settings: ResolvedSiteSettings;
+}
+
+const { settings } = Astro.props;
+
+if (!settings.subscriptionEnabled || !settings.subscriptionPopupEnabled) return;
+---
+
+<div
+  id="subscribe-popup-overlay"
+  class="subscribe-popup-overlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="subscribe-popup-headline"
+  aria-hidden="true"
+>
+  <div class="subscribe-popup" id="subscribe-popup">
+    <button
+      type="button"
+      id="subscribe-popup-close"
+      class="subscribe-popup__close"
+      aria-label="Close subscription popup"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="subscribe-popup__eyebrow">From the author</div>
+    <h2 class="subscribe-popup__headline" id="subscribe-popup-headline">
+      {settings.subscriptionPopupHeadline}
+    </h2>
+    <p class="subscribe-popup__subtext">{settings.subscriptionPopupSubtext}</p>
+
+    <form id="subscribe-popup-form" class="subscribe-popup__form" novalidate>
+      <label for="subscribe-popup-email" class="sr-only">
+        Email address
+      </label>
+      <input
+        type="email"
+        id="subscribe-popup-email"
+        name="email"
+        class="subscribe-popup__input"
+        placeholder="Your email address"
+        autocomplete="email"
+        required
+        aria-required="true"
+      />
+      <button type="submit" id="subscribe-popup-btn" class="subscribe-popup__btn">
+        <span class="subscribe-popup__btn-text">
+          {settings.subscriptionPopupSubtext
+            ? settings.subscriptionPopupHeadline.includes('go')
+              ? 'Subscribe'
+              : 'Subscribe'
+            : 'Subscribe'}
+        </span>
+        <span class="subscribe-popup__btn-spinner" aria-hidden="true"></span>
+      </button>
+      <p
+        id="subscribe-popup-error"
+        class="subscribe-popup__error"
+        role="alert"
+        aria-live="polite"
+      ></p>
+    </form>
+
+    <button type="button" id="subscribe-popup-dismiss" class="subscribe-popup__dismiss">
+      No thanks, I'll pass
+    </button>
+  </div>
+</div>
+
+<script>
+  // ── Constants ─────────────────────────────────────────────────────────────
+  const STORAGE_SUBSCRIBED_KEY = 'nb_subscribed';
+  const STORAGE_DISMISSED_KEY = 'nb_popup_dismissed';
+  const SCROLL_THRESHOLD = 0.7; // 70% scroll depth
+  const DESKTOP_BREAKPOINT = 768; // px
+
+  // ── Elements ──────────────────────────────────────────────────────────────
+  const overlay = document.getElementById('subscribe-popup-overlay') as HTMLElement | null;
+  const form = document.getElementById('subscribe-popup-form') as HTMLFormElement | null;
+  const emailInput = document.getElementById('subscribe-popup-email') as HTMLInputElement | null;
+  const btn = document.getElementById('subscribe-popup-btn') as HTMLButtonElement | null;
+  const btnText = btn?.querySelector('.subscribe-popup__btn-text') as HTMLElement | null;
+  const spinner = btn?.querySelector('.subscribe-popup__btn-spinner') as HTMLElement | null;
+  const errorEl = document.getElementById('subscribe-popup-error') as HTMLElement | null;
+  const closeBtn = document.getElementById('subscribe-popup-close') as HTMLButtonElement | null;
+  const dismissBtn = document.getElementById('subscribe-popup-dismiss') as HTMLButtonElement | null;
+
+  // ── Guards ────────────────────────────────────────────────────────────────
+  // Never show if user already subscribed (localStorage) or dismissed this session (sessionStorage)
+  const alreadySubscribed = localStorage.getItem(STORAGE_SUBSCRIBED_KEY) === 'true';
+  const dismissedThisSession = sessionStorage.getItem(STORAGE_DISMISSED_KEY) === 'true';
+
+  if (alreadySubscribed || dismissedThisSession || !overlay) {
+    // Remove from DOM entirely to keep it clean
+    overlay?.remove();
+  } else {
+    let shown = false;
+
+    // ── Show / Hide helpers ────────────────────────────────────────────────
+    function showPopup() {
+      if (shown || !overlay) return;
+      shown = true;
+      overlay.setAttribute('aria-hidden', 'false');
+      overlay.classList.add('subscribe-popup-overlay--visible');
+      // Focus the email input for accessibility
+      setTimeout(() => emailInput?.focus(), 300);
+    }
+
+    function hidePopup(sessionDismiss = true) {
+      if (!overlay) return;
+      overlay.classList.remove('subscribe-popup-overlay--visible');
+      overlay.classList.add('subscribe-popup-overlay--hiding');
+      setTimeout(() => {
+        overlay.setAttribute('aria-hidden', 'true');
+        overlay.classList.remove('subscribe-popup-overlay--hiding');
+      }, 350);
+      if (sessionDismiss) {
+        sessionStorage.setItem(STORAGE_DISMISSED_KEY, 'true');
+      }
+    }
+
+    // ── Trigger: Exit-intent (desktop) ────────────────────────────────────
+    function onMouseLeave(e: MouseEvent) {
+      if (window.innerWidth >= DESKTOP_BREAKPOINT && e.clientY <= 20) {
+        showPopup();
+        document.removeEventListener('mouseleave', onMouseLeave);
+      }
+    }
+
+    // ── Trigger: 70% Scroll depth (mobile / all) ──────────────────────────
+    function onScroll() {
+      const isMobile = window.innerWidth < DESKTOP_BREAKPOINT;
+      const scrolled = window.scrollY + window.innerHeight;
+      const total = document.documentElement.scrollHeight;
+      if ((isMobile || true) && scrolled / total >= SCROLL_THRESHOLD) {
+        showPopup();
+        window.removeEventListener('scroll', onScroll, { capture: false } as EventListenerOptions);
+      }
+    }
+
+    document.addEventListener('mouseleave', onMouseLeave);
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // ── Dismiss buttons ───────────────────────────────────────────────────
+    closeBtn?.addEventListener('click', () => hidePopup(true));
+    dismissBtn?.addEventListener('click', () => hidePopup(true));
+
+    // Click outside popup to dismiss
+    overlay?.addEventListener('click', (e) => {
+      if (e.target === overlay) hidePopup(true);
+    });
+
+    // Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && shown) hidePopup(true);
+    });
+
+    // ── Form submission ───────────────────────────────────────────────────
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = emailInput?.value.trim() ?? '';
+      if (!email) return;
+
+      if (btn) btn.disabled = true;
+      if (btnText) btnText.style.opacity = '0';
+      if (spinner) spinner.style.display = 'block';
+      if (errorEl) errorEl.textContent = '';
+
+      try {
+        const res = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, source: 'popup' }),
+        });
+        const data = await res.json();
+
+        if (data.success && data.redirect) {
+          // Persist subscription flag so popup never shows again
+          localStorage.setItem(STORAGE_SUBSCRIBED_KEY, 'true');
+          hidePopup(false);
+          // Small delay so the hide animation plays before redirect
+          setTimeout(() => {
+            window.location.href = data.redirect;
+          }, 300);
+        } else {
+          if (errorEl) errorEl.textContent = data.error || 'Something went wrong.';
+          if (btn) btn.disabled = false;
+          if (btnText) btnText.style.opacity = '1';
+          if (spinner) spinner.style.display = 'none';
+        }
+      } catch {
+        if (errorEl) errorEl.textContent = 'Network error. Please try again.';
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.style.opacity = '1';
+        if (spinner) spinner.style.display = 'none';
+      }
+    });
+  }
+</script>
+
+<style lang="scss">
+  .subscribe-popup-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+
+    @include ui.media-breakpoint-up(sm) {
+      align-items: center;
+    }
+
+    &--visible {
+      opacity: 1;
+      pointer-events: all;
+
+      .subscribe-popup {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    &--hiding {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  .subscribe-popup {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 var(--spacing-md, #{ui.$spacing-md});
+    padding: var(--spacing-3xl, #{ui.$spacing-3xl}) var(--spacing-2xl, #{ui.$spacing-2xl});
+    background: var(--bg-primary, #{ui.$bg-primary-light});
+    border-radius: var(--border-radius-lg, #{ui.$border-radius-lg})
+      var(--border-radius-lg, #{ui.$border-radius-lg}) 0 0;
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+    border-bottom: none;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.14);
+    transform: translateY(32px);
+    opacity: 0;
+    transition:
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.35s ease;
+
+    @include ui.media-breakpoint-up(sm) {
+      border-radius: var(--border-radius-lg, #{ui.$border-radius-lg});
+      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2);
+      transform: translateY(24px);
+    }
+
+    &__close {
+      position: absolute;
+      top: var(--spacing-md, #{ui.$spacing-md});
+      right: var(--spacing-md, #{ui.$spacing-md});
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      color: var(--text-muted, #{ui.$text-muted-light});
+      cursor: pointer;
+      transition:
+        background ui.$transition-fast,
+        color ui.$transition-fast;
+
+      &:hover {
+        background: var(--bg-secondary, #{ui.$bg-secondary-light});
+        color: var(--text-primary, #{ui.$text-primary-light});
+      }
+    }
+
+    &__eyebrow {
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-weight: ui.$font-weight-medium;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-color, #{ui.$primary-accent});
+      margin-bottom: var(--spacing-sm, #{ui.$spacing-sm});
+    }
+
+    &__headline {
+      font-family: var(--font-family-headings, #{ui.$font-family-headings});
+      font-size: var(--h3-size, #{ui.$h3-font-size});
+      font-weight: ui.$font-weight-semibold;
+      color: var(--text-primary, #{ui.$text-primary-light});
+      margin: 0 0 var(--spacing-sm, #{ui.$spacing-sm}) 0;
+      line-height: 1.3;
+    }
+
+    &__subtext {
+      @include ui.description-text;
+      margin: 0 0 var(--spacing-xl, #{ui.$spacing-xl}) 0;
+      line-height: var(--line-height-prose, #{ui.$line-height-prose});
+    }
+
+    &__form {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    &__input {
+      width: 100%;
+      padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      color: var(--text-primary, #{ui.$text-primary-light});
+      background: var(--bg-secondary, #{ui.$bg-secondary-light});
+      border: var(--border-width-base, #{ui.$border-width-base}) solid
+        var(--border-color, #{ui.$border-light});
+      border-bottom: none;
+      border-radius: var(--border-radius-md, #{ui.$border-radius-md})
+        var(--border-radius-md, #{ui.$border-radius-md}) 0 0;
+      outline: none;
+      transition: border-color ui.$transition-fast;
+      box-sizing: border-box;
+
+      &:focus {
+        border-color: var(--accent-color, #{ui.$primary-accent});
+      }
+
+      &::placeholder {
+        color: var(--text-muted, #{ui.$text-muted-light});
+      }
+    }
+
+    &__btn {
+      position: relative;
+      width: 100%;
+      padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+      background: var(--accent-color, #{ui.$primary-accent});
+      color: #fff;
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-weight: ui.$font-weight-medium;
+      border: none;
+      border-radius: 0 0 var(--border-radius-md, #{ui.$border-radius-md})
+        var(--border-radius-md, #{ui.$border-radius-md});
+      cursor: pointer;
+      transition: background ui.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background: var(--accent-hover, #{ui.$primary-accent-hover});
+      }
+
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+    }
+
+    &__btn-text {
+      transition: opacity ui.$transition-fast;
+    }
+
+    &__btn-spinner {
+      display: none;
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: popup-spin 0.7s linear infinite;
+    }
+
+    &__error {
+      margin-top: var(--spacing-xs, #{ui.$spacing-xs});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      color: var(--error-color, #e53e3e);
+      min-height: 1.2em;
+    }
+
+    &__dismiss {
+      display: block;
+      width: 100%;
+      margin-top: var(--spacing-md, #{ui.$spacing-md});
+      padding: 0;
+      background: none;
+      border: none;
+      font-family: var(--font-family-base, #{ui.$font-family-base});
+      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      color: var(--text-muted, #{ui.$text-muted-light});
+      cursor: pointer;
+      text-align: center;
+      transition: color ui.$transition-fast;
+
+      &:hover {
+        color: var(--text-secondary, #{ui.$text-secondary-light});
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  @keyframes popup-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>

@@ -16,6 +16,7 @@ import PwaIconsSection from '@/components/settings/PwaIconsSection.astro';
 import ReadingExperienceSection from '@/components/settings/ReadingExperienceSection.astro';
 import LegalComplianceSection from '@/components/settings/LegalComplianceSection.astro';
 import SeoSocialSection from '@/components/settings/SeoSocialSection.astro';
+import SubscriptionSection from '@/components/settings/SubscriptionSection.astro';
 import SettingsSaveBar from '@/components/settings/SettingsSaveBar.astro';
 import PortalToast from '@/components/PortalToast.astro';
 
@@ -29,7 +30,12 @@ if (!user) {
 const settings = await getSiteSettings();
 ---
 
-<BaseLayout title="Publication Settings — Notesby Studio" hideNav={true} hideFooter={true}>
+<BaseLayout
+  title="Publication Settings — Notesby Studio"
+  hideNav={true}
+  hideFooter={true}
+  hidePopup={true}
+>
   <PortalToast />
   <div class="settings-layout">
     <!-- Top Minimal Navigation Bar -->
@@ -64,6 +70,9 @@ const settings = await getSiteSettings();
 
           <!-- 5. SEO & Social Profiles -->
           <SeoSocialSection settings={settings} />
+
+          <!-- 6. Email Subscription -->
+          <SubscriptionSection settings={settings} />
 
           <!-- Sticky Bottom Save Bar -->
           <SettingsSaveBar />

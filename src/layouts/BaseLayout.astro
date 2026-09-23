@@ -7,6 +7,7 @@
 
 import Header from '@/components/Header.astro';
 import SEO from '@/components/SEO.astro';
+import SubscribePopup from '@/components/SubscribePopup.astro';
 import { getSiteSettings } from '@/lib/settings';
 import { ROUTES } from '@/links';
 import '@/styles/main.scss';
@@ -21,6 +22,7 @@ interface Props {
   keywords?: string[] | string;
   hideNav?: boolean;
   hideFooter?: boolean;
+  hidePopup?: boolean;
 }
 
 const {
@@ -33,6 +35,7 @@ const {
   keywords,
   hideNav = false,
   hideFooter = false,
+  hidePopup = false,
 } = Astro.props;
 
 const settings = await getSiteSettings();
@@ -165,5 +168,6 @@ const settings = await getSiteSettings();
         }
       }
     </style>
+    {!hidePopup && <SubscribePopup settings={settings} />}
   </body>
 </html>

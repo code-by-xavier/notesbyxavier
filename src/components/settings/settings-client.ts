@@ -279,7 +279,14 @@ export function initSettingsClient() {
     if (saveStatusText) saveStatusText.textContent = 'Saving to cloud...';
 
     const formData = new FormData(form);
-    const payload = Object.fromEntries(formData.entries());
+    const payload: Record<string, unknown> = Object.fromEntries(formData.entries());
+
+    // Checkbox fields serialize as 'on' when checked, absent when unchecked.
+    // Convert known boolean toggles to actual booleans for the API.
+    const booleanFields = ['subscriptionEnabled', 'subscriptionPopupEnabled'];
+    for (const field of booleanFields) {
+      payload[field] = formData.has(field);
+    }
 
     try {
       const res = await fetch('/api/settings', {

@@ -41,6 +41,20 @@ export interface NotesConfig {
     copyrightText: string;
     poweredByText: string;
   };
+  emailSubscription?: {
+    enabled?: boolean;
+    sectionHeadline?: string;
+    sectionSubtext?: string;
+    sectionCtaLabel?: string;
+    sectionPlaceholder?: string;
+    popupEnabled?: boolean;
+    popupHeadline?: string;
+    popupSubtext?: string;
+    popupCtaLabel?: string;
+    popupDismissLabel?: string;
+    confirmedHeadline?: string;
+    confirmedSubtext?: string;
+  };
 }
 
 export const notesConfig: NotesConfig = {
@@ -86,5 +100,20 @@ export const notesConfig: NotesConfig = {
   footer: {
     copyrightText: `© ${new Date().getFullYear()} Jane Doe. All rights reserved.`,
     poweredByText: 'Built with Notesby — an open-source static publishing engine by CLSTRE.',
+  },
+  emailSubscription: {
+    enabled: true,
+    sectionHeadline: 'Stay in the loop.',
+    sectionSubtext:
+      'No noise. Just essays, field notes, and ideas worth reading — straight to your inbox.',
+    sectionCtaLabel: 'Subscribe',
+    sectionPlaceholder: 'Your email address',
+    popupEnabled: true,
+    popupHeadline: 'Before you go…',
+    popupSubtext: 'Get the next essay delivered to your inbox. Join readers who think deeply.',
+    popupCtaLabel: 'Yes, subscribe me',
+    popupDismissLabel: 'No thanks',
+    confirmedHeadline: "You're in. ✦",
+    confirmedSubtext: 'The next essay lands in your inbox. Follow along on social in the meantime.',
   },
 };

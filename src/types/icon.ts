@@ -40,4 +40,5 @@ export type IconName =
   | 'sun'
   | 'alert-triangle'
   | 'menu'
-  | 'alert';
+  | 'alert'
+  | 'mail';

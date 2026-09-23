@@ -23,7 +23,7 @@ if (!user) {
 const userNotes = await listNotesByAuthor(user.id);
 ---
 
-<BaseLayout title="Studio Portal — Notesby" hideNav={true} hideFooter={true}>
+<BaseLayout title="Studio Portal — Notesby" hideNav={true} hideFooter={true} hidePopup={true}>
   <PortalToast />
   <div class="portal-layout">
     <!-- Top Minimal Navigation Bar -->
@@ -260,6 +260,63 @@ const userNotes = await listNotesByAuthor(user.id);
             </div>
           )}
         </section>
+
+        <!-- Subscribers Section -->
+        <section class="portal-section" id="subscribers-section">
+          <div class="portal-section__header">
+            <div>
+              <h2 class="portal-section__title">
+                Email Subscribers
+                <span
+                  class="portal-subscribers-count"
+                  id="subscribers-count"
+                  aria-label="subscriber count"
+                ></span>
+              </h2>
+              <p class="portal-section__subtitle">
+                Readers who opted in via the subscription section or popup.
+              </p>
+            </div>
+            <a
+              href="/api/subscribers/export"
+              id="subscribers-export-btn"
+              class="portal-btn-secondary"
+              style="display:none"
+              aria-label="Download subscribers as CSV"
+            >
+              <Icon name="external-link" size={13} />
+              <span>Export CSV</span>
+            </a>
+          </div>
+
+          <div id="subscribers-loading" class="portal-loading-state">
+            <span class="portal-loading-dot"></span>
+            <span>Loading subscribers…</span>
+          </div>
+
+          <div id="subscribers-empty" class="portal-empty-state" style="display:none">
+            <div class="portal-empty-state__icon">
+              <Icon name="mail" size={24} />
+            </div>
+            <h3 class="portal-empty-state__title">No subscribers yet</h3>
+            <p class="portal-empty-state__text">
+              Once readers subscribe via the section or popup, they'll appear here.
+            </p>
+          </div>
+
+          <div class="portal-table-wrapper" id="subscribers-table-wrapper" style="display:none">
+            <table class="portal-table" id="subscribers-table">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Source</th>
+                  <th>Subscribed</th>
+                </tr>
+              </thead>
+              <tbody id="subscribers-tbody"></tbody>
+            </table>
+          </div>
+        </section>
       </div>
     </main>
   </div>
@@ -368,6 +425,57 @@ const userNotes = await listNotesByAuthor(user.id);
       }
     });
   });
+
+  // ── Subscribers Section ────────────────────────────────────────────────────
+  (async () => {
+    const loadingEl = document.getElementById('subscribers-loading');
+    const emptyEl = document.getElementById('subscribers-empty');
+    const tableWrapper = document.getElementById('subscribers-table-wrapper');
+    const tbody = document.getElementById('subscribers-tbody');
+    const countBadge = document.getElementById('subscribers-count');
+    const exportBtn = document.getElementById('subscribers-export-btn') as HTMLAnchorElement | null;
+
+    try {
+      const res = await fetch('/api/subscribers');
+      if (!res.ok) throw new Error('Failed to load');
+      const data = await res.json();
+      const list: { email: string; source: string; createdAt: string }[] = data.subscribers || [];
+
+      if (loadingEl) loadingEl.style.display = 'none';
+
+      if (list.length === 0) {
+        if (emptyEl) emptyEl.style.display = '';
+      } else {
+        if (countBadge) countBadge.textContent = String(list.length);
+        if (exportBtn) exportBtn.style.display = '';
+        if (tableWrapper) tableWrapper.style.display = '';
+        if (tbody) {
+          tbody.innerHTML = list
+            .map((s) => {
+              const date = new Intl.DateTimeFormat('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              }).format(new Date(s.createdAt));
+              const sourceLabel = s.source === 'popup' ? 'Popup' : 'Section';
+              return `<tr>
+                <td class="portal-table__title-cell">${s.email}</td>
+                <td><span class="portal-source-pill portal-source-pill--${s.source}">${sourceLabel}</span></td>
+                <td class="portal-table__date">${date}</td>
+              </tr>`;
+            })
+            .join('');
+        }
+      }
+    } catch {
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (emptyEl) {
+        emptyEl.style.display = '';
+        const title = emptyEl.querySelector('.portal-empty-state__title');
+        if (title) title.textContent = 'Could not load subscribers';
+      }
+    }
+  })();
 </script>
 
 <style lang="scss">
@@ -939,6 +1047,102 @@ const userNotes = await listNotesByAuthor(user.id);
       background-color: rgba(7, 90, 170, 0.12);
       color: var(--accent-color, #{ui.$primary-accent});
       margin-left: 4px;
+    }
+  }
+
+  // Subscriber count badge
+  .portal-subscribers-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    margin-left: var(--spacing-xs, #{ui.$spacing-xs});
+    background: var(--accent-color, #{ui.$primary-accent});
+    color: #fff;
+    font-size: 11px;
+    font-weight: ui.$font-weight-medium;
+    border-radius: 999px;
+    vertical-align: middle;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  // Source pill for subscriber table
+  .portal-source-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    font-weight: ui.$font-weight-medium;
+    text-transform: capitalize;
+
+    &--section {
+      background: rgba(7, 90, 170, 0.1);
+      color: var(--accent-color, #{ui.$primary-accent});
+    }
+
+    &--popup {
+      background: rgba(139, 92, 246, 0.1);
+      color: #7c3aed;
+    }
+  }
+
+  // Loading state
+  .portal-loading-state {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, #{ui.$spacing-sm});
+    padding: var(--spacing-xl, #{ui.$spacing-xl}) 0;
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    color: var(--text-muted, #{ui.$text-muted-light});
+  }
+
+  .portal-loading-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-color, #{ui.$primary-accent});
+    animation: portal-pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes portal-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(0.7);
+    }
+  }
+
+  // Secondary button
+  .portal-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2xs, #{ui.$spacing-2xs});
+    padding: var(--spacing-xs, #{ui.$spacing-xs}) var(--spacing-md, #{ui.$spacing-md});
+    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    border: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+    background: var(--bg-secondary, #{ui.$bg-secondary-light});
+    color: var(--text-secondary, #{ui.$text-secondary-light});
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-xs, #{ui.$font-size-xs});
+    font-weight: ui.$font-weight-medium;
+    text-decoration: none;
+    transition:
+      border-color ui.$transition-fast,
+      color ui.$transition-fast;
+
+    &:hover {
+      border-color: var(--accent-color, #{ui.$primary-accent});
+      color: var(--accent-color, #{ui.$primary-accent});
     }
   }
 </style>
