@@ -30,6 +30,7 @@ $text-muted-light: #8c8883 !default;
 $code-bg-light: #f4f4f2 !default;
 $tag-bg-light: #f2f2f0 !default;
 $tag-text-light: #44403c !default;
+$subscribe-bg-light: #f1f5f9 !default; // Sophisticated subtle slate-blue wash (stands out from white)
 
 $bg-dark: #161616 !default; // Warm deep charcoal
 $surface-dark: #1f1f1f !default;
@@ -41,6 +42,7 @@ $text-muted-dark: #737373 !default;
 $code-bg-dark: #222222 !default;
 $tag-bg-dark: #262626 !default;
 $tag-text-dark: #d4d4d4 !default;
+$subscribe-bg-dark: #181d24 !default; // Deep architectural charcoal-slate
 
 // ==========================================================================
 // 3. STATUS & EDITORIAL TAGS
@@ -158,11 +160,16 @@ $scrollbar-size: 4px !default;
 $portal-nav-max-width: 900px !default;
 $settings-bottom-padding: 90px !default;
 
-// Theme Toggle Dimensions
+// Theme & Form Toggle Dimensions
 $toggle-track-width: 44px !default;
 $toggle-track-height: 24px !default;
 $toggle-thumb-size: 20px !default;
+$toggle-thumb-travel: 20px !default;
 $toggle-padding: 6px !default;
+
+// Auth & Brand Logos
+$auth-logo-height: 28px !default;
+$auth-logo-max-width: 170px !default;
 
 // Tag & Badge Paddings
 $badge-padding-y: 0.15rem !default;

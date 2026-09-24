@@ -103,6 +103,15 @@ export async function ensureSchema() {
         subscription_confirmed_subtext text,
         updated_at timestamp DEFAULT now() NOT NULL
       );
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_enabled boolean DEFAULT true;
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_section_headline varchar(255);
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_section_subtext text;
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_section_cta_label varchar(100);
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_popup_enabled boolean DEFAULT true;
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_popup_headline varchar(255);
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_popup_subtext text;
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_confirmed_headline varchar(255);
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_confirmed_subtext text;
       CREATE TABLE IF NOT EXISTS notes (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         title varchar(255) NOT NULL,

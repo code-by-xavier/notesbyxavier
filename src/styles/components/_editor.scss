@@ -326,6 +326,14 @@
 // Headline Cover Image Area
 .zen-cover-area {
   margin: var(--spacing-xs, #{ui.$spacing-xs}) 0 var(--spacing-md, #{ui.$spacing-md}) 0;
+  transition: all ui.$transition-fast;
+
+  &--dragover {
+    outline: 2px dashed var(--accent-color, #{ui.$primary-accent});
+    outline-offset: 4px;
+    border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+    background-color: rgba(7, 90, 170, 0.04);
+  }
 }
 
 .zen-add-cover-btn {
@@ -343,6 +351,7 @@
   border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
   transition: all ui.$transition-fast;
   animation: fade-in 0.2s ease;
+  user-select: none;
 
   &:hover {
     background-color: var(--tag-bg, #{ui.$tag-bg-light});
@@ -353,6 +362,8 @@
 .zen-cover-preview {
   position: relative;
   width: 100%;
+  min-height: 140px;
+  background-color: var(--tag-bg, #{ui.$tag-bg-light});
   max-height: 380px;
   border-radius: var(--border-radius-md, #{ui.$border-radius-md});
   overflow: hidden;
@@ -570,6 +581,7 @@
   position: absolute;
   bottom: 12px;
   right: 12px;
+  z-index: 5;
   display: flex;
   gap: 8px;
   opacity: 0.88;
@@ -607,6 +619,71 @@
       background-color: #fef2f2;
     }
   }
+}
+
+// Dedicated Error Card for Broken / Missing Cover Images
+.zen-cover-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  padding: var(--spacing-xl, #{ui.$spacing-xl}) var(--spacing-md, #{ui.$spacing-md});
+  background-color: var(--surface-color, #{ui.$surface-light});
+  text-align: center;
+  gap: var(--spacing-xs, #{ui.$spacing-xs});
+}
+
+.zen-cover-error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(220, 38, 38, 0.08);
+  color: var(--error-color, #{ui.$error-color});
+}
+
+.zen-cover-error-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.zen-cover-error-title {
+  font-family: var(--font-family-base, #{ui.$font-family-base});
+  font-size: var(--font-size-sm, #{ui.$font-size-sm});
+  font-weight: ui.$font-weight-medium;
+  color: var(--text-primary, #{ui.$text-primary-light});
+  margin: 0;
+}
+
+.zen-cover-error-subtitle {
+  font-family: var(--font-family-base, #{ui.$font-family-base});
+  font-size: var(--font-size-xs, #{ui.$font-size-xs});
+  color: var(--text-muted, #{ui.$text-muted-light});
+  margin: 0;
+}
+
+.zen-cover-error-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, #{ui.$spacing-xs});
+  margin-top: var(--spacing-xs, #{ui.$spacing-xs});
+}
+
+// Inline Images inside Editorial Canvas & Reader View
+.zen-body-image,
+.zen-content-editable img,
+.zen-preview-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+  border: var(--border-width-base, #{ui.$border-width-base}) solid
+    var(--border-subtle, #{ui.$border-subtle-light});
+  margin: var(--spacing-md, #{ui.$spacing-md}) 0;
+  display: block;
 }
 
 // Title: Newsreader serif matching live essay headings

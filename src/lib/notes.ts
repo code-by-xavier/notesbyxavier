@@ -55,6 +55,35 @@ export function estimateReadingTime(content: string): string {
 }
 
 /**
+ * Strips Markdown syntax to return clean, human-readable plain text for excerpts/cards.
+ * Properly converts Markdown links [label](url) to just label, removes images, code fences,
+ * HTML tags, and styling markers so URLs never leak into plain text teasers.
+ */
+export function stripMarkdownToPlainText(text: string): string {
+  if (!text) return '';
+  return (
+    text
+      // Remove fenced code blocks
+      .replace(/```[\s\S]*?```/g, '')
+      // Inline code: `code` -> code
+      .replace(/`([^`]+)`/g, '$1')
+      // Remove image embeds: ![alt](url) -> ''
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+      // Markdown links: [label](url) -> label
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+      // Remove HTML tags: <tag> -> ''
+      .replace(/<[^>]*>/g, '')
+      // Remove markdown headers, blockquotes, list markers at start of lines
+      .replace(/^([#>\s*-]|\d+\.)+\s+/gm, '')
+      // Remove bold, italic, strikethrough delimiters
+      .replace(/[*_~]/g, '')
+      // Collapse multiple whitespace/newlines into a single space
+      .replace(/\s+/g, ' ')
+      .trim()
+  );
+}
+
+/**
  * Parse Markdown string into safe HTML with automatic slugged headings for TOC
  */
 export function parseMarkdown(content: string): { html: string; headings: NoteHeading[] } {
@@ -138,9 +167,9 @@ export async function getAllFeedNotes(): Promise<NoteCardItem[]> {
         ? n.publishedCoverImage
         : n.coverImage;
 
-    let description = n.excerpt;
+    let description = n.excerpt ? stripMarkdownToPlainText(n.excerpt) : '';
     if (!description && content) {
-      const clean = content.replace(/[#*`_~>[\]()]/g, '').trim();
+      const clean = stripMarkdownToPlainText(content);
       description = clean.slice(0, 160) + (clean.length > 160 ? '...' : '');
     }
     return {

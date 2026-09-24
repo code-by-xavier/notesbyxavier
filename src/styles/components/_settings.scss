@@ -151,7 +151,7 @@
       font-weight: ui.$font-weight-semibold;
       letter-spacing: 0.08em;
       color: var(--accent-color, #{ui.$primary-accent});
-      background-color: rgba(7, 90, 170, 0.08);
+      background-color: var(--accent-light, #{ui.$primary-accent-light});
       padding: 3px 8px;
       border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
       margin-bottom: var(--spacing-xs, #{ui.$spacing-xs});
@@ -201,7 +201,7 @@
       width: 38px;
       height: 38px;
       border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
-      background-color: rgba(7, 90, 170, 0.08);
+      background-color: var(--accent-light, #{ui.$primary-accent-light});
       color: var(--accent-color, #{ui.$primary-accent});
       flex-shrink: 0;
     }
@@ -248,6 +248,13 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+
+    &--toggle {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--spacing-lg, #{ui.$spacing-lg});
+    }
   }
 
   .form-label {
@@ -272,7 +279,7 @@
     &:focus {
       outline: none;
       border-color: var(--accent-color, #{ui.$primary-accent});
-      box-shadow: 0 0 0 2px rgba(7, 90, 170, 0.12);
+      box-shadow: 0 0 0 2px var(--accent-light, #{ui.$primary-accent-light});
     }
   }
 
@@ -295,6 +302,83 @@
       background-color: var(--tag-bg, #{ui.$tag-bg-light});
       padding: 1px 4px;
       border-radius: 2px;
+    }
+  }
+
+  .settings-subheading {
+    font-family: var(--font-family-base, #{ui.$font-family-base});
+    font-size: var(--font-size-sm, #{ui.$font-size-sm});
+    font-weight: ui.$font-weight-semibold;
+    color: var(--text-primary, #{ui.$text-primary-light});
+    margin: var(--spacing-xl, #{ui.$spacing-xl}) 0 var(--spacing-2xs, #{ui.$spacing-2xs}) 0;
+    text-transform: uppercase;
+    letter-spacing: ui.$letter-spacing-category;
+  }
+
+  .settings-divider {
+    border: none;
+    border-top: var(--border-width-base, #{ui.$border-width-base}) solid
+      var(--border-color, #{ui.$border-light});
+    margin: var(--spacing-xl, #{ui.$spacing-xl}) 0;
+  }
+
+  .toggle-label-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .form-label--inline {
+    margin-bottom: var(--spacing-3xs, #{ui.$spacing-3xs});
+  }
+
+  .toggle-switch {
+    flex-shrink: 0;
+    position: relative;
+    display: inline-block;
+    width: var(--toggle-track-width, #{ui.$toggle-track-width});
+    height: var(--toggle-track-height, #{ui.$toggle-track-height});
+    margin-top: 2px;
+    cursor: pointer;
+
+    &__input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+
+      &:checked + .toggle-switch__track {
+        background-color: var(--accent-color, #{ui.$primary-accent});
+
+        &::after {
+          transform: translateX(var(--toggle-thumb-travel, #{ui.$toggle-thumb-travel}));
+        }
+      }
+
+      &:focus + .toggle-switch__track,
+      &:focus-visible + .toggle-switch__track {
+        box-shadow: 0 0 0 2px var(--accent-light, #{ui.$primary-accent-light});
+      }
+    }
+
+    &__track {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--border-radius-full, #{ui.$border-radius-full});
+      background-color: var(--border-color, #{ui.$border-light});
+      transition: background-color ui.$transition-base;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: var(--spacing-3xs, #{ui.$spacing-3xs});
+        left: var(--spacing-3xs, #{ui.$spacing-3xs});
+        width: var(--toggle-thumb-size, #{ui.$toggle-thumb-size});
+        height: var(--toggle-thumb-size, #{ui.$toggle-thumb-size});
+        border-radius: var(--border-radius-full, #{ui.$border-radius-full});
+        background-color: var(--color-white, #{ui.$color-white});
+        box-shadow: ui.$shadow-sm;
+        transition: transform ui.$transition-base;
+      }
     }
   }
 
@@ -401,7 +485,7 @@
   .upload-mini-spinner {
     width: 20px;
     height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(ui.$color-white, 0.3);
     border-top-color: var(--color-white, #{ui.$color-white});
     border-radius: 50%;
     animation: miniSpin 0.75s infinite linear;
@@ -468,7 +552,7 @@
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    background-color: rgba(7, 90, 170, 0.08);
+    background-color: var(--accent-light, #{ui.$primary-accent-light});
     border-radius: var(--border-radius-xs, #{ui.$border-radius-xs});
     font-size: var(--font-size-xs, #{ui.$font-size-xs});
     color: var(--text-primary, #{ui.$text-primary-light});

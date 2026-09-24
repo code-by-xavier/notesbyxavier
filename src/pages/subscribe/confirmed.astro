@@ -48,10 +48,13 @@ if (settings.contactEmail) {
     icon: 'mail',
   });
 }
+
+const rawHeadline = settings.subscriptionConfirmedHeadline || "You're in.";
+const headline = rawHeadline.replace(/[✦★*]/g, '').trim() || "You're in.";
 ---
 
 <BaseLayout
-  title={`${settings.subscriptionConfirmedHeadline} — ${settings.siteTitle}`}
+  title={`${headline} — ${settings.siteTitle}`}
   description={settings.subscriptionConfirmedSubtext}
 >
   <div class="confirmed-page">
@@ -74,7 +77,7 @@ if (settings.contactEmail) {
 
       <div class="confirmed-page__badge">SUBSCRIPTION CONFIRMED</div>
 
-      <h1 class="confirmed-page__headline">{settings.subscriptionConfirmedHeadline}</h1>
+      <h1 class="confirmed-page__headline">{headline}</h1>
       <p class="confirmed-page__subtext">{settings.subscriptionConfirmedSubtext}</p>
 
       {socialLinks.length > 0 && (
@@ -141,11 +144,13 @@ if (settings.contactEmail) {
 </BaseLayout>
 
 <style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
   .confirmed-page {
     min-height: 70vh;
     display: flex;
     align-items: center;
-    padding: var(--spacing-5xl, #{ui.$spacing-5xl}) 0;
+    padding: ui.$spacing-5xl 0;
 
     &__container {
       @include ui.container;
@@ -159,44 +164,44 @@ if (settings.contactEmail) {
       justify-content: center;
       width: 56px;
       height: 56px;
-      border-radius: 50%;
-      background: rgba(7, 90, 170, 0.1);
-      color: var(--accent-color, #{ui.$primary-accent});
-      margin: 0 auto var(--spacing-lg, #{ui.$spacing-lg});
-      border: 2px solid rgba(7, 90, 170, 0.2);
+      border-radius: ui.$border-radius-full;
+      background: rgba(16, 185, 129, 0.12);
+      color: ui.$success-color;
+      border: ui.$border-width-base solid rgba(16, 185, 129, 0.25);
+      margin: 0 auto ui.$spacing-lg;
     }
 
     &__badge {
-      font-family: var(--font-family-base, #{ui.$font-family-base});
-      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-family: ui.$font-family-base;
+      font-size: ui.$font-size-xs;
       font-weight: ui.$font-weight-medium;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: ui.$letter-spacing-mono;
       color: var(--accent-color, #{ui.$primary-accent});
-      margin-bottom: var(--spacing-sm, #{ui.$spacing-sm});
+      margin-bottom: ui.$spacing-sm;
     }
 
     &__headline {
-      font-family: var(--font-family-headings, #{ui.$font-family-headings});
+      font-family: ui.$font-family-headings;
       font-size: clamp(2rem, 5vw, 3rem);
       font-weight: ui.$font-weight-semibold;
       color: var(--text-primary, #{ui.$text-primary-light});
-      margin: 0 0 var(--spacing-md, #{ui.$spacing-md}) 0;
-      letter-spacing: var(--letter-spacing-heading-lg, #{ui.$letter-spacing-heading-lg});
+      margin: 0 0 ui.$spacing-md 0;
+      letter-spacing: ui.$letter-spacing-heading-lg;
     }
 
     &__subtext {
       @include ui.description-text;
-      font-size: var(--font-size-md, #{ui.$font-size-md});
-      line-height: var(--line-height-prose, #{ui.$line-height-prose});
-      margin: 0 0 var(--spacing-3xl, #{ui.$spacing-3xl}) 0;
+      font-size: ui.$font-size-md;
+      line-height: ui.$line-height-prose;
+      margin: 0 0 ui.$spacing-3xl 0;
     }
 
     &__back {
       display: inline-block;
-      margin-top: var(--spacing-3xl, #{ui.$spacing-3xl});
-      font-family: var(--font-family-base, #{ui.$font-family-base});
-      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      margin-top: ui.$spacing-3xl;
+      font-family: ui.$font-family-base;
+      font-size: ui.$font-size-sm;
       font-weight: ui.$font-weight-medium;
       color: var(--accent-color, #{ui.$primary-accent});
       text-decoration: none;
@@ -212,16 +217,16 @@ if (settings.contactEmail) {
   // Social link cards
   .confirmed-social {
     &__label {
-      font-family: var(--font-family-base, #{ui.$font-family-base});
-      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-family: ui.$font-family-base;
+      font-size: ui.$font-size-sm;
       color: var(--text-muted, #{ui.$text-muted-light});
-      margin-bottom: var(--spacing-lg, #{ui.$spacing-lg});
+      margin-bottom: ui.$spacing-lg;
     }
 
     &__grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: var(--spacing-sm, #{ui.$spacing-sm});
+      gap: ui.$spacing-sm;
       text-align: left;
 
       @include ui.media-breakpoint-up(sm) {
@@ -232,12 +237,11 @@ if (settings.contactEmail) {
     &__card {
       display: flex;
       align-items: center;
-      gap: var(--spacing-md, #{ui.$spacing-md});
-      padding: var(--spacing-md, #{ui.$spacing-md}) var(--spacing-lg, #{ui.$spacing-lg});
-      background: var(--bg-secondary, #{ui.$bg-secondary-light});
-      border: var(--border-width-base, #{ui.$border-width-base}) solid
-        var(--border-color, #{ui.$border-light});
-      border-radius: var(--border-radius-md, #{ui.$border-radius-md});
+      gap: ui.$spacing-md;
+      padding: ui.$spacing-md ui.$spacing-lg;
+      background: var(--surface-color, #{ui.$surface-light});
+      border: ui.$border-width-base solid var(--border-color, #{ui.$border-light});
+      border-radius: ui.$border-radius-md;
       text-decoration: none;
       transition:
         border-color ui.$transition-fast,
@@ -258,11 +262,10 @@ if (settings.contactEmail) {
       justify-content: center;
       width: 36px;
       height: 36px;
-      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
-      background: var(--bg-tertiary, #{ui.$bg-primary-light});
+      border-radius: ui.$border-radius-sm;
+      background: var(--bg-color, #{ui.$bg-light});
       color: var(--text-primary, #{ui.$text-primary-light});
-      border: var(--border-width-base, #{ui.$border-width-base}) solid
-        var(--border-color, #{ui.$border-light});
+      border: ui.$border-width-base solid var(--border-color, #{ui.$border-light});
     }
 
     &__card-content {
@@ -274,8 +277,8 @@ if (settings.contactEmail) {
     }
 
     &__card-label {
-      font-family: var(--font-family-base, #{ui.$font-family-base});
-      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-family: ui.$font-family-base;
+      font-size: ui.$font-size-sm;
       font-weight: ui.$font-weight-medium;
       color: var(--text-primary, #{ui.$text-primary-light});
       white-space: nowrap;
@@ -284,7 +287,7 @@ if (settings.contactEmail) {
     }
 
     &__card-sub {
-      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-size: ui.$font-size-xs;
       color: var(--text-muted, #{ui.$text-muted-light});
       white-space: nowrap;
       overflow: hidden;
@@ -293,7 +296,7 @@ if (settings.contactEmail) {
 
     &__card-arrow {
       flex-shrink: 0;
-      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      font-size: ui.$font-size-sm;
       color: var(--text-muted, #{ui.$text-muted-light});
       transition:
         transform ui.$transition-fast,

@@ -59,12 +59,17 @@ const { settings } = Astro.props;
           id="favicon-file-input"
           accept="image/png,image/x-icon,image/vnd.microsoft.icon,image/svg+xml,image/webp,image/jpeg"
           class="visually-hidden"
-          style="display: none;"
         />
-        <button type="button" id="upload-favicon-btn" class="media-upload-btn">
+        <label
+          for="favicon-file-input"
+          id="upload-favicon-btn"
+          class="media-upload-btn"
+          role="button"
+          tabindex="0"
+        >
           <Icon name="image" size={13} />
           <span>Upload Favicon</span>
-        </button>
+        </label>
       </div>
 
       <!-- Apple Touch Icon Upload -->
@@ -93,12 +98,17 @@ const { settings } = Astro.props;
           id="touchicon-file-input"
           accept="image/png,image/webp,image/jpeg,image/svg+xml,image/avif"
           class="visually-hidden"
-          style="display: none;"
         />
-        <button type="button" id="upload-touchicon-btn" class="media-upload-btn">
+        <label
+          for="touchicon-file-input"
+          id="upload-touchicon-btn"
+          class="media-upload-btn"
+          role="button"
+          tabindex="0"
+        >
           <Icon name="image" size={13} />
           <span>Upload PWA Icon</span>
-        </button>
+        </label>
       </div>
     </div>
   </div>

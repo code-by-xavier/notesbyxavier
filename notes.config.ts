@@ -113,7 +113,7 @@ export const notesConfig: NotesConfig = {
     popupSubtext: 'Get the next essay delivered to your inbox. Join readers who think deeply.',
     popupCtaLabel: 'Yes, subscribe me',
     popupDismissLabel: 'No thanks',
-    confirmedHeadline: "You're in. ✦",
+    confirmedHeadline: "You're in.",
     confirmedSubtext: 'The next essay lands in your inbox. Follow along on social in the meantime.',
   },
 };

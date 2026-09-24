@@ -27,8 +27,8 @@ export const GET: APIRoute = async () => {
     await db.select({ id: siteSettings.id }).from(siteSettings).limit(1);
     dbOk = true;
     alreadySetup = await isSetupCompleted();
-  } catch (err: any) {
-    dbError = err?.message ?? 'Unknown database error';
+  } catch (err: unknown) {
+    dbError = err instanceof Error ? err.message : 'Unknown database error';
     console.warn('[Setup Health] DB check failed:', dbError);
   }
 
@@ -38,8 +38,8 @@ export const GET: APIRoute = async () => {
     const bucket = storage.bucket(bucketName);
     await bucket.exists();
     storageOk = true;
-  } catch (err: any) {
-    storageError = err?.message ?? 'Unknown storage error';
+  } catch (err: unknown) {
+    storageError = err instanceof Error ? err.message : 'Unknown storage error';
     console.warn('[Setup Health] GCS check failed:', storageError);
   }
 

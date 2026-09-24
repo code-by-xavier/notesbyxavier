@@ -17,7 +17,7 @@
   --text-secondary: #{$text-secondary-light};
   --text-muted: #{$text-muted-light};
   --black: #1c1917;
-  --white: #ffffff;
+  --white: #{$color-white};
   --color-white: #{$color-white};
   --error-bg-subtle: #{$color-danger-light};
   --portal-nav-max-width: #{$portal-nav-max-width};
@@ -28,6 +28,7 @@
   --code-bg: #{$code-bg-light};
   --tag-bg: #{$tag-bg-light};
   --tag-text: #{$tag-text-light};
+  --subscribe-bg: #{$subscribe-bg-light};
 
   // 2. Syndication & Accents
   --rss-accent: #{$rss-accent};
@@ -116,11 +117,16 @@
   --thumbnail-height: #{$thumbnail-height};
   --cover-max-height: #{$cover-max-height};
 
-  // Theme Toggle Dimensions
+  // Theme & Form Toggle Dimensions
   --toggle-track-width: #{$toggle-track-width};
   --toggle-track-height: #{$toggle-track-height};
   --toggle-thumb-size: #{$toggle-thumb-size};
+  --toggle-thumb-travel: #{$toggle-thumb-travel};
   --toggle-padding: #{$toggle-padding};
+
+  // Auth & Brand Logos
+  --auth-logo-height: #{$auth-logo-height};
+  --auth-logo-max-width: #{$auth-logo-max-width};
 
   // Tag & Badge Paddings
   --badge-padding-y: #{$badge-padding-y};
@@ -167,6 +173,7 @@
   --code-bg: #{$code-bg-dark};
   --tag-bg: #{$tag-bg-dark};
   --tag-text: #{$tag-text-dark};
+  --subscribe-bg: #{$subscribe-bg-dark};
   --error-bg-subtle: rgba(239, 68, 68, 0.15);
   --shadow-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(56, 189, 248, 0.25);
 }

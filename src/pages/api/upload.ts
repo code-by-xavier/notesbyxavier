@@ -201,10 +201,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
         },
       }
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Failed to process image upload';
     return new Response(
       JSON.stringify({
-        error: err.message || 'Failed to process image upload',
+        error: message,
       }),
       {
         status: 500,

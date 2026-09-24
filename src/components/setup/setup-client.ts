@@ -148,7 +148,7 @@ export function initSetupWizard() {
           errMsg.textContent = `Could not connect to: ${issues.join(' and ')}. Check your environment variables and ensure services are running.`;
         }
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       setHealthCard('db', 'error', 'Request failed');
       setHealthCard('storage', 'error', 'Request failed');
       if (errBox) errBox.style.display = 'flex';
@@ -299,21 +299,21 @@ export function initSetupWizard() {
 
     try {
       const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      let json: any = null;
+      let json: { success?: boolean; url?: string; error?: string } | null = null;
       try {
         json = await res.json();
       } catch {
         const text = await res.text().catch(() => '');
         throw new Error(text || `Server returned status ${res.status}`);
       }
-      if (res.ok && json.success && json.url) {
+      if (res.ok && json?.success && json.url) {
         data.avatarUrl = json.url;
         if (img) img.src = json.url;
       } else {
-        alert(json.error || 'Failed to upload photo. Please verify image size and format.');
+        alert(json?.error || 'Failed to upload photo. Please verify image size and format.');
       }
-    } catch (err: any) {
-      alert('Upload failed: ' + (err?.message || 'Network error occurred.'));
+    } catch (err: unknown) {
+      alert('Upload failed: ' + (err instanceof Error ? err.message : 'Network error occurred.'));
     } finally {
       if (statusEl) statusEl.style.display = 'none';
     }

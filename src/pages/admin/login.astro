@@ -38,7 +38,16 @@ if (sessionToken) {
     <div class="auth-card">
       <header class="auth-card__header">
         <a href={ROUTES.HOME} class="auth-brand" aria-label="Notesby Home">
-          <img src="/images/notesby-logo-black.svg" alt="Notesby" class="auth-brand__logo" />
+          <img
+            src="/images/notesby-logo-black.svg"
+            alt="Notesby"
+            class="auth-brand__logo auth-brand__logo--light"
+          />
+          <img
+            src="/images/notesby-logo-white.svg"
+            alt="Notesby"
+            class="auth-brand__logo auth-brand__logo--dark"
+          />
         </a>
         <h1 class="auth-card__title">Sign In to Studio</h1>
         <p class="auth-card__subtitle">Enter your credentials to access your writing canvas.</p>
@@ -149,7 +158,7 @@ if (sessionToken) {
       }
 
       window.location.href = result.redirect || '/admin';
-    } catch (err: any) {
+    } catch (err: unknown) {
       showError('A network error occurred. Please try again.');
       setLoading(false);
     }
@@ -196,32 +205,33 @@ if (sessionToken) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-xs, #{ui.$spacing-xs}) var(--spacing-md, #{ui.$spacing-md});
-    background-color: #ffffff;
-    border-radius: var(--border-radius-md, #{ui.$border-radius-md});
-    box-shadow:
-      0 4px 14px rgba(0, 0, 0, 0.08),
-      0 1px 3px rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(0, 0, 0, 0.06);
     text-decoration: none;
-    margin-bottom: var(--spacing-2xs, #{ui.$spacing-2xs});
-    transition:
-      transform ui.$transition-fast,
-      box-shadow ui.$transition-fast;
+    margin-bottom: var(--spacing-sm, #{ui.$spacing-sm});
+    transition: transform ui.$transition-fast;
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow:
-        0 6px 18px rgba(0, 0, 0, 0.12),
-        0 2px 4px rgba(0, 0, 0, 0.06);
     }
 
     &__logo {
       width: auto;
-      height: 42px;
-      max-width: 170px;
+      height: var(--auth-logo-height, #{ui.$auth-logo-height});
+      max-width: var(--auth-logo-max-width, #{ui.$auth-logo-max-width});
       object-fit: contain;
       display: block;
+
+      &--dark {
+        display: none;
+      }
+    }
+
+    :global([data-theme='dark']) & {
+      .auth-brand__logo--light {
+        display: none;
+      }
+      .auth-brand__logo--dark {
+        display: block;
+      }
     }
 
     &__mark {

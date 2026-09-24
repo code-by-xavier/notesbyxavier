@@ -39,8 +39,9 @@ export const GET: APIRoute = async ({ params, locals }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message || 'Failed to fetch note' }), {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Failed to fetch note';
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -79,8 +80,9 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message || 'Failed to update note' }), {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Failed to update note';
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -117,8 +119,9 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message || 'Failed to delete note' }), {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Failed to delete note';
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

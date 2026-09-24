@@ -46,20 +46,57 @@ const { note, initialContentHtml } = Astro.props;
           id="cover-file-input"
           accept="image/png,image/jpeg,image/webp,image/avif,image/gif"
           class="visually-hidden"
-          style="display: none;"
+        />
+        <input
+          type="file"
+          id="inline-image-input"
+          accept="image/png,image/jpeg,image/webp,image/avif,image/gif"
+          class="visually-hidden"
         />
 
         <div
           id="cover-preview-wrapper"
           class="zen-cover-preview"
-          style={note.coverImage ? '' : 'display: none;'}
+          style={note.coverImage && note.coverImage.trim() !== '' ? '' : 'display: none;'}
         >
           <img
             id="cover-preview-img"
-            src={note.coverImage || ''}
+            src={note.coverImage && note.coverImage.trim() !== '' ? note.coverImage : undefined}
             alt="Headline Cover Image"
             class="zen-cover-img"
           />
+
+          <!-- Error Fallback Card if Cover Image Fails to Load or 404s -->
+          <div id="cover-error-state" class="zen-cover-error-state" style="display: none;">
+            <div class="zen-cover-error-icon">
+              <Icon name="image" size={24} />
+            </div>
+            <div class="zen-cover-error-info">
+              <p class="zen-cover-error-title">Cover image unavailable</p>
+              <p class="zen-cover-error-subtitle">The image could not be loaded from storage</p>
+            </div>
+            <div class="zen-cover-error-actions">
+              <label
+                for="cover-file-input"
+                id="fallback-change-cover-btn"
+                class="zen-cover-action-btn"
+                role="button"
+                tabindex="0"
+              >
+                <Icon name="image" size={13} />
+                <span>Replace Cover</span>
+              </label>
+              <button
+                type="button"
+                id="fallback-remove-cover-btn"
+                class="zen-cover-action-btn zen-cover-action-btn--danger"
+              >
+                <Icon name="trash" size={13} />
+                <span>Remove</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Smooth Replacement Loading Overlay -->
           <div
             id="cover-overlay-loading"
@@ -80,10 +117,16 @@ const { note, initialContentHtml } = Astro.props;
           </div>
 
           <div class="zen-cover-actions">
-            <button type="button" id="change-cover-btn" class="zen-cover-action-btn">
+            <label
+              for="cover-file-input"
+              id="change-cover-btn"
+              class="zen-cover-action-btn"
+              role="button"
+              tabindex="0"
+            >
               <Icon name="image" size={13} />
               <span>Change Cover</span>
-            </button>
+            </label>
             <button
               type="button"
               id="remove-cover-btn"
@@ -117,15 +160,17 @@ const { note, initialContentHtml } = Astro.props;
           </div>
         </div>
 
-        <button
-          type="button"
+        <label
+          for="cover-file-input"
           id="add-cover-btn"
           class="zen-add-cover-btn"
-          style={note.coverImage ? 'display: none;' : ''}
+          role="button"
+          tabindex="0"
+          style={note.coverImage && note.coverImage.trim() !== '' ? 'display: none;' : ''}
         >
           <Icon name="image" size={15} />
           <span>Add Cover Image</span>
-        </button>
+        </label>
       </div>
 
       <!-- Formatting Toolbar for Quick True-to-Life Formatting -->
@@ -192,6 +237,17 @@ const { note, initialContentHtml } = Astro.props;
         >
           <Icon name="link" size={13} />
         </button>
+        <label
+          for="inline-image-input"
+          class="zen-format-btn"
+          id="toolbar-image-btn"
+          role="button"
+          tabindex="0"
+          title="Insert Image (/image)"
+          aria-label="Insert Image"
+        >
+          <Icon name="image" size={13} />
+        </label>
         <span class="zen-toolbar-divider"></span>
         <button
           type="button"
@@ -267,7 +323,7 @@ const { note, initialContentHtml } = Astro.props;
       >
         <img
           id="preview-cover-img"
-          src={note.coverImage || ''}
+          src={note.coverImage && note.coverImage.trim() !== '' ? note.coverImage : undefined}
           alt="Cover Image"
           class="zen-preview-cover-img"
         />
@@ -303,6 +359,10 @@ const { note, initialContentHtml } = Astro.props;
     <button type="button" class="zen-slash-item" data-action="link">
       <span class="zen-slash-item__key">/link</span>
       <span class="zen-slash-item__label">Insert Link (Cmd+K)</span>
+    </button>
+    <button type="button" class="zen-slash-item" data-action="image">
+      <span class="zen-slash-item__key">/image</span>
+      <span class="zen-slash-item__label">Upload / Embed Image</span>
     </button>
   </div>
 </main>

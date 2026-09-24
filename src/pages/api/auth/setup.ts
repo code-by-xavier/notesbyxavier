@@ -120,11 +120,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Setup endpoint error:', error);
-    return new Response(
-      JSON.stringify({ error: error.message || 'Failed to initialize publication.' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    const message = error instanceof Error ? error.message : 'Failed to initialize publication.';
+    return new Response(JSON.stringify({ error: message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 };

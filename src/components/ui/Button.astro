@@ -5,8 +5,9 @@
 // Polymorphic button/anchor component with size, variant, block,
 // and loading state support.
 import Icon from '@/components/Icon.astro';
+import type { HTMLAttributes } from 'astro/types';
 
-interface Props {
+interface Props extends HTMLAttributes<'button'>, HTMLAttributes<'a'> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   type?: 'button' | 'submit' | 'reset';
@@ -16,7 +17,6 @@ interface Props {
   id?: string;
   loadingText?: string;
   class?: string;
-  [key: string]: any;
 }
 
 const {

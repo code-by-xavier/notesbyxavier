@@ -78,7 +78,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (
     pathname.startsWith('/api/notes') ||
     (pathname.startsWith('/api/upload') && isSetupDoneForApi) ||
-    pathname.startsWith('/api/settings')
+    pathname.startsWith('/api/settings') ||
+    pathname.startsWith('/api/subscribers')
   ) {
     const sessionToken = cookies.get(SESSION_COOKIE_NAME)?.value;
     if (!sessionToken) {

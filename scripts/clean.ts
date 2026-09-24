@@ -97,8 +97,9 @@ function safeRemove(relPath: string, description: string) {
     console.log(
       `  ✓ Removed ${description} (${relPath}) ${size > 0 ? `[${formatBytes(size)}]` : ''}`
     );
-  } catch (err: any) {
-    console.error(`  ✗ Failed to remove ${relPath}: ${err.message}`);
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    console.error(`  ✗ Failed to remove ${relPath}: ${errorMsg}`);
   }
 }
 
@@ -125,8 +126,9 @@ function cleanUploadsDir() {
     console.log(
       `  ✓ Cleaned ${filesRemoved} uploaded media file(s) [${formatBytes(uploadBytes)}] (kept .gitkeep)`
     );
-  } catch (err: any) {
-    console.error(`  ✗ Error cleaning uploads directory: ${err.message}`);
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    console.error(`  ✗ Error cleaning uploads directory: ${errorMsg}`);
   }
 }
 
@@ -155,8 +157,9 @@ function resetDocker() {
     console.log(
       '  ✓ Docker containers stopped and volumes (notesby_pgdata, notesby_storage_data) wiped'
     );
-  } catch (err: any) {
-    console.warn(`  ⚠️  Docker command failed or Docker is not running: ${err.message}`);
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    console.warn(`  ⚠️  Docker command failed or Docker is not running: ${errorMsg}`);
   }
 }
 

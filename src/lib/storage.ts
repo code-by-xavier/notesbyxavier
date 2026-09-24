@@ -51,8 +51,9 @@ export async function ensureBucket(): Promise<boolean> {
 
     isBucketVerified = true;
     return true;
-  } catch (err: any) {
-    console.warn(`⚠️  [GCS Storage] Bucket check failed (${err.message}).`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn(`⚠️  [GCS Storage] Bucket check failed (${message}).`);
     return false;
   }
 }
@@ -105,9 +106,10 @@ export async function uploadMedia(
     const publicUrl = getPublicUrl(filename);
     console.log(`✅ [GCS Storage] Uploaded "${filename}" (${buffer.length} bytes) -> ${publicUrl}`);
     return publicUrl;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
     console.warn(
-      `⚠️  [GCS Storage] Upload failed (${err.message}). Falling back to local media endpoint (/api/media)...`
+      `⚠️  [GCS Storage] Upload failed (${message}). Falling back to local media endpoint (/api/media)...`
     );
 
     // Fallback: Save to local public/uploads directory

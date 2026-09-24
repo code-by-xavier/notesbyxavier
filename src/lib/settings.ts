@@ -138,7 +138,7 @@ export async function getSiteSettings(): Promise<ResolvedSiteSettings> {
     subscriptionConfirmedHeadline:
       dbSettings?.subscriptionConfirmedHeadline ||
       notesConfig.emailSubscription?.confirmedHeadline ||
-      "You're in. ✦",
+      "You're in.",
     subscriptionConfirmedSubtext:
       dbSettings?.subscriptionConfirmedSubtext ||
       notesConfig.emailSubscription?.confirmedSubtext ||

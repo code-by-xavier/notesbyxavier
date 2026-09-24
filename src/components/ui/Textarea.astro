@@ -6,7 +6,9 @@
 // with the CLSTRE design system tokens.
 // ============================================================
 
-interface Props {
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'textarea'> {
   id?: string;
   name: string;
   value?: string;
@@ -20,7 +22,6 @@ interface Props {
   hasError?: boolean;
   class?: string;
   ariaDescribedby?: string;
-  [key: string]: any;
 }
 
 const {

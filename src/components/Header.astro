@@ -22,8 +22,6 @@ const avatarUrl =
   settings.authorAvatar && settings.authorAvatar !== '/images/avatar-placeholder.svg'
     ? settings.authorAvatar
     : '';
-const siteLogo = settings.siteLogo;
-const siteLogoDark = settings.siteLogoDark;
 const authorName = settings.authorName;
 const initials = authorName
   .split(' ')
@@ -221,7 +219,7 @@ const currentPath = Astro.url.pathname;
         .avatar-img {
           width: auto;
           height: 100%;
-          max-height: 28px;
+          max-height: 32px;
           max-width: 150px;
           object-fit: contain;
           padding: 0;

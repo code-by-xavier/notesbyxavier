@@ -8,11 +8,23 @@ import type { APIRoute } from 'astro';
 import { db } from '@/db';
 import { subscribers } from '@/db/schema';
 import { desc } from 'drizzle-orm';
+import { validateSession, SESSION_COOKIE_NAME } from '@/lib/auth';
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ locals }) => {
-  if (!locals.user) {
+export const GET: APIRoute = async ({ locals, cookies }) => {
+  let user = locals.user;
+  if (!user) {
+    const sessionToken = cookies.get(SESSION_COOKIE_NAME)?.value;
+    if (sessionToken) {
+      const sessionData = await validateSession(sessionToken);
+      if (sessionData) {
+        user = sessionData.user;
+      }
+    }
+  }
+
+  if (!user) {
     return new Response('Unauthorized', { status: 401 });
   }
 
@@ -45,7 +57,8 @@ export const GET: APIRoute = async ({ locals }) => {
         'Content-Disposition': `attachment; filename="${filename}"`,
       },
     });
-  } catch (err: any) {
-    return new Response(`Export failed: ${err.message}`, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Export failed';
+    return new Response(`Export failed: ${message}`, { status: 500 });
   }
 };

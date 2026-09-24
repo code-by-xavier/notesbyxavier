@@ -106,12 +106,17 @@ const currentLogoDisplay = settings.customLogo || settings.siteLogo;
           id="avatar-file-input"
           accept="image/png,image/jpeg,image/webp,image/avif,image/gif"
           class="visually-hidden"
-          style="display: none;"
         />
-        <button type="button" id="upload-avatar-btn" class="media-upload-btn">
+        <label
+          for="avatar-file-input"
+          id="upload-avatar-btn"
+          class="media-upload-btn"
+          role="button"
+          tabindex="0"
+        >
           <Icon name="image" size={13} />
           <span>Upload Photo</span>
-        </button>
+        </label>
       </div>
 
       <!-- Logo Upload -->
@@ -138,15 +143,20 @@ const currentLogoDisplay = settings.customLogo || settings.siteLogo;
           id="logo-file-input"
           accept="image/png,image/jpeg,image/webp,image/avif,image/gif,image/svg+xml"
           class="visually-hidden"
-          style="display: none;"
         />
         <div class="media-btn-row">
-          <button type="button" id="upload-logo-btn" class="media-upload-btn">
+          <label
+            for="logo-file-input"
+            id="upload-logo-btn"
+            class="media-upload-btn"
+            role="button"
+            tabindex="0"
+          >
             <Icon name="image" size={13} />
             <span id="upload-logo-btn-text">
               {hasCustomLogo ? 'Change Custom Logo' : 'Upload Custom Logo'}
             </span>
-          </button>
+          </label>
           <button
             type="button"
             id="remove-logo-btn"

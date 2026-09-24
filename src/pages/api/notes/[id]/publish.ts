@@ -58,13 +58,11 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
         headers: { 'Content-Type': 'application/json' },
       }
     );
-  } catch (err: any) {
-    return new Response(
-      JSON.stringify({ error: err.message || 'Failed to toggle publish status' }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Failed to toggle publish status';
+    return new Response(JSON.stringify({ error: message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 };

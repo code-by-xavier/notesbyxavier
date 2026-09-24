@@ -57,7 +57,24 @@ CREATE TABLE "site_settings" (
 	"linkedin_url" varchar(255),
 	"github_url" varchar(255),
 	"contact_email" varchar(255),
+	"subscription_enabled" boolean DEFAULT true,
+	"subscription_section_headline" varchar(255),
+	"subscription_section_subtext" text,
+	"subscription_section_cta_label" varchar(100),
+	"subscription_popup_enabled" boolean DEFAULT true,
+	"subscription_popup_headline" varchar(255),
+	"subscription_popup_subtext" text,
+	"subscription_confirmed_headline" varchar(255),
+	"subscription_confirmed_subtext" text,
 	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "subscribers" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"email" varchar(255) NOT NULL,
+	"source" varchar(20) DEFAULT 'section' NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "subscribers_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
 CREATE TABLE "users" (

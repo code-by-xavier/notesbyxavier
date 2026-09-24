@@ -14,83 +14,85 @@ interface Props {
 
 const { settings } = Astro.props;
 
-if (!settings.subscriptionEnabled || !settings.subscriptionPopupEnabled) return;
+const isEnabled = settings.subscriptionEnabled && settings.subscriptionPopupEnabled;
 ---
 
-<div
-  id="subscribe-popup-overlay"
-  class="subscribe-popup-overlay"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="subscribe-popup-headline"
-  aria-hidden="true"
->
-  <div class="subscribe-popup" id="subscribe-popup">
-    <button
-      type="button"
-      id="subscribe-popup-close"
-      class="subscribe-popup__close"
-      aria-label="Close subscription popup"
-    >
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
+{isEnabled && (
+  <div
+    id="subscribe-popup-overlay"
+    class="subscribe-popup-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="subscribe-popup-headline"
+    aria-hidden="true"
+  >
+    <div class="subscribe-popup" id="subscribe-popup">
+      <button
+        type="button"
+        id="subscribe-popup-close"
+        class="subscribe-popup__close"
+        aria-label="Close subscription popup"
       >
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </button>
-
-    <div class="subscribe-popup__eyebrow">From the author</div>
-    <h2 class="subscribe-popup__headline" id="subscribe-popup-headline">
-      {settings.subscriptionPopupHeadline}
-    </h2>
-    <p class="subscribe-popup__subtext">{settings.subscriptionPopupSubtext}</p>
-
-    <form id="subscribe-popup-form" class="subscribe-popup__form" novalidate>
-      <label for="subscribe-popup-email" class="sr-only">
-        Email address
-      </label>
-      <input
-        type="email"
-        id="subscribe-popup-email"
-        name="email"
-        class="subscribe-popup__input"
-        placeholder="Your email address"
-        autocomplete="email"
-        required
-        aria-required="true"
-      />
-      <button type="submit" id="subscribe-popup-btn" class="subscribe-popup__btn">
-        <span class="subscribe-popup__btn-text">
-          {settings.subscriptionPopupSubtext
-            ? settings.subscriptionPopupHeadline.includes('go')
-              ? 'Subscribe'
-              : 'Subscribe'
-            : 'Subscribe'}
-        </span>
-        <span class="subscribe-popup__btn-spinner" aria-hidden="true"></span>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
       </button>
-      <p
-        id="subscribe-popup-error"
-        class="subscribe-popup__error"
-        role="alert"
-        aria-live="polite"
-      ></p>
-    </form>
 
-    <button type="button" id="subscribe-popup-dismiss" class="subscribe-popup__dismiss">
-      No thanks, I'll pass
-    </button>
+      <div class="subscribe-popup__eyebrow">From the author</div>
+      <h2 class="subscribe-popup__headline" id="subscribe-popup-headline">
+        {settings.subscriptionPopupHeadline}
+      </h2>
+      <p class="subscribe-popup__subtext">{settings.subscriptionPopupSubtext}</p>
+
+      <form id="subscribe-popup-form" class="subscribe-popup__form" novalidate>
+        <label for="subscribe-popup-email" class="sr-only">
+          Email address
+        </label>
+        <input
+          type="email"
+          id="subscribe-popup-email"
+          name="email"
+          class="subscribe-popup__input"
+          placeholder="Your email address"
+          autocomplete="email"
+          required
+          aria-required="true"
+        />
+        <button type="submit" id="subscribe-popup-btn" class="subscribe-popup__btn">
+          <span class="subscribe-popup__btn-text">
+            {settings.subscriptionPopupSubtext
+              ? settings.subscriptionPopupHeadline.includes('go')
+                ? 'Subscribe'
+                : 'Subscribe'
+              : 'Subscribe'}
+          </span>
+          <span class="subscribe-popup__btn-spinner" aria-hidden="true"></span>
+        </button>
+        <p
+          id="subscribe-popup-error"
+          class="subscribe-popup__error"
+          role="alert"
+          aria-live="polite"
+        ></p>
+      </form>
+
+      <button type="button" id="subscribe-popup-dismiss" class="subscribe-popup__dismiss">
+        No thanks, I'll pass
+      </button>
+    </div>
   </div>
-</div>
+)}
 
 <script>
   // ── Constants ─────────────────────────────────────────────────────────────
@@ -224,6 +226,8 @@ if (!settings.subscriptionEnabled || !settings.subscriptionPopupEnabled) return;
 </script>
 
 <style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
   .subscribe-popup-overlay {
     position: fixed;
     inset: 0;
@@ -236,7 +240,7 @@ if (!settings.subscriptionEnabled || !settings.subscriptionPopupEnabled) return;
     justify-content: center;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.35s ease;
+    transition: opacity ui.$transition-slow;
 
     @include ui.media-breakpoint-up(sm) {
       align-items: center;
@@ -262,33 +266,32 @@ if (!settings.subscriptionEnabled || !settings.subscriptionPopupEnabled) return;
     position: relative;
     width: 100%;
     max-width: 480px;
-    margin: 0 var(--spacing-md, #{ui.$spacing-md});
-    padding: var(--spacing-3xl, #{ui.$spacing-3xl}) var(--spacing-2xl, #{ui.$spacing-2xl});
-    background: var(--bg-primary, #{ui.$bg-primary-light});
-    border-radius: var(--border-radius-lg, #{ui.$border-radius-lg})
-      var(--border-radius-lg, #{ui.$border-radius-lg}) 0 0;
-    border: var(--border-width-base, #{ui.$border-width-base}) solid
-      var(--border-color, #{ui.$border-light});
+    margin: 0 ui.$spacing-md;
+    padding: ui.$spacing-3xl ui.$spacing-2xl;
+    background: var(--bg-color, #{ui.$bg-light});
+    border-radius: ui.$border-radius-lg ui.$border-radius-lg 0 0;
+    border: ui.$border-width-base solid var(--border-color, #{ui.$border-light});
     border-bottom: none;
-    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.14);
-    transform: translateY(32px);
+    box-shadow: ui.$shadow-lg;
+    transform: translateY(ui.$spacing-xl);
     opacity: 0;
     transition:
-      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-      opacity 0.35s ease;
+      transform ui.$transition-slow cubic-bezier(0.16, 1, 0.3, 1),
+      opacity ui.$transition-slow;
 
     @include ui.media-breakpoint-up(sm) {
-      border-radius: var(--border-radius-lg, #{ui.$border-radius-lg});
-      border-bottom: var(--border-width-base, #{ui.$border-width-base}) solid
-        var(--border-color, #{ui.$border-light});
-      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2);
-      transform: translateY(24px);
+      border-radius: ui.$border-radius-lg;
+      border-bottom: ui.$border-width-base solid var(--border-color, #{ui.$border-light});
+      box-shadow:
+        0 24px 80px rgba(0, 0, 0, 0.2),
+        ui.$shadow-lg;
+      transform: translateY(ui.$spacing-lg);
     }
 
     &__close {
       position: absolute;
-      top: var(--spacing-md, #{ui.$spacing-md});
-      right: var(--spacing-md, #{ui.$spacing-md});
+      top: ui.$spacing-md;
+      right: ui.$spacing-md;
       width: 32px;
       height: 32px;
       display: flex;
@@ -296,7 +299,7 @@ if (!settings.subscriptionEnabled || !settings.subscriptionPopupEnabled) return;
       justify-content: center;
       background: transparent;
       border: none;
-      border-radius: var(--border-radius-sm, #{ui.$border-radius-sm});
+      border-radius: ui.$border-radius-sm;
       color: var(--text-muted, #{ui.$text-muted-light});
       cursor: pointer;
       transition:
@@ -304,54 +307,47 @@ if (!settings.subscriptionEnabled || !settings.subscriptionPopupEnabled) return;
         color ui.$transition-fast;
 
       &:hover {
-        background: var(--bg-secondary, #{ui.$bg-secondary-light});
+        background: var(--surface-color, #{ui.$surface-light});
         color: var(--text-primary, #{ui.$text-primary-light});
       }
     }
 
     &__eyebrow {
-      font-family: var(--font-family-base, #{ui.$font-family-base});
-      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-family: ui.$font-family-base;
+      font-size: ui.$font-size-xs;
       font-weight: ui.$font-weight-medium;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: ui.$letter-spacing-mono;
       color: var(--accent-color, #{ui.$primary-accent});
-      margin-bottom: var(--spacing-sm, #{ui.$spacing-sm});
+      margin-bottom: ui.$spacing-sm;
     }
 
     &__headline {
-      font-family: var(--font-family-headings, #{ui.$font-family-headings});
-      font-size: var(--h3-size, #{ui.$h3-font-size});
-      font-weight: ui.$font-weight-semibold;
-      color: var(--text-primary, #{ui.$text-primary-light});
-      margin: 0 0 var(--spacing-sm, #{ui.$spacing-sm}) 0;
-      line-height: 1.3;
+      @include ui.h3-heading-style;
+      margin: 0 0 ui.$spacing-sm 0;
     }
 
     &__subtext {
       @include ui.description-text;
-      margin: 0 0 var(--spacing-xl, #{ui.$spacing-xl}) 0;
-      line-height: var(--line-height-prose, #{ui.$line-height-prose});
+      margin: 0 0 ui.$spacing-xl 0;
+      line-height: ui.$line-height-prose;
     }
 
     &__form {
       display: flex;
       flex-direction: column;
-      gap: 0;
     }
 
     &__input {
       width: 100%;
-      padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
-      font-family: var(--font-family-base, #{ui.$font-family-base});
-      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      padding: ui.$spacing-sm ui.$spacing-md;
+      font-family: ui.$font-family-base;
+      font-size: ui.$font-size-sm;
       color: var(--text-primary, #{ui.$text-primary-light});
-      background: var(--bg-secondary, #{ui.$bg-secondary-light});
-      border: var(--border-width-base, #{ui.$border-width-base}) solid
-        var(--border-color, #{ui.$border-light});
+      background: var(--surface-color, #{ui.$surface-light});
+      border: ui.$border-width-base solid var(--border-color, #{ui.$border-light});
       border-bottom: none;
-      border-radius: var(--border-radius-md, #{ui.$border-radius-md})
-        var(--border-radius-md, #{ui.$border-radius-md}) 0 0;
+      border-radius: ui.$border-radius-md ui.$border-radius-md 0 0;
       outline: none;
       transition: border-color ui.$transition-fast;
       box-sizing: border-box;
@@ -368,15 +364,14 @@ if (!settings.subscriptionEnabled || !settings.subscriptionPopupEnabled) return;
     &__btn {
       position: relative;
       width: 100%;
-      padding: var(--spacing-sm, #{ui.$spacing-sm}) var(--spacing-md, #{ui.$spacing-md});
+      padding: ui.$spacing-sm ui.$spacing-md;
       background: var(--accent-color, #{ui.$primary-accent});
-      color: #fff;
-      font-family: var(--font-family-base, #{ui.$font-family-base});
-      font-size: var(--font-size-sm, #{ui.$font-size-sm});
+      color: ui.$color-white;
+      font-family: ui.$font-family-base;
+      font-size: ui.$font-size-sm;
       font-weight: ui.$font-weight-medium;
       border: none;
-      border-radius: 0 0 var(--border-radius-md, #{ui.$border-radius-md})
-        var(--border-radius-md, #{ui.$border-radius-md});
+      border-radius: 0 0 ui.$border-radius-md ui.$border-radius-md;
       cursor: pointer;
       transition: background ui.$transition-fast;
 
@@ -395,34 +390,25 @@ if (!settings.subscriptionEnabled || !settings.subscriptionPopupEnabled) return;
     }
 
     &__btn-spinner {
-      display: none;
-      position: absolute;
-      inset: 0;
-      margin: auto;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.35);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: popup-spin 0.7s linear infinite;
+      @include ui.btn-spinner;
     }
 
     &__error {
-      margin-top: var(--spacing-xs, #{ui.$spacing-xs});
-      font-size: var(--font-size-xs, #{ui.$font-size-xs});
-      color: var(--error-color, #e53e3e);
+      margin-top: ui.$spacing-xs;
+      font-size: ui.$font-size-xs;
+      color: var(--error-color, #{ui.$error-color});
       min-height: 1.2em;
     }
 
     &__dismiss {
       display: block;
       width: 100%;
-      margin-top: var(--spacing-md, #{ui.$spacing-md});
+      margin-top: ui.$spacing-md;
       padding: 0;
       background: none;
       border: none;
-      font-family: var(--font-family-base, #{ui.$font-family-base});
-      font-size: var(--font-size-xs, #{ui.$font-size-xs});
+      font-family: ui.$font-family-base;
+      font-size: ui.$font-size-xs;
       color: var(--text-muted, #{ui.$text-muted-light});
       cursor: pointer;
       text-align: center;
@@ -436,18 +422,10 @@ if (!settings.subscriptionEnabled || !settings.subscriptionPopupEnabled) return;
   }
 
   .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
+    @include ui.sr-only;
   }
 
-  @keyframes popup-spin {
+  @keyframes btn-spin {
     to {
       transform: rotate(360deg);
     }

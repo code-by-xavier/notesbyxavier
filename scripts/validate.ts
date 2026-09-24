@@ -212,10 +212,12 @@ const mixinsFile = path.join(abstractsDir, '_mixins.scss');
 const indexFile = path.join(abstractsDir, '_index.scss');
 const mainStylesFile = path.join(process.cwd(), 'src/styles/main.scss');
 
+let variablesContent = '';
+
 if (!fs.existsSync(variablesFile) || !fs.existsSync(mixinsFile) || !fs.existsSync(indexFile)) {
   fail('SCSS abstracts directory missing one of: _variables.scss, _mixins.scss, _index.scss');
 } else {
-  const variablesContent = fs.readFileSync(variablesFile, 'utf8');
+  variablesContent = fs.readFileSync(variablesFile, 'utf8');
 
   // Verify CLSTRE Brand Blue
   if (!variablesContent.includes('#075aaa')) {
@@ -259,8 +261,41 @@ if (!fs.existsSync(mainStylesFile)) {
       fs.unlinkSync(tmpOut);
     }
     pass('SCSS standalone compilation succeeded with zero syntax errors');
-  } catch (err: any) {
-    fail(`SCSS compilation failed: ${err.message}`);
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    fail(`SCSS compilation failed: ${errorMsg}`);
+  }
+
+  // Verify all design system tokens used across .astro and .scss files exist in _variables.scss
+  const definedTokens = new Set<string>();
+  for (const match of variablesContent.matchAll(/\$([a-zA-Z0-9_-]+):/g)) {
+    definedTokens.add(match[1]);
+  }
+
+  let undefinedTokenErrors = 0;
+  function scanStyles(dir: string) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        scanStyles(fullPath);
+      } else if (/\.(astro|scss)$/.test(entry.name)) {
+        const fileContent = fs.readFileSync(fullPath, 'utf8');
+        for (const match of fileContent.matchAll(/(?:ui|v)\.\$([a-zA-Z0-9_-]+)/g)) {
+          const varName = match[1];
+          if (!definedTokens.has(varName)) {
+            fail(
+              `${path.relative(process.cwd(), fullPath)}: Undefined SCSS variable "${match[0]}". Not found in _variables.scss.`
+            );
+            undefinedTokenErrors++;
+          }
+        }
+      }
+    }
+  }
+  scanStyles(path.join(process.cwd(), 'src'));
+  if (undefinedTokenErrors === 0) {
+    pass('All SCSS design system tokens across .astro and .scss files verified');
   }
 }
 
@@ -306,8 +341,14 @@ try {
   } else {
     pass('Astro check passed with 0 errors');
   }
-} catch (err: any) {
-  fail(`Astro check failed:\n${err.stdout || err.message}`);
+} catch (err: unknown) {
+  const errorMsg =
+    err instanceof Error && 'stdout' in err && (err as { stdout?: unknown }).stdout
+      ? String((err as { stdout?: unknown }).stdout)
+      : err instanceof Error
+        ? err.message
+        : String(err);
+  fail(`Astro check failed:\n${errorMsg}`);
 }
 
 // ============================================================
@@ -318,8 +359,14 @@ console.log('\n[7/8] Running TypeScript Typecheck (tsc --noEmit)...');
 try {
   execSync('pnpm exec tsc --noEmit', { stdio: 'pipe' });
   pass('TypeScript typecheck passed with 0 type errors');
-} catch (err: any) {
-  fail(`TypeScript typecheck failed:\n${err.stdout ? err.stdout.toString() : err.message}`);
+} catch (err: unknown) {
+  const errorMsg =
+    err instanceof Error && 'stdout' in err && (err as { stdout?: unknown }).stdout
+      ? String((err as { stdout?: unknown }).stdout)
+      : err instanceof Error
+        ? err.message
+        : String(err);
+  fail(`TypeScript typecheck failed:\n${errorMsg}`);
 }
 
 // ============================================================
@@ -330,7 +377,7 @@ console.log('\n[8/8] Running Code Formatting & Lint Validation (prettier --check
 try {
   execSync('pnpm exec prettier --check .', { stdio: 'pipe' });
   pass('Prettier formatting & lint validation passed cleanly');
-} catch (err: any) {
+} catch {
   fail('Prettier detected unformatted files. Run "pnpm format" to fix.');
 }
 

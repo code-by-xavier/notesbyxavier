@@ -626,8 +626,12 @@ const { notes = [] } = Astro.props;
     });
 
     // Listen for custom trigger event from Studio Editor
-    window.addEventListener('notesby:open-link-modal', (e: any) => {
-      openModal(e.detail);
+    window.addEventListener('notesby:open-link-modal', (e: Event) => {
+      const customEvent = e as CustomEvent<{
+        selectedText?: string;
+        existingAnchor?: { href: string; text: string; targetBlank: boolean } | null;
+      }>;
+      openModal(customEvent.detail);
     });
   }
 

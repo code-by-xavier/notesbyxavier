@@ -113,6 +113,7 @@ const settings = await getSiteSettings();
 <style lang="scss">
   .essay-layout {
     padding-top: var(--feed-padding-top, #{ui.$feed-padding-top});
+    padding-bottom: var(--spacing-6xl, #{ui.$spacing-6xl});
 
     &__container {
       display: flex;
@@ -154,7 +155,7 @@ const settings = await getSiteSettings();
     }
 
     &__meta {
-      @include ui.meta-row-style(sm, xs);
+      @include ui.meta-row-style(md, xs);
     }
 
     &__dot {
@@ -212,6 +213,8 @@ const settings = await getSiteSettings();
       font-family: var(--font-family-base, #{ui.$font-family-base});
       font-size: var(--font-size-nav, #{ui.$font-size-nav});
       font-weight: ui.$font-weight-medium;
+      margin-top: var(--spacing-xl, #{ui.$spacing-xl});
+      padding-top: var(--spacing-md, #{ui.$spacing-md});
     }
 
     &__back-link {

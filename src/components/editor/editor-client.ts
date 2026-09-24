@@ -42,9 +42,14 @@ export function initZenEditor() {
   const coverActions = coverPreviewWrapper?.querySelector(
     '.zen-cover-actions'
   ) as HTMLElement | null;
+  const coverErrorState = document.getElementById('cover-error-state');
+  const fallbackChangeCoverBtn = document.getElementById('fallback-change-cover-btn');
+  const fallbackRemoveCoverBtn = document.getElementById('fallback-remove-cover-btn');
   const addCoverBtn = document.getElementById('add-cover-btn');
   const changeCoverBtn = document.getElementById('change-cover-btn');
   const removeCoverBtn = document.getElementById('remove-cover-btn');
+  const inlineImageInput = document.getElementById('inline-image-input') as HTMLInputElement | null;
+  const toolbarImageBtn = document.getElementById('toolbar-image-btn');
 
   // Cover Loading State Elements
   const coverUploadingCard = document.getElementById('cover-uploading-card');
@@ -71,7 +76,7 @@ export function initZenEditor() {
   let currentStatus = initialStatus;
   let currentCoverImage: string | null = initialCoverImage || null;
   let hasUnpublishedChanges = initialHasUnpublishedChanges;
-  let saveTimeout: any = null;
+  let saveTimeout: ReturnType<typeof setTimeout> | null = null;
   let isSaving = false;
   let activeViewMode: 'write' | 'preview' = 'write';
 
@@ -133,6 +138,11 @@ export function initZenEditor() {
         case 'a': {
           const href = el.getAttribute('href') || '#';
           return `[${children}](${href})`;
+        }
+        case 'img': {
+          const src = el.getAttribute('src') || '';
+          const alt = el.getAttribute('alt') || '';
+          return `\n\n![${alt}](${src})\n\n`;
         }
         case 'br':
           return '\n';
@@ -467,8 +477,15 @@ export function initZenEditor() {
   }
 
   // Handle link application or removal from LinkModal
-  window.addEventListener('notesby:apply-link', (e: any) => {
-    const { text, url, targetBlank, remove, isEdit } = e.detail;
+  window.addEventListener('notesby:apply-link', (e: Event) => {
+    const customEvent = e as CustomEvent<{
+      text?: string;
+      url: string;
+      targetBlank?: boolean;
+      remove?: boolean;
+      isEdit?: boolean;
+    }>;
+    const { text, url, targetBlank, remove, isEdit } = customEvent.detail;
 
     // Restore saved selection
     const selection = window.getSelection();
@@ -489,7 +506,9 @@ export function initZenEditor() {
 
     if (isEdit && activeLinkAnchor) {
       activeLinkAnchor.setAttribute('href', url);
-      activeLinkAnchor.textContent = text;
+      if (text !== undefined) {
+        activeLinkAnchor.textContent = text;
+      }
       if (targetBlank) {
         activeLinkAnchor.setAttribute('target', '_blank');
         activeLinkAnchor.setAttribute('rel', 'noopener noreferrer');
@@ -524,7 +543,7 @@ export function initZenEditor() {
     } else {
       const a = document.createElement('a');
       a.href = url;
-      a.textContent = text;
+      a.textContent = text || url;
       if (targetBlank) {
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
@@ -558,6 +577,113 @@ export function initZenEditor() {
   linkBtn?.addEventListener('mousedown', (e) => {
     e.preventDefault();
     handleLinkAction();
+  });
+
+  // Inline Body Image Insertion Handlers
+  let savedImageRange: Range | null = null;
+
+  async function uploadAndInsertInlineImage(file: File, targetRange?: Range | null) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Unsupported file type. Please upload a JPEG, PNG, WebP, AVIF, or GIF image.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size exceeds the 5 MB limit. Please choose a smaller image.');
+      return;
+    }
+
+    setSaveStatus('saving');
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        const img = document.createElement('img');
+        img.src = data.url;
+        img.alt = file.name.replace(/\.[^/.]+$/, '');
+        img.className = 'zen-body-image';
+
+        const range = targetRange || savedImageRange;
+        if (range) {
+          range.insertNode(img);
+          const p = document.createElement('p');
+          p.innerHTML = '<br>';
+          img.parentNode?.insertBefore(p, img.nextSibling);
+        } else {
+          contentEditable?.appendChild(img);
+          const p = document.createElement('p');
+          p.innerHTML = '<br>';
+          contentEditable?.appendChild(p);
+        }
+        savedImageRange = null;
+        setSaveStatus('saved');
+        queueAutoSave();
+      } else {
+        alert(data.error || 'Failed to upload image.');
+        setSaveStatus('error');
+      }
+    } catch {
+      alert('Upload failed due to a network error.');
+      setSaveStatus('error');
+    }
+  }
+
+  function triggerInlineImageUpload() {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      savedImageRange = selection.getRangeAt(0).cloneRange();
+    } else {
+      savedImageRange = null;
+    }
+    inlineImageInput?.click();
+  }
+
+  toolbarImageBtn?.addEventListener('mousedown', () => {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      savedImageRange = selection.getRangeAt(0).cloneRange();
+    }
+  });
+
+  toolbarImageBtn?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      triggerInlineImageUpload();
+    }
+  });
+
+  toolbarImageBtn?.addEventListener('click', () => {
+    if (!savedImageRange) {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        savedImageRange = selection.getRangeAt(0).cloneRange();
+      }
+    }
+    if (inlineImageInput && toolbarImageBtn.tagName.toLowerCase() !== 'label') {
+      inlineImageInput.click();
+    }
+  });
+
+  inlineImageInput?.addEventListener('click', () => {
+    if (inlineImageInput) inlineImageInput.value = '';
+  });
+
+  inlineImageInput?.addEventListener('change', async () => {
+    const file = inlineImageInput.files?.[0];
+    if (!file) return;
+    try {
+      await uploadAndInsertInlineImage(file, savedImageRange);
+    } finally {
+      inlineImageInput.value = '';
+    }
   });
 
   // Open links in new tab on Cmd/Ctrl + Click, prevent default navigation in editor
@@ -618,6 +744,10 @@ export function initZenEditor() {
       } else if (action === 'link') {
         slashMenu.style.display = 'none';
         handleLinkAction();
+        return;
+      } else if (action === 'image') {
+        slashMenu.style.display = 'none';
+        triggerInlineImageUpload();
         return;
       }
 
@@ -688,9 +818,32 @@ export function initZenEditor() {
   modeWriteBtn?.addEventListener('click', () => setViewMode('write'));
   modePreviewBtn?.addEventListener('click', () => setViewMode('preview'));
 
-  // Cover Image Upload Handlers
-  addCoverBtn?.addEventListener('click', () => coverFileInput?.click());
-  changeCoverBtn?.addEventListener('click', () => coverFileInput?.click());
+  // Cover Image State & Logic
+  if (coverPreviewImg) {
+    coverPreviewImg.addEventListener('error', () => {
+      if (
+        currentCoverImage &&
+        coverPreviewWrapper &&
+        coverPreviewWrapper.style.display !== 'none'
+      ) {
+        coverPreviewImg.style.display = 'none';
+        if (coverActions) coverActions.style.display = 'none';
+        if (coverErrorState) coverErrorState.style.display = 'flex';
+      }
+    });
+
+    coverPreviewImg.addEventListener('load', () => {
+      if (
+        currentCoverImage &&
+        coverPreviewWrapper &&
+        coverPreviewWrapper.style.display !== 'none'
+      ) {
+        coverPreviewImg.style.display = 'block';
+        if (coverActions) coverActions.style.display = 'flex';
+        if (coverErrorState) coverErrorState.style.display = 'none';
+      }
+    });
+  }
 
   function formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 B';
@@ -700,22 +853,16 @@ export function initZenEditor() {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
   }
 
-  coverFileInput?.addEventListener('change', async () => {
-    const file = coverFileInput.files?.[0];
-    if (!file) return;
-
-    // Client-side validation: MIME type & size
+  async function uploadAndApplyCoverImage(file: File) {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
       alert('Unsupported file type. Please upload a JPEG, PNG, WebP, AVIF, or GIF image.');
-      coverFileInput.value = '';
       return;
     }
 
     const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
     if (file.size > MAX_SIZE) {
       alert('File size exceeds the 5 MB limit. Please choose a smaller image.');
-      coverFileInput.value = '';
       return;
     }
 
@@ -747,6 +894,7 @@ export function initZenEditor() {
 
     const formData = new FormData();
     formData.append('image', file);
+    formData.append('file', file);
 
     try {
       const uploadRes = await fetch('/api/upload', {
@@ -754,7 +902,7 @@ export function initZenEditor() {
         body: formData,
       });
 
-      let uploadData: any = null;
+      let uploadData: { success?: boolean; url?: string; error?: string } | null = null;
       try {
         uploadData = await uploadRes.json();
       } catch {
@@ -779,7 +927,12 @@ export function initZenEditor() {
         }
 
         currentCoverImage = uploadData.url;
-        if (coverPreviewImg) coverPreviewImg.src = currentCoverImage || '';
+        if (coverErrorState) coverErrorState.style.display = 'none';
+        if (coverActions) (coverActions as HTMLElement).style.display = 'flex';
+        if (coverPreviewImg) {
+          coverPreviewImg.style.display = 'block';
+          coverPreviewImg.src = currentCoverImage || '';
+        }
         if (previewCoverImg) previewCoverImg.src = currentCoverImage || '';
         if (previewCoverFigure) previewCoverFigure.style.display = 'block';
 
@@ -809,7 +962,7 @@ export function initZenEditor() {
         markDirty();
         await performSave();
       } else {
-        alert(uploadData.error || 'Failed to upload cover image.');
+        alert(uploadData?.error || 'Failed to upload cover image.');
         setSaveStatus('error');
         // Revert loading states
         if (isReplacement) {
@@ -839,8 +992,37 @@ export function initZenEditor() {
       }
     } finally {
       URL.revokeObjectURL(localPreviewUrl);
-      coverFileInput.value = '';
+      if (coverFileInput) coverFileInput.value = '';
     }
+  }
+
+  // Cover Image Buttons & Accessibility
+  coverFileInput?.addEventListener('click', () => {
+    if (coverFileInput) coverFileInput.value = '';
+  });
+
+  [addCoverBtn, changeCoverBtn, fallbackChangeCoverBtn].forEach((btn) => {
+    btn?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        coverFileInput?.click();
+      }
+    });
+    btn?.addEventListener('click', () => {
+      if (btn.tagName.toLowerCase() !== 'label') {
+        coverFileInput?.click();
+      }
+    });
+  });
+
+  fallbackRemoveCoverBtn?.addEventListener('click', () => {
+    removeCoverBtn?.click();
+  });
+
+  coverFileInput?.addEventListener('change', async () => {
+    const file = coverFileInput.files?.[0];
+    if (!file) return;
+    await uploadAndApplyCoverImage(file);
   });
 
   // Smooth cover removal without screen jump
@@ -857,8 +1039,13 @@ export function initZenEditor() {
       currentCoverImage = null;
       coverPreviewWrapper.style.display = 'none';
       coverPreviewWrapper.classList.remove('zen-cover-preview--collapsing');
-      if (coverPreviewImg) coverPreviewImg.src = '';
-      if (previewCoverImg) previewCoverImg.src = '';
+      if (coverErrorState) coverErrorState.style.display = 'none';
+      if (coverActions) (coverActions as HTMLElement).style.display = 'flex';
+      if (coverPreviewImg) {
+        coverPreviewImg.removeAttribute('src');
+        coverPreviewImg.style.display = 'none';
+      }
+      if (previewCoverImg) previewCoverImg.removeAttribute('src');
       if (previewCoverFigure) previewCoverFigure.style.display = 'none';
       if (addCoverBtn) {
         addCoverBtn.style.display = 'inline-flex';
@@ -869,11 +1056,88 @@ export function initZenEditor() {
     }, 280);
   });
 
+  // ── Drag & Drop and Clipboard Image Support ─────────────────────────────────
+  const coverArea = document.getElementById('cover-area');
+
+  // Prevent browser from navigating away on dropped files outside dropzones
+  window.addEventListener('dragover', (e) => e.preventDefault());
+  window.addEventListener('drop', (e) => e.preventDefault());
+
+  // Cover area drag & drop
+  if (coverArea) {
+    coverArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      coverArea.classList.add('zen-cover-area--dragover');
+    });
+
+    ['dragleave', 'dragend', 'drop'].forEach((type) => {
+      coverArea.addEventListener(type, (e) => {
+        e.stopPropagation();
+        coverArea.classList.remove('zen-cover-area--dragover');
+      });
+    });
+
+    coverArea.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      const file = e.dataTransfer?.files?.[0];
+      if (file && file.type.startsWith('image/')) {
+        await uploadAndApplyCoverImage(file);
+      }
+    });
+  }
+
+  // ContentEditable drag & drop
+  if (contentEditable) {
+    contentEditable.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+
+    contentEditable.addEventListener('drop', async (e) => {
+      const file = e.dataTransfer?.files?.[0];
+      if (file && file.type.startsWith('image/')) {
+        e.preventDefault();
+        e.stopPropagation();
+        let dropRange: Range | null = null;
+        if ('caretRangeFromPoint' in document) {
+          dropRange = (
+            document as Document & {
+              caretRangeFromPoint: (x: number, y: number) => Range | null;
+            }
+          ).caretRangeFromPoint(e.clientX, e.clientY);
+        }
+        await uploadAndInsertInlineImage(file, dropRange);
+      }
+    });
+
+    // Clipboard Paste (Screenshots / Copy-pasted images)
+    contentEditable.addEventListener('paste', async (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (file) {
+            const selection = window.getSelection();
+            const range =
+              selection && selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
+            await uploadAndInsertInlineImage(file, range);
+          }
+          return;
+        }
+      }
+    });
+  }
+
   // Dedicated Unpublish Action
   unpublishBtn?.addEventListener('click', async () => {
     const confirmUnpublish = confirm(
       'This note is live on your publication. Do you want to unpublish it and revert to a draft?'
     );
+    if (!confirmUnpublish) return;
 
     unpublishBtn.disabled = true;
     const span = unpublishBtn.querySelector('span');
@@ -899,8 +1163,8 @@ export function initZenEditor() {
         alert(data.error || 'Failed to unpublish note');
         if (span) span.textContent = origText;
       }
-    } catch (err: any) {
-      alert(err.message || 'Network error');
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Network error');
       if (span) span.textContent = origText;
     } finally {
       unpublishBtn.disabled = false;

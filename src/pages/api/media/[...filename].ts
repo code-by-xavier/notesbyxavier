@@ -63,8 +63,9 @@ export const GET: APIRoute = async ({ params }) => {
         },
       });
     }
-  } catch (err: any) {
-    console.warn(`[Media Proxy] GCS read attempt for "${filename}" failed: ${err.message}`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn(`[Media Proxy] GCS read attempt for "${filename}" failed: ${message}`);
   }
 
   // 2. Fallback to local filesystem (public/uploads/)

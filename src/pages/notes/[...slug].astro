@@ -8,8 +8,10 @@
 
 import { getCollection, render } from 'astro:content';
 import EssayLayout from '@/layouts/EssayLayout.astro';
-import { getNoteBySlug, parseMarkdown } from '@/lib/notes';
+import { getNoteBySlug, parseMarkdown, stripMarkdownToPlainText } from '@/lib/notes';
 import { ROUTES } from '@/links';
+
+import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
 
 export const prerender = false;
 
@@ -33,7 +35,7 @@ let noteData: {
   readingTime?: string;
   keywords?: string[];
   html?: string;
-  Content?: any;
+  Content?: AstroComponentFactory;
 } | null = null;
 
 if (dbNote && dbNote.status === 'published') {
@@ -56,7 +58,11 @@ if (dbNote && dbNote.status === 'published') {
   noteData = {
     title: titleToRender,
     subtitle: subtitleToRender || undefined,
-    description: dbNote.excerpt || '',
+    description: dbNote.excerpt
+      ? stripMarkdownToPlainText(dbNote.excerpt)
+      : contentToRender
+        ? stripMarkdownToPlainText(contentToRender).slice(0, 160)
+        : '',
     pubDate: dbNote.publishedAt || dbNote.createdAt,
     updatedDate: dbNote.updatedAt,
     headings,

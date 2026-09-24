@@ -6,13 +6,13 @@
 // ============================================================
 
 import Icon from '@/components/Icon.astro';
+import type { HTMLAttributes } from 'astro/types';
 
-interface Props {
+interface Props extends HTMLAttributes<'p'> {
   variant?: 'default' | 'info' | 'warning' | 'muted' | 'tip';
   id?: string;
   icon?: boolean;
   class?: string;
-  [key: string]: any;
 }
 
 const { variant = 'default', id, icon = false, class: className = '', ...rest } = Astro.props;

@@ -386,3 +386,53 @@
     }
   }
 }
+
+// Screen-reader only (accessibility utility)
+@mixin sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+// Spinning loader used by subscribe buttons
+@mixin btn-spinner($size: 16px, $color: #{v.$color-white}) {
+  display: none;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: $size;
+  height: $size;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: $color;
+  border-radius: v.$border-radius-full;
+  animation: btn-spin 0.7s linear infinite;
+}
+
+// Accent icon-wrap circle (used on confirmation page & section icons)
+@mixin accent-icon-wrap($size: 56px) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $size;
+  height: $size;
+  border-radius: v.$border-radius-full;
+  background: v.$primary-accent-light;
+  color: var(--accent-color, #{v.$primary-accent});
+  border: v.$border-width-base solid rgba(7, 90, 170, 0.2);
+}
+
+// Source / status pill shared between section and popup
+@mixin source-pill-base {
+  display: inline-block;
+  padding: 2px v.$spacing-xs;
+  border-radius: v.$border-radius-full;
+  font-size: var(--font-size-xs, #{v.$font-size-xs});
+  font-weight: v.$font-weight-medium;
+  text-transform: capitalize;
+}

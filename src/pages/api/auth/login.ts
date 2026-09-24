@@ -63,7 +63,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Login endpoint error:', error);
     return new Response(JSON.stringify({ error: 'Authentication failed. Please try again.' }), {
       status: 500,

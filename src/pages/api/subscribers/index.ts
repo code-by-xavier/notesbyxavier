@@ -8,11 +8,23 @@ import type { APIRoute } from 'astro';
 import { db } from '@/db';
 import { subscribers } from '@/db/schema';
 import { desc } from 'drizzle-orm';
+import { validateSession, SESSION_COOKIE_NAME } from '@/lib/auth';
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ locals }) => {
-  if (!locals.user) {
+export const GET: APIRoute = async ({ locals, cookies }) => {
+  let user = locals.user;
+  if (!user) {
+    const sessionToken = cookies.get(SESSION_COOKIE_NAME)?.value;
+    if (sessionToken) {
+      const sessionData = await validateSession(sessionToken);
+      if (sessionData) {
+        user = sessionData.user;
+      }
+    }
+  }
+
+  if (!user) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },
@@ -34,8 +46,9 @@ export const GET: APIRoute = async ({ locals }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message || 'Failed to fetch subscribers' }), {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Failed to fetch subscribers';
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

@@ -65,32 +65,33 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xs, #{ui.$spacing-xs}) var(--spacing-md, #{ui.$spacing-md});
-  background-color: #ffffff;
-  border-radius: var(--border-radius-md, #{ui.$border-radius-md});
-  box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.08),
-    0 1px 3px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.06);
   text-decoration: none;
   align-self: center;
-  transition:
-    transform ui.$transition-fast,
-    box-shadow ui.$transition-fast;
+  transition: transform ui.$transition-fast;
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow:
-      0 6px 18px rgba(0, 0, 0, 0.12),
-      0 2px 4px rgba(0, 0, 0, 0.06);
   }
 
   &__logo {
     width: auto;
-    height: 42px;
-    max-width: 170px;
+    height: var(--auth-logo-height, #{ui.$auth-logo-height});
+    max-width: var(--auth-logo-max-width, #{ui.$auth-logo-max-width});
     object-fit: contain;
     display: block;
+
+    &--dark {
+      display: none;
+    }
+  }
+
+  :global([data-theme='dark']) & {
+    .setup-brand__logo--light {
+      display: none;
+    }
+    .setup-brand__logo--dark {
+      display: block;
+    }
   }
 
   &__name {

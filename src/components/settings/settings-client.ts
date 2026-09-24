@@ -67,7 +67,11 @@ export function showPortalNotification(
 export function initSettingsClient() {
   // Expose notification API globally
   if (typeof window !== 'undefined') {
-    (window as any).showPortalNotification = showPortalNotification;
+    (
+      window as Window & {
+        showPortalNotification?: typeof showPortalNotification;
+      }
+    ).showPortalNotification = showPortalNotification;
   }
 
   // DOM Elements
@@ -152,7 +156,7 @@ export function initSettingsClient() {
         body: formData,
       });
 
-      let data: any = null;
+      let data: { url?: string; error?: string } | null = null;
       try {
         data = await res.json();
       } catch {
@@ -184,8 +188,12 @@ export function initSettingsClient() {
           previewImg.src = hiddenInput.value;
         }
       }
-    } catch (err: any) {
-      showPortalNotification('error', 'Upload Error', err?.message || 'Failed to upload asset.');
+    } catch (err: unknown) {
+      showPortalNotification(
+        'error',
+        'Upload Error',
+        err instanceof Error ? err.message : 'Failed to upload asset.'
+      );
       if (previewImg && hiddenInput?.value) {
         previewImg.src = hiddenInput.value;
       }
@@ -195,8 +203,29 @@ export function initSettingsClient() {
     }
   }
 
-  // Bind Upload Triggers
-  uploadAvatarBtn?.addEventListener('click', () => avatarFileInput?.click());
+  // Bind Upload Triggers with keyboard accessibility and double-trigger prevention
+  [
+    { btn: uploadAvatarBtn, input: avatarFileInput },
+    { btn: uploadLogoBtn, input: logoFileInput },
+    { btn: uploadFaviconBtn, input: faviconFileInput },
+    { btn: uploadTouchiconBtn, input: touchiconFileInput },
+  ].forEach(({ btn, input }) => {
+    btn?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        input?.click();
+      }
+    });
+    btn?.addEventListener('click', () => {
+      if (btn.tagName.toLowerCase() !== 'label') {
+        input?.click();
+      }
+    });
+    input?.addEventListener('click', () => {
+      if (input) input.value = '';
+    });
+  });
+
   avatarFileInput?.addEventListener('change', () => {
     if (avatarFileInput) {
       handleAssetUpload(
@@ -213,7 +242,6 @@ export function initSettingsClient() {
   const uploadLogoBtnText = document.getElementById('upload-logo-btn-text');
   const DEFAULT_LOGO_FALLBACK = '/images/notesby-logo-black.svg';
 
-  uploadLogoBtn?.addEventListener('click', () => logoFileInput?.click());
   logoFileInput?.addEventListener('change', () => {
     if (logoFileInput) {
       handleAssetUpload(
@@ -248,14 +276,12 @@ export function initSettingsClient() {
     );
   });
 
-  uploadFaviconBtn?.addEventListener('click', () => faviconFileInput?.click());
   faviconFileInput?.addEventListener('change', () => {
     if (faviconFileInput) {
       handleAssetUpload(faviconFileInput, faviconPreview, faviconInput, faviconLoading, 'Favicon');
     }
   });
 
-  uploadTouchiconBtn?.addEventListener('click', () => touchiconFileInput?.click());
   touchiconFileInput?.addEventListener('change', () => {
     if (touchiconFileInput) {
       handleAssetUpload(
