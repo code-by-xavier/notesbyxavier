@@ -10,6 +10,11 @@ export const ROUTES = {
   // Public Reader Pages
   HOME: '/',
   ABOUT: '/about',
+
+  // ⚠️  DOWNSTREAM-ONLY — DO NOT REMOVE ON UPSTREAM MERGE
+  // This route does not exist in the upstream engine (Notesby).
+  // If you see a merge conflict here, always keep this line.
+  PROJECTS: '/projects',
   TERMS: '/terms',
   PRIVACY: '/privacy',
   AI_POLICY: '/ai-policy',
@@ -48,7 +53,7 @@ export const ROUTES = {
 
 export const EXTERNAL_LINKS = {
   CLSTRE: 'https://clstre.com',
-  AUTHOR: 'https://clstre.com',
+  AUTHOR: 'https://notesbyxavier.com',
   REPOSITORY: 'https://github.com/CLSTRE-ORG/Notesby',
   ISSUES: 'https://github.com/CLSTRE-ORG/Notesby/issues',
   SUPPORT_EMAIL: 'mailto:support@clstre.com',
