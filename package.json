@@ -36,6 +36,7 @@
     "lint": "prettier --check .",
     "format": "prettier --write .",
     "validate": "tsx ./scripts/validate.ts",
+    "prepare:upstream": "tsx ./scripts/prepare-upstream.ts",
     "claude": "bash -c 'unset CLAUDE_CODE_USE_VERTEX ANTHROPIC_VERTEX_PROJECT_ID CLOUD_ML_REGION && dotenv run -q -- claude \"$@\"' --",
     "prepare": "husky"
   },
