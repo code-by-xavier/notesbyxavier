@@ -3,74 +3,85 @@
 // ============================================================
 // Notesby — About Page
 // Publication philosophy and platform introduction.
+// Renders custom Markdown from Admin Settings, or generic defaults.
 // ============================================================
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getSiteSettings } from '@/lib/settings';
 import { EXTERNAL_LINKS } from '@/links';
+import { parseMarkdown } from '@/lib/notes';
 
 export const prerender = false;
 
 const settings = await getSiteSettings();
+const customHtml = settings.aboutText ? parseMarkdown(settings.aboutText).html : null;
 ---
 
 <BaseLayout title={`About — ${settings.siteTitle}`}>
   <div class="reading-container about-page">
     <h1 class="about-page__title">About</h1>
 
-    <div class="prose-editorial">
-      <p>
-        Welcome to <strong>{settings.siteTitle}</strong>, a personal space for essays, working
-        notes, and considered perspectives.
-      </p>
+    {customHtml ? (
+      <div class="prose-editorial" set:html={customHtml} />
+    ) : (
+      <div class="prose-editorial">
+        <p>
+          Welcome to <strong>{settings.siteTitle}</strong>, a personal space for essays, working
+          notes, and considered perspectives.
+        </p>
 
-      <h2>Philosophy</h2>
-      <p>
-        Writing helps clarify what we think and why. Most platforms push for quick reactions and
-        endless scrolling, so this site takes a simpler approach: clean typography, no tracking
-        popups, and room to sit with an idea from start to finish.
-      </p>
+        <h2>Philosophy</h2>
+        <p>
+          Writing helps clarify what we think and why. Most platforms push for quick reactions and
+          endless scrolling, so this site takes a simpler approach: clean typography, no tracking
+          popups, and room to sit with an idea from start to finish.
+        </p>
 
-      <h2>The Platform</h2>
-      <p>
-        This site runs on <strong>Notesby</strong>, an open-source publishing engine created by{' '}
-        <a href={EXTERNAL_LINKS.AUTHOR} target="_blank" rel="noopener noreferrer">
-          Xavier Lawrence
-        </a>{' '}
-        as part of the{' '}
-        <a href={EXTERNAL_LINKS.CLSTRE} target="_blank" rel="noopener noreferrer">
-          CLSTRE
-        </a>{' '}
-        ecosystem. It gives writers full ownership of their content, their data, and their reading
-        experience.
-      </p>
+        <h2>The Platform</h2>
+        <p>
+          This site runs on <strong>Notesby</strong>, an open-source publishing engine designed as
+          part of the{' '}
+          <a href={EXTERNAL_LINKS.CLSTRE} target="_blank" rel="noopener noreferrer">
+            CLSTRE
+          </a>{' '}
+          ecosystem. It gives writers full ownership of their content, their data, and their reading
+          experience.
+        </p>
 
-      <p>
-        The source code is open and available on{' '}
-        <a
-          href={settings.githubUrl || EXTERNAL_LINKS.REPOSITORY}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          GitHub
-        </a>
-        .
-      </p>
+        <p>
+          The source code is open and available on{' '}
+          <a
+            href={settings.githubUrl || EXTERNAL_LINKS.REPOSITORY}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+          .
+        </p>
 
-      <h2>Connect</h2>
-      <p>
-        You can reach out via <a href={`mailto:${settings.contactEmail}`}>email</a> or follow
-        updates on{' '}
-        <a href={settings.twitterUrl} target="_blank" rel="noopener noreferrer">
-          X
-        </a>
-        .
-      </p>
-    </div>
+        <h2>Connect</h2>
+        <p>
+          You can reach out via <a href={`mailto:${settings.contactEmail}`}>email</a>
+          {settings.twitterUrl && (
+            <>
+              {' '}
+              or follow updates on{' '}
+              <a href={settings.twitterUrl} target="_blank" rel="noopener noreferrer">
+                X
+              </a>
+            </>
+          )}
+          .
+        </p>
+      </div>
+    )}
   </div>
 </BaseLayout>
 
 <style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
   .about-page {
     padding: var(--spacing-5xl, #{ui.$spacing-5xl}) var(--spacing-lg, #{ui.$spacing-lg});
 
