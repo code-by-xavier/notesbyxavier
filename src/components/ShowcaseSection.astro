@@ -1,0 +1,20 @@
+---
+// File: src/components/ShowcaseSection.astro
+// ============================================================
+// Notesby — Showcase Section
+// Proxies to IndustryGateway for unified ecosystem gateway styling.
+// ============================================================
+
+import type { ResolvedSiteSettings } from '@/lib/settings';
+import IndustryGateway from '@/components/IndustryGateway.astro';
+
+interface Props {
+  settings: ResolvedSiteSettings;
+  class?: string;
+  className?: string;
+}
+
+const { settings, class: classProp, className: classNameProp } = Astro.props;
+---
+
+<IndustryGateway settings={settings} class={classProp || classNameProp} />

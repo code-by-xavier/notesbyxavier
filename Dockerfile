@@ -29,6 +29,12 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 
+# Local-fallback media directory, writable by the unprivileged runtime user
+RUN mkdir -p /app/public/uploads && chown -R node:node /app/public
+
+# Never run the server as root
+USER node
+
 EXPOSE 8080
 
 CMD ["node", "./dist/server/entry.mjs"]

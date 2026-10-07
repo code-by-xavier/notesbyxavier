@@ -45,12 +45,7 @@ const currentPath = Astro.url.pathname;
         <div class="site-header__avatar">
           {avatarUrl ? (
             <>
-              <img
-                src={avatarUrl}
-                alt={authorName}
-                class="avatar-img"
-                onerror="this.style.display='none'; if (this.nextElementSibling) this.nextElementSibling.style.display='flex';"
-              />
+              <img src={avatarUrl} alt={authorName} class="avatar-img" data-avatar-img />
               <span class="avatar-fallback" style="display: none;">
                 {initials}
               </span>
@@ -423,6 +418,19 @@ const currentPath = Astro.url.pathname;
     }
   }
 </style>
+
+<script>
+  // Show initials when the avatar image fails to load (no inline handler, CSP-friendly).
+  document.querySelectorAll<HTMLImageElement>('img[data-avatar-img]').forEach((img) => {
+    const showFallback = () => {
+      img.style.display = 'none';
+      const next = img.nextElementSibling as HTMLElement | null;
+      if (next) next.style.display = 'flex';
+    };
+    img.addEventListener('error', showFallback, { once: true });
+    if (img.complete && img.naturalWidth === 0) showFallback();
+  });
+</script>
 
 <script>
   function setupMobileMenu() {

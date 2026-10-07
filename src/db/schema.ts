@@ -4,7 +4,16 @@
 // Defines users, sessions, siteSettings, notes, and subscribers models.
 // ============================================================
 
-import { pgTable, uuid, varchar, text, timestamp, boolean, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  timestamp,
+  boolean,
+  integer,
+  index,
+} from 'drizzle-orm/pg-core';
 
 /**
  * Users Table — Authors, Editors, and Administrators
@@ -22,15 +31,23 @@ export const users = pgTable('users', {
 /**
  * Sessions Table — Active Authenticated Web Sessions
  */
-export const sessions = pgTable('sessions', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  token: text('token').notNull().unique(),
-  expiresAt: timestamp('expires_at').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+export const sessions = pgTable(
+  'sessions',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    // SHA-256 hash of the cookie token; the raw token is never stored.
+    token: text('token').notNull().unique(),
+    expiresAt: timestamp('expires_at').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [
+    index('sessions_user_id_idx').on(t.userId),
+    index('sessions_expires_at_idx').on(t.expiresAt),
+  ]
+);
 
 /**
  * Site Settings Table — Sovereign Engine Configuration State
@@ -69,38 +86,53 @@ export const siteSettings = pgTable('site_settings', {
   subscriptionPopupSubtext: text('subscription_popup_subtext'),
   subscriptionConfirmedHeadline: varchar('subscription_confirmed_headline', { length: 255 }),
   subscriptionConfirmedSubtext: text('subscription_confirmed_subtext'),
+  // Generic Showcase / Promotion Callout
+  showcaseEnabled: boolean('showcase_enabled').default(false),
+  showcaseEyebrow: varchar('showcase_eyebrow', { length: 100 }),
+  showcaseHeadline: varchar('showcase_headline', { length: 255 }),
+  showcaseSubtext: text('showcase_subtext'),
+  showcaseCtaLabel: varchar('showcase_cta_label', { length: 100 }),
+  showcaseCtaUrl: varchar('showcase_cta_url', { length: 500 }),
+  showcaseImage: text('showcase_image'),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 /**
  * Notes Table — Essays, Op-Eds, and Field Notes
  */
-export const notes = pgTable('notes', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  title: varchar('title', { length: 255 }).notNull(),
-  subtitle: text('subtitle'),
-  slug: varchar('slug', { length: 255 }).notNull().unique(),
-  category: varchar('category', { length: 50 }).default('Essays').notNull(),
-  content: text('content').default('').notNull(),
-  excerpt: text('excerpt').default('').notNull(),
-  tags: text('tags').array(),
-  status: varchar('status', { length: 20 }).default('draft').notNull(), // 'draft' | 'published' | 'archived'
-  readingTime: varchar('reading_time', { length: 50 }).default('1 min read').notNull(),
-  coverImage: text('cover_image'),
-  coverImageAlt: text('cover_image_alt'),
-  authorId: uuid('author_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  publishedAt: timestamp('published_at'),
-  hasUnpublishedChanges: boolean('has_unpublished_changes').default(false).notNull(),
-  publishedTitle: varchar('published_title', { length: 255 }),
-  publishedSubtitle: text('published_subtitle'),
-  publishedContent: text('published_content'),
-  publishedCategory: varchar('published_category', { length: 50 }),
-  publishedCoverImage: text('published_cover_image'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+export const notes = pgTable(
+  'notes',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    title: varchar('title', { length: 255 }).notNull(),
+    subtitle: text('subtitle'),
+    slug: varchar('slug', { length: 255 }).notNull().unique(),
+    category: varchar('category', { length: 50 }).default('Essays').notNull(),
+    content: text('content').default('').notNull(),
+    excerpt: text('excerpt').default('').notNull(),
+    tags: text('tags').array(),
+    status: varchar('status', { length: 20 }).default('draft').notNull(), // 'draft' | 'published' | 'archived'
+    readingTime: varchar('reading_time', { length: 50 }).default('1 min read').notNull(),
+    coverImage: text('cover_image'),
+    coverImageAlt: text('cover_image_alt'),
+    authorId: uuid('author_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    publishedAt: timestamp('published_at'),
+    hasUnpublishedChanges: boolean('has_unpublished_changes').default(false).notNull(),
+    publishedTitle: varchar('published_title', { length: 255 }),
+    publishedSubtitle: text('published_subtitle'),
+    publishedContent: text('published_content'),
+    publishedCategory: varchar('published_category', { length: 50 }),
+    publishedCoverImage: text('published_cover_image'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (t) => [
+    index('notes_author_id_idx').on(t.authorId),
+    index('notes_status_published_at_idx').on(t.status, t.publishedAt.desc()),
+  ]
+);
 
 /**
  * Subscribers Table — Email List Opt-ins

@@ -122,11 +122,8 @@ pnpm run prepare:upstream
 
 1. Creates/resets an isolated `upstream-syncing` branch from your current code.
 2. Automatically removes site-specific personal files:
-   - `src/pages/projects.astro` (personal portfolio page)
-   - `src/data/projects.ts` (personal project records)
    - `src/content/notes/first-note.mdx` (personal starter note)
 3. Sanitizes `notes.config.ts`:
-   - Strips the `/projects` navigation link.
    - Restores open-source template defaults (`Jane Doe`, `https://example.com`, etc.).
 4. Sets `package.json` name to `"notesby"`.
 5. Runs the full 8-phase `pnpm validate` suite to guarantee zero upstream regressions.

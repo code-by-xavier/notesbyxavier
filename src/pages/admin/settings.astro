@@ -8,7 +8,7 @@
 // ============================================================
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getSiteSettings } from '@/lib/settings';
+import { getSettingsForEditing } from '@/lib/settings';
 import { ROUTES } from '@/links';
 import SettingsNav from '@/components/settings/SettingsNav.astro';
 import IdentityBrandingSection from '@/components/settings/IdentityBrandingSection.astro';
@@ -27,7 +27,7 @@ if (!user) {
   return Astro.redirect(ROUTES.ADMIN.LOGIN);
 }
 
-const settings = await getSiteSettings();
+const { values: settings, defaults } = await getSettingsForEditing();
 ---
 
 <BaseLayout
@@ -72,7 +72,7 @@ const settings = await getSiteSettings();
           <SeoSocialSection settings={settings} />
 
           <!-- 6. Email Subscription -->
-          <SubscriptionSection settings={settings} />
+          <SubscriptionSection settings={settings} defaults={defaults} />
 
           <!-- Sticky Bottom Save Bar -->
           <SettingsSaveBar />

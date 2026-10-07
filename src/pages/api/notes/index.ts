@@ -6,61 +6,32 @@
 
 import type { APIRoute } from 'astro';
 import { listNotesByAuthor, createNoteDraft } from '@/lib/notes';
+import { json, handleError, unauthorized, readOptionalJson } from '@/lib/http';
+import { optString } from '@/lib/validation';
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ locals }) => {
   const user = locals.user;
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  if (!user) return unauthorized();
 
   try {
-    const userNotes = await listNotesByAuthor(user.id);
-    return new Response(JSON.stringify({ success: true, notes: userNotes }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return json({ success: true, notes: await listNotesByAuthor(user.id) });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to list notes';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return handleError('notes:list', err, 'Failed to list notes');
   }
 };
 
 export const POST: APIRoute = async ({ request, locals }) => {
   const user = locals.user;
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  if (!user) return unauthorized();
 
   try {
-    let title: string | undefined;
-    try {
-      const body = await request.json();
-      title = body.title;
-    } catch {
-      // Empty body is acceptable for creating a blank draft
-    }
-
-    const note = await createNoteDraft(user.id, title);
-    return new Response(JSON.stringify({ success: true, note }), {
-      status: 201,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    // Empty body is acceptable for creating a blank draft
+    const body = await readOptionalJson(request, 10_000);
+    const note = await createNoteDraft(user.id, optString(body, 'title', 255));
+    return json({ success: true, note }, 201);
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to create note draft';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return handleError('notes:create', err, 'Failed to create note draft');
   }
 };

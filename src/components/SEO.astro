@@ -93,7 +93,10 @@ const jsonLd = generateJsonLd({
 {isEssay && <meta property="article:author" content={settings.authorName} />}
 
 <!-- JSON-LD Structured Data for Google Search Console & SEO -->
-<script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')}
+></script>
 
 <!-- RSS Syndication -->
 <link

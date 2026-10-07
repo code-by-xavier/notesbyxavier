@@ -54,22 +54,67 @@ export interface ResolvedSiteSettings {
   subscriptionPopupSubtext: string;
   subscriptionConfirmedHeadline: string;
   subscriptionConfirmedSubtext: string;
+  // Generic Showcase / Promotion Callout
+  showcaseEnabled: boolean;
+  showcaseEyebrow: string;
+  showcaseHeadline: string;
+  showcaseSubtext: string;
+  showcaseCtaLabel: string;
+  showcaseCtaUrl: string;
+  showcaseImage: string;
+  showcaseImageAlt: string;
 }
 
-export async function getSiteSettings(): Promise<ResolvedSiteSettings> {
-  let dbSettings: SiteSettings | null = null;
+async function loadSettingsRow(): Promise<SiteSettings | null> {
   try {
     const [row] = await db.select().from(siteSettings).where(eq(siteSettings.id, 1)).limit(1);
-    if (row) {
-      dbSettings = row;
-    }
+    return row ?? null;
   } catch (err) {
     console.warn(
       '[Notesby] Warning: Could not query site_settings from database, using config fallbacks:',
       err
     );
+    return null;
   }
+}
 
+export async function getSiteSettings(): Promise<ResolvedSiteSettings> {
+  return resolveSiteSettings(await loadSettingsRow());
+}
+
+/** Free-text copy fields that fall back to built-in defaults and are shown as placeholders when unset. */
+const EDITABLE_COPY_KEYS = [
+  'subscriptionSectionHeadline',
+  'subscriptionSectionSubtext',
+  'subscriptionSectionCtaLabel',
+  'subscriptionPopupHeadline',
+  'subscriptionPopupSubtext',
+  'subscriptionConfirmedHeadline',
+  'subscriptionConfirmedSubtext',
+  'showcaseEyebrow',
+  'showcaseHeadline',
+  'showcaseSubtext',
+  'showcaseCtaLabel',
+  'showcaseCtaUrl',
+] as const satisfies readonly (keyof ResolvedSiteSettings & keyof SiteSettings)[];
+
+/**
+ * Settings for the admin form: `values` holds only what the owner actually saved (empty
+ * for unset copy fields), while `defaults` holds the fallbacks to render as placeholders.
+ */
+export async function getSettingsForEditing(): Promise<{
+  values: ResolvedSiteSettings;
+  defaults: ResolvedSiteSettings;
+}> {
+  const row = await loadSettingsRow();
+  const values = resolveSiteSettings(row);
+  for (const key of EDITABLE_COPY_KEYS) {
+    values[key] = row?.[key] ?? '';
+  }
+  return { values, defaults: resolveSiteSettings(null) };
+}
+
+function resolveSiteSettings(dbSettings: SiteSettings | null): ResolvedSiteSettings {
   const currentYear = new Date().getFullYear();
   const defaultEntity = dbSettings?.authorName || notesConfig.authorName || 'Notesby Publisher';
   const rawLogo = dbSettings?.siteLogo ? dbSettings.siteLogo.trim() : '';
@@ -143,5 +188,26 @@ export async function getSiteSettings(): Promise<ResolvedSiteSettings> {
       dbSettings?.subscriptionConfirmedSubtext ||
       notesConfig.emailSubscription?.confirmedSubtext ||
       'The next essay lands in your inbox. Follow along on social.',
+    // Generic Showcase / Promotion Callout
+    showcaseEnabled: dbSettings?.showcaseEnabled ?? notesConfig.showcase?.enabled ?? true,
+    showcaseEyebrow: dbSettings?.showcaseEyebrow || notesConfig.showcase?.eyebrow || 'Featured',
+    showcaseHeadline:
+      dbSettings?.showcaseHeadline ||
+      notesConfig.showcase?.headline ||
+      'Showcase Your *Work* and *Projects*.',
+    showcaseSubtext:
+      dbSettings?.showcaseSubtext ||
+      notesConfig.showcase?.subtext ||
+      'Highlight your products, featured essays, client services, or latest releases. Fully customizable from your publication settings.',
+    showcaseCtaLabel:
+      dbSettings?.showcaseCtaLabel || notesConfig.showcase?.ctaLabel || 'Learn More →',
+    showcaseCtaUrl:
+      dbSettings?.showcaseCtaUrl || notesConfig.showcase?.ctaUrl || 'https://example.com',
+    showcaseImage: (() => {
+      const raw = dbSettings?.showcaseImage?.trim();
+      if (raw && raw !== '/images/showcase-graphic.svg') return raw;
+      return notesConfig.showcase?.image || '/images/showcase-placeholder.svg';
+    })(),
+    showcaseImageAlt: notesConfig.showcase?.imageAlt || 'Showcase Feature',
   };
 }

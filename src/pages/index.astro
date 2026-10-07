@@ -7,6 +7,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import CategorySlider from '@/components/CategorySlider.astro';
 import SubscribeSection from '@/components/SubscribeSection.astro';
+import IndustryGateway from '@/components/IndustryGateway.astro';
 import { getAllFeedNotes } from '@/lib/notes';
 import { notesConfig } from '@config';
 import { getSiteSettings } from '@/lib/settings';
@@ -76,7 +77,8 @@ categoryMap.forEach((notes, catName) => {
     </div>
   </main>
 
-  <SubscribeSection settings={settings} />
+  {settings.subscriptionEnabled && <SubscribeSection settings={settings} />}
+  {settings.showcaseEnabled && <IndustryGateway settings={settings} />}
 </BaseLayout>
 
 <style lang="scss">

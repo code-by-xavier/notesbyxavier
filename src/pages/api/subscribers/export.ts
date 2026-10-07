@@ -1,32 +1,26 @@
 // File: src/pages/api/subscribers/export.ts
 // ============================================================
 // Notesby — Subscribers CSV Export Endpoint (Authenticated)
-// GET: Streams a full CSV download of the email subscriber list.
+// GET: Returns a CSV download of the email subscriber list.
+// Cells are quoted and neutralized against spreadsheet formula injection.
 // ============================================================
 
 import type { APIRoute } from 'astro';
 import { db } from '@/db';
 import { subscribers } from '@/db/schema';
 import { desc } from 'drizzle-orm';
-import { validateSession, SESSION_COOKIE_NAME } from '@/lib/auth';
+import { handleError, unauthorized } from '@/lib/http';
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ locals, cookies }) => {
-  let user = locals.user;
-  if (!user) {
-    const sessionToken = cookies.get(SESSION_COOKIE_NAME)?.value;
-    if (sessionToken) {
-      const sessionData = await validateSession(sessionToken);
-      if (sessionData) {
-        user = sessionData.user;
-      }
-    }
-  }
+function csvCell(value: string): string {
+  // Cells starting with these characters are interpreted as formulas by spreadsheet apps.
+  const safe = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+  return `"${safe.replace(/"/g, '""')}"`;
+}
 
-  if (!user) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+export const GET: APIRoute = async ({ locals }) => {
+  if (!locals.user) return unauthorized();
 
   try {
     const list = await db
@@ -38,16 +32,10 @@ export const GET: APIRoute = async ({ locals, cookies }) => {
       .from(subscribers)
       .orderBy(desc(subscribers.createdAt));
 
-    // Build CSV
-    const header = 'Email,Source,Subscribed At\n';
-    const rows = list
-      .map((s) => {
-        const date = new Date(s.createdAt).toISOString();
-        return `${s.email},${s.source},${date}`;
-      })
-      .join('\n');
-
-    const csv = header + rows;
+    const rows = list.map((s) =>
+      [csvCell(s.email), csvCell(s.source), csvCell(new Date(s.createdAt).toISOString())].join(',')
+    );
+    const csv = ['Email,Source,Subscribed At', ...rows].join('\r\n') + '\r\n';
     const filename = `subscribers-${new Date().toISOString().split('T')[0]}.csv`;
 
     return new Response(csv, {
@@ -55,10 +43,10 @@ export const GET: APIRoute = async ({ locals, cookies }) => {
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
         'Content-Disposition': `attachment; filename="${filename}"`,
+        'Cache-Control': 'no-store',
       },
     });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Export failed';
-    return new Response(`Export failed: ${message}`, { status: 500 });
+    return handleError('subscribers:export', err, 'Export failed');
   }
 };

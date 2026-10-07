@@ -7,6 +7,7 @@
 // ============================================================
 
 import Icon from '@/components/Icon.astro';
+import MarkdownHint from '@/components/settings/MarkdownHint.astro';
 import type { ResolvedSiteSettings } from '@/lib/settings';
 
 interface Props {
@@ -60,6 +61,7 @@ const { settings } = Astro.props;
       <p class="form-help">
         Custom introduction rendered on your public <code>/about</code> page.
       </p>
+      <MarkdownHint />
     </div>
   </div>
 </section>

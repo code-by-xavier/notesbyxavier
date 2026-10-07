@@ -9,7 +9,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getSiteSettings } from '@/lib/settings';
 import { ROUTES } from '@/links';
-import { marked } from 'marked';
+import { parseMarkdown } from '@/lib/notes';
 
 export const prerender = false;
 
@@ -23,7 +23,7 @@ const isFullCustomDocument =
   rawPolicy.includes('\n#') ||
   rawPolicy.split('\n\n').filter((p) => p.trim().length > 0).length > 2;
 
-const parsedContent = rawPolicy ? await marked.parse(rawPolicy) : null;
+const parsedContent = rawPolicy ? parseMarkdown(rawPolicy).html : null;
 ---
 
 <BaseLayout

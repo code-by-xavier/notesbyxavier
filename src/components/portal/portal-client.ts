@@ -122,6 +122,14 @@ export function initPublishToggles() {
 
 // ── Subscribers Section ────────────────────────────────────────────────────
 
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
 export async function initSubscribersList() {
   const loadingEl = document.getElementById('subscribers-loading');
   const emptyEl = document.getElementById('subscribers-empty');
@@ -155,17 +163,17 @@ export async function initSubscribersList() {
             const sourceLabel = s.source === 'popup' ? 'Popup Modal' : 'Inline Section';
             return `<tr>
               <td class="portal-table__title-cell">
-                <span class="portal-subscriber-email">${s.email}</span>
+                <span class="portal-subscriber-email">${escapeHtml(s.email)}</span>
               </td>
               <td>
-                <span class="portal-source-pill portal-source-pill--${s.source}">${sourceLabel}</span>
+                <span class="portal-source-pill portal-source-pill--${s.source === 'popup' ? 'popup' : 'section'}">${sourceLabel}</span>
               </td>
               <td class="portal-table__date">${date}</td>
               <td class="text-right portal-table__actions">
                 <button
                   type="button"
                   class="portal-table__edit-btn portal-copy-email-btn"
-                  data-email="${s.email}"
+                  data-email="${escapeHtml(s.email)}"
                   title="Copy email to clipboard"
                 >
                   Copy

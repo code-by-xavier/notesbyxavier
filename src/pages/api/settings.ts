@@ -2,6 +2,7 @@
 // ============================================================
 // Notesby — Publication Settings API Endpoint
 // GET: Fetch resolved site settings | PUT: Update site settings
+// Both require an authenticated session (enforced by middleware and re-checked here).
 // ============================================================
 
 import type { APIRoute } from 'astro';
@@ -9,142 +10,137 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { siteSettings, users } from '@/db/schema';
 import { getSiteSettings } from '@/lib/settings';
+import { json, handleError, unauthorized, readJson, HttpError } from '@/lib/http';
+import { isValidEmail, isSafeMediaRef, normalizeHttpUrl, optString } from '@/lib/validation';
 
 export const prerender = false;
 
-export const GET: APIRoute = async () => {
+const TEXT_FIELDS: Record<string, number> = {
+  siteTitle: 255,
+  authorName: 255,
+  authorBio: 5_000,
+  copyrightText: 1_000,
+  postBottomCopy: 5_000,
+  aboutText: 20_000,
+  legalEntityName: 255,
+  privacyPolicyText: 100_000,
+  termsOfServiceText: 100_000,
+  aiPolicyText: 100_000,
+  description: 2_000,
+  subscriptionSectionHeadline: 255,
+  subscriptionSectionSubtext: 1_000,
+  subscriptionSectionCtaLabel: 100,
+  subscriptionPopupHeadline: 255,
+  subscriptionPopupSubtext: 1_000,
+  subscriptionConfirmedHeadline: 255,
+  subscriptionConfirmedSubtext: 1_000,
+  // Generic Showcase Callout
+  showcaseEyebrow: 100,
+  showcaseHeadline: 255,
+  showcaseSubtext: 1_000,
+  showcaseCtaLabel: 100,
+};
+
+// Rendered as hrefs on public pages: must be http(s) only (no javascript: etc.).
+const LINK_FIELDS = ['twitterUrl', 'linkedinUrl', 'githubUrl', 'showcaseCtaUrl'] as const;
+
+// Rendered as <img>/<link> sources: http(s) URL or site-relative path.
+const MEDIA_FIELDS = [
+  'authorAvatar',
+  'siteLogo',
+  'favicon',
+  'appleTouchIcon',
+  'ogImage',
+  'showcaseImage',
+] as const;
+
+const BOOLEAN_FIELDS = [
+  'subscriptionEnabled',
+  'subscriptionPopupEnabled',
+  'showcaseEnabled',
+] as const;
+
+export const GET: APIRoute = async ({ locals }) => {
+  if (!locals.user) return unauthorized();
+
   try {
-    const settings = await getSiteSettings();
-    return new Response(JSON.stringify({ success: true, settings }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return json({ success: true, settings: await getSiteSettings() });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch settings';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return handleError('settings:get', err, 'Failed to fetch settings');
   }
 };
 
 export const PUT: APIRoute = async ({ request, locals }) => {
   const user = locals.user;
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  if (!user) return unauthorized();
 
   try {
-    const body = await request.json();
+    const body = await readJson(request, 500_000);
+    const payload: Record<string, string | boolean> = {};
 
-    const updatePayload = {
-      siteTitle: typeof body.siteTitle === 'string' ? body.siteTitle.trim() : undefined,
-      authorName: typeof body.authorName === 'string' ? body.authorName.trim() : undefined,
-      authorBio: typeof body.authorBio === 'string' ? body.authorBio.trim() : undefined,
-      authorAvatar: typeof body.authorAvatar === 'string' ? body.authorAvatar.trim() : undefined,
-      siteLogo: typeof body.siteLogo === 'string' ? body.siteLogo.trim() : undefined,
-      favicon: typeof body.favicon === 'string' ? body.favicon.trim() : undefined,
-      appleTouchIcon:
-        typeof body.appleTouchIcon === 'string' ? body.appleTouchIcon.trim() : undefined,
-      ogImage: typeof body.ogImage === 'string' ? body.ogImage.trim() : undefined,
-      copyrightText: typeof body.copyrightText === 'string' ? body.copyrightText.trim() : undefined,
-      postBottomCopy:
-        typeof body.postBottomCopy === 'string' ? body.postBottomCopy.trim() : undefined,
-      aboutText: typeof body.aboutText === 'string' ? body.aboutText.trim() : undefined,
-      legalEntityName:
-        typeof body.legalEntityName === 'string' ? body.legalEntityName.trim() : undefined,
-      privacyPolicyText:
-        typeof body.privacyPolicyText === 'string' ? body.privacyPolicyText.trim() : undefined,
-      termsOfServiceText:
-        typeof body.termsOfServiceText === 'string' ? body.termsOfServiceText.trim() : undefined,
-      aiPolicyText: typeof body.aiPolicyText === 'string' ? body.aiPolicyText.trim() : undefined,
-      domain: typeof body.domain === 'string' ? body.domain.trim() : undefined,
-      description: typeof body.description === 'string' ? body.description.trim() : undefined,
-      twitterUrl: typeof body.twitterUrl === 'string' ? body.twitterUrl.trim() : undefined,
-      linkedinUrl: typeof body.linkedinUrl === 'string' ? body.linkedinUrl.trim() : undefined,
-      githubUrl: typeof body.githubUrl === 'string' ? body.githubUrl.trim() : undefined,
-      contactEmail: typeof body.contactEmail === 'string' ? body.contactEmail.trim() : undefined,
-      // Email Subscription Copy
-      subscriptionEnabled:
-        typeof body.subscriptionEnabled === 'boolean' ? body.subscriptionEnabled : undefined,
-      subscriptionSectionHeadline:
-        typeof body.subscriptionSectionHeadline === 'string'
-          ? body.subscriptionSectionHeadline.trim()
-          : undefined,
-      subscriptionSectionSubtext:
-        typeof body.subscriptionSectionSubtext === 'string'
-          ? body.subscriptionSectionSubtext.trim()
-          : undefined,
-      subscriptionSectionCtaLabel:
-        typeof body.subscriptionSectionCtaLabel === 'string'
-          ? body.subscriptionSectionCtaLabel.trim()
-          : undefined,
-      subscriptionPopupEnabled:
-        typeof body.subscriptionPopupEnabled === 'boolean'
-          ? body.subscriptionPopupEnabled
-          : undefined,
-      subscriptionPopupHeadline:
-        typeof body.subscriptionPopupHeadline === 'string'
-          ? body.subscriptionPopupHeadline.trim()
-          : undefined,
-      subscriptionPopupSubtext:
-        typeof body.subscriptionPopupSubtext === 'string'
-          ? body.subscriptionPopupSubtext.trim()
-          : undefined,
-      subscriptionConfirmedHeadline:
-        typeof body.subscriptionConfirmedHeadline === 'string'
-          ? body.subscriptionConfirmedHeadline.trim()
-          : undefined,
-      subscriptionConfirmedSubtext:
-        typeof body.subscriptionConfirmedSubtext === 'string'
-          ? body.subscriptionConfirmedSubtext.trim()
-          : undefined,
-      updatedAt: new Date(),
-    };
+    for (const [key, max] of Object.entries(TEXT_FIELDS)) {
+      const value = optString(body, key, max);
+      if (value !== undefined) payload[key] = value;
+    }
 
-    // Filter out undefined keys
-    const cleanPayload = Object.fromEntries(
-      Object.entries(updatePayload).filter(([_, v]) => v !== undefined)
-    );
+    for (const key of LINK_FIELDS) {
+      const value = optString(body, key, 255);
+      if (value === undefined) continue;
+      if (value !== '' && !normalizeHttpUrl(value)) {
+        throw new HttpError(400, `"${key}" must be an http(s) URL.`);
+      }
+      payload[key] = value;
+    }
 
-    // Upsert into site_settings
+    for (const key of MEDIA_FIELDS) {
+      const value = optString(body, key, 2_048);
+      if (value === undefined) continue;
+      if (value !== '' && !isSafeMediaRef(value)) {
+        throw new HttpError(400, `"${key}" must be an http(s) URL or a site-relative path.`);
+      }
+      payload[key] = value;
+    }
+
+    const domain = optString(body, 'domain', 255);
+    if (domain !== undefined) {
+      const normalized = domain === '' ? '' : normalizeHttpUrl(domain);
+      if (normalized === null) throw new HttpError(400, '"domain" must be an http(s) URL.');
+      payload.domain = normalized === '' ? '' : new URL(normalized).origin;
+    }
+
+    const contactEmail = optString(body, 'contactEmail', 254);
+    if (contactEmail !== undefined) {
+      if (contactEmail !== '' && !isValidEmail(contactEmail)) {
+        throw new HttpError(400, '"contactEmail" must be a valid email address.');
+      }
+      payload.contactEmail = contactEmail;
+    }
+
+    for (const key of BOOLEAN_FIELDS) {
+      if (body[key] === undefined) continue;
+      if (typeof body[key] !== 'boolean') throw new HttpError(400, `"${key}" must be a boolean.`);
+      payload[key] = body[key] as boolean;
+    }
+
+    const now = new Date();
     await db
       .insert(siteSettings)
-      .values({
-        id: 1,
-        isSetupCompleted: true,
-        ...cleanPayload,
-      })
+      .values({ id: 1, isSetupCompleted: true, ...payload })
       .onConflictDoUpdate({
         target: siteSettings.id,
-        set: {
-          ...cleanPayload,
-          updatedAt: new Date(),
-        },
+        set: { ...payload, updatedAt: now },
       });
 
     // Also sync the author's display name to the users table
-    if (cleanPayload.authorName) {
+    if (typeof payload.authorName === 'string' && payload.authorName) {
       await db
         .update(users)
-        .set({ name: cleanPayload.authorName as string, updatedAt: new Date() })
+        .set({ name: payload.authorName, updatedAt: now })
         .where(eq(users.id, user.id));
     }
 
-    const resolved = await getSiteSettings();
-
-    return new Response(JSON.stringify({ success: true, settings: resolved }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return json({ success: true, settings: await getSiteSettings() });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to update settings';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return handleError('settings:update', err, 'Failed to update settings');
   }
 };

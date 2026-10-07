@@ -276,6 +276,11 @@
     padding: 9px 12px;
     transition: all ui.$transition-fast;
 
+    &::placeholder {
+      color: var(--text-muted, #{ui.$text-muted-light});
+      opacity: 1;
+    }
+
     &:focus {
       outline: none;
       border-color: var(--accent-color, #{ui.$primary-accent});

@@ -8,6 +8,7 @@
 // ============================================================
 
 import Icon from '@/components/Icon.astro';
+import MarkdownHint from '@/components/settings/MarkdownHint.astro';
 import { LOCKED_COLOPHON_TEXT, type ResolvedSiteSettings } from '@/lib/settings';
 
 interface Props {
@@ -93,6 +94,7 @@ const { settings } = Astro.props;
       <p class="form-help">
         If empty, the clean default sovereign privacy pledge will be automatically displayed.
       </p>
+      <MarkdownHint />
     </div>
 
     <div class="form-group">
@@ -109,6 +111,7 @@ const { settings } = Astro.props;
       <p class="form-help">
         If empty, the default editorial terms will be automatically displayed.
       </p>
+      <MarkdownHint />
     </div>
 
     <div class="form-group">
@@ -126,6 +129,7 @@ const { settings } = Astro.props;
         Author policy prohibiting unauthorized automated AI model training and scraper ingestion.
         Rendered on /ai-policy and linked in the global footer.
       </p>
+      <MarkdownHint />
     </div>
   </div>
 </section>

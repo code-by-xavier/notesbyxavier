@@ -11,6 +11,9 @@ import { marked } from 'marked';
 import { getCollection } from 'astro:content';
 import { db } from '@/db';
 import { notes, type Note, type NewNote } from '@/db/schema';
+import { isUniqueViolation } from '@/lib/http';
+import { escapeHtml, isSafeImageSrc, isSafeLinkHref } from '@/lib/validation';
+import crypto from 'node:crypto';
 
 export interface NoteCardItem {
   id: string;
@@ -84,41 +87,44 @@ export function stripMarkdownToPlainText(text: string): string {
 }
 
 /**
- * Parse Markdown string into safe HTML with automatic slugged headings for TOC
+ * Parse Markdown string into safe HTML with automatic slugged headings for TOC.
+ * Raw HTML is escaped (never passed through) and links/images with script-capable
+ * URL schemes are neutralized, so stored content cannot execute in readers' browsers.
  */
 export function parseMarkdown(content: string): { html: string; headings: NoteHeading[] } {
   const headings: NoteHeading[] = [];
+  const usedSlugs = new Map<string, number>();
   const renderer = new marked.Renderer();
 
-  renderer.heading = function ({ text, depth }: { text: string; depth: number }) {
-    const rawText = text.replace(/<[^>]*>/g, '').trim();
-    const slug = generateSlug(rawText);
+  renderer.heading = function ({ tokens, depth }) {
+    const inner = this.parser.parseInline(tokens);
+    const rawText = inner
+      .replace(/<[^>]*>/g, '')
+      .replace(/&amp;/g, '&')
+      .trim();
+    const base = generateSlug(rawText);
+    const seen = usedSlugs.get(base) ?? 0;
+    usedSlugs.set(base, seen + 1);
+    const slug = seen === 0 ? base : `${base}-${seen}`;
     headings.push({ depth, slug, text: rawText });
-    return `<h${depth} id="${slug}">${text}</h${depth}>`;
+    return `<h${depth} id="${slug}">${inner}</h${depth}>\n`;
   };
 
-  let html = (marked.parse(content || '', { renderer, async: false }) as string) || '';
+  renderer.html = ({ text }) => escapeHtml(text);
 
-  // Ensure any existing HTML headings without IDs receive slugs and are tracked for TOC
-  const headingRegex = /<h([1-6])([^>]*)>(.*?)<\/h\1>/gi;
-  html = html.replace(headingRegex, (match, depthStr, attrs, text) => {
-    const depth = parseInt(depthStr, 10);
-    const rawText = text.replace(/<[^>]*>/g, '').trim();
-    if (!rawText) return match;
+  const baseLink = renderer.link;
+  renderer.link = function (token) {
+    if (!isSafeLinkHref(token.href)) return this.parser.parseInline(token.tokens);
+    return baseLink.call(this, token);
+  };
 
-    const idMatch = attrs.match(/id="([^"]+)"/);
-    const slug = idMatch ? idMatch[1] : generateSlug(rawText);
+  const baseImage = renderer.image;
+  renderer.image = function (token) {
+    if (!isSafeImageSrc(token.href)) return escapeHtml(token.text);
+    return baseImage.call(this, token);
+  };
 
-    if (!headings.some((h) => h.slug === slug)) {
-      headings.push({ depth, slug, text: rawText });
-    }
-
-    if (!attrs.includes('id=')) {
-      return `<h${depth} id="${slug}"${attrs}>${text}</h${depth}>`;
-    }
-    return match;
-  });
-
+  const html = (marked.parse(content || '', { renderer, async: false }) as string) || '';
   return { html, headings };
 }
 
@@ -243,32 +249,33 @@ export async function getNoteBySlug(slug: string): Promise<Note | null> {
  * Create a new blank or titled draft note
  */
 export async function createNoteDraft(authorId: string, initialTitle?: string): Promise<Note> {
-  const title = initialTitle?.trim() || 'Untitled Note';
-  let baseSlug = generateSlug(title);
-  let finalSlug = baseSlug;
-  let counter = 1;
+  const title = initialTitle?.trim().slice(0, 255) || 'Untitled Note';
+  const baseSlug = generateSlug(title).slice(0, 200);
 
-  // Ensure unique slug
-  while (await getNoteBySlug(finalSlug)) {
-    finalSlug = `${baseSlug}-${counter}`;
-    counter++;
+  // Insert first and resolve collisions via the unique constraint; a check-then-insert
+  // loop races when two drafts are created at the same moment.
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const slug = attempt === 0 ? baseSlug : `${baseSlug}-${crypto.randomBytes(3).toString('hex')}`;
+    try {
+      const [newNote] = await db
+        .insert(notes)
+        .values({
+          title,
+          slug,
+          authorId,
+          category: 'Essays',
+          status: 'draft',
+          content: '',
+          excerpt: '',
+          readingTime: '1 min read',
+        })
+        .returning();
+      return newNote;
+    } catch (err) {
+      if (!isUniqueViolation(err)) throw err;
+    }
   }
-
-  const [newNote] = await db
-    .insert(notes)
-    .values({
-      title,
-      slug: finalSlug,
-      authorId,
-      category: 'Essays',
-      status: 'draft',
-      content: '',
-      excerpt: '',
-      readingTime: '1 min read',
-    })
-    .returning();
-
-  return newNote;
+  throw new Error('Could not allocate a unique slug for the new note.');
 }
 
 /**
@@ -308,10 +315,10 @@ export async function updateNote(
       trimmedTitle !== 'Untitled Note' &&
       (existing.slug.startsWith('untitled-note') || existing.status === 'draft')
     ) {
-      let baseSlug = generateSlug(trimmedTitle);
+      const baseSlug = generateSlug(trimmedTitle).slice(0, 200);
       let candidateSlug = baseSlug;
       let counter = 1;
-      while (true) {
+      while (counter < 50) {
         const conflict = await getNoteBySlug(candidateSlug);
         if (!conflict || conflict.id === id) break;
         candidateSlug = `${baseSlug}-${counter}`;
@@ -340,13 +347,23 @@ export async function updateNote(
     updatePayload.coverImage = data.coverImage;
   }
 
-  const [updated] = await db
-    .update(notes)
-    .set(updatePayload)
-    .where(and(eq(notes.id, id), eq(notes.authorId, authorId)))
-    .returning();
+  const runUpdate = () =>
+    db
+      .update(notes)
+      .set(updatePayload)
+      .where(and(eq(notes.id, id), eq(notes.authorId, authorId)))
+      .returning();
 
-  return updated || null;
+  try {
+    const [updated] = await runUpdate();
+    return updated || null;
+  } catch (err) {
+    // A concurrent request claimed the same slug between our check and the write.
+    if (!isUniqueViolation(err) || !updatePayload.slug) throw err;
+    updatePayload.slug = `${updatePayload.slug}-${crypto.randomBytes(3).toString('hex')}`;
+    const [updated] = await runUpdate();
+    return updated || null;
+  }
 }
 
 /**

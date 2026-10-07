@@ -32,6 +32,18 @@ export const GET: APIRoute = async () => {
     console.warn('[Setup Health] DB check failed:', dbError);
   }
 
+  // Once the publication is claimed this public endpoint reveals nothing about infrastructure
+  // and does not trigger outbound storage calls.
+  if (alreadySetup) {
+    return new Response(
+      JSON.stringify({ db: true, storage: true, alreadySetup: true, errors: {} }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+      }
+    );
+  }
+
   // --- Google Cloud Storage Connectivity Check ---
   try {
     const bucketName = process.env.GCS_BUCKET_NAME || 'notesby-media';

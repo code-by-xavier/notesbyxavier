@@ -7,7 +7,7 @@
 // ============================================================
 
 import type { APIRoute } from 'astro';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import { storage } from '@/lib/storage';
 
@@ -26,78 +26,72 @@ const MIME_MAP: Record<string, string> = {
   '.ico': 'image/x-icon',
 };
 
+// Letters, digits, dot, dash, underscore only; must start alphanumeric. No separators or traversal.
+const SAFE_FILENAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,199}$/;
+
+// Uploaded names are content-addressed and unique, so responses are immutable.
+// `sandbox` + `default-src 'none'` stop any script inside an SVG from running if opened directly.
+const MEDIA_HEADERS = {
+  'Cache-Control': 'public, max-age=31536000, immutable',
+  'X-Content-Type-Options': 'nosniff',
+  'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+  'Cross-Origin-Resource-Policy': 'cross-origin',
+} as const;
+
+function mediaResponse(data: Buffer, contentType: string): Response {
+  return new Response(new Uint8Array(data), {
+    status: 200,
+    headers: {
+      ...MEDIA_HEADERS,
+      'Content-Type': contentType,
+      'Content-Length': String(data.length),
+    },
+  });
+}
+
 export const GET: APIRoute = async ({ params }) => {
-  const rawFilename = params.filename;
+  const filename = params.filename;
 
-  if (!rawFilename) {
-    return new Response('Not Found', { status: 404 });
+  if (!filename || !SAFE_FILENAME.test(filename)) {
+    return new Response('Not Found', { status: 404, headers: { 'Cache-Control': 'no-store' } });
   }
 
-  // Security: Prevent directory traversal
-  const filename = path.basename(rawFilename);
-  if (filename !== rawFilename || filename.includes('..')) {
-    return new Response('Invalid media filename', { status: 400 });
+  const contentType = MIME_MAP[path.extname(filename).toLowerCase()];
+  if (!contentType) {
+    return new Response('Not Found', { status: 404, headers: { 'Cache-Control': 'no-store' } });
   }
 
-  const ext = path.extname(filename).toLowerCase();
-  const defaultMime = MIME_MAP[ext] || 'application/octet-stream';
-
-  // 1. Attempt to stream from Google Cloud Storage
+  // 1. Google Cloud Storage (single round trip; a missing object simply throws)
   try {
-    const bucket = storage.bucket(bucketName);
-    const file = bucket.file(filename);
-    const [exists] = await file.exists();
-
-    if (exists) {
-      const [metadata] = await file.getMetadata();
-      const [buffer] = await file.download();
-
-      const contentType = metadata.contentType || defaultMime;
-
-      return new Response(new Uint8Array(buffer), {
-        status: 200,
-        headers: {
-          'Content-Type': contentType,
-          'Cache-Control': 'public, max-age=31536000, immutable',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-    }
+    const [buffer] = await storage.bucket(bucketName).file(filename).download();
+    return mediaResponse(buffer, contentType);
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.warn(`[Media Proxy] GCS read attempt for "${filename}" failed: ${message}`);
-  }
-
-  // 2. Fallback to local filesystem (public/uploads/)
-  const localFilePath = path.join(process.cwd(), 'public', 'uploads', filename);
-  if (fs.existsSync(localFilePath)) {
-    try {
-      const buffer = fs.readFileSync(localFilePath);
-      return new Response(new Uint8Array(buffer), {
-        status: 200,
-        headers: {
-          'Content-Type': defaultMime,
-          'Cache-Control': 'public, max-age=31536000, immutable',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-    } catch {
-      return new Response('Failed to read local media file', { status: 500 });
+    const code = (err as { code?: number })?.code;
+    if (code !== 404) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`[Media Proxy] GCS read for "${filename}" failed: ${message}`);
     }
   }
 
-  // 3. Graceful fallback for missing or stale media (e.g. from container restarts)
-  // Instead of breaking <img> tags with a 404, redirect to the corresponding default asset
-  const isAvatar = filename.toLowerCase().includes('avatar');
-  const fallbackAsset = isAvatar
+  // 2. Local filesystem fallback (public/uploads/)
+  try {
+    const buffer = await fs.readFile(path.join(process.cwd(), 'public', 'uploads', filename));
+    return mediaResponse(buffer, contentType);
+  } catch (err: unknown) {
+    if ((err as NodeJS.ErrnoException)?.code !== 'ENOENT') {
+      console.error(`[Media Proxy] Local read for "${filename}" failed:`, err);
+      return new Response('Failed to read media file', { status: 500 });
+    }
+  }
+
+  // 3. Graceful fallback for missing or stale media (e.g. from container restarts):
+  // redirect to a default asset instead of breaking <img> tags with a 404.
+  const fallbackAsset = filename.toLowerCase().includes('avatar')
     ? '/images/avatar-placeholder.svg'
     : '/images/notesby-logo-black.svg';
 
   return new Response(null, {
     status: 307,
-    headers: {
-      Location: fallbackAsset,
-      'Cache-Control': 'no-cache',
-    },
+    headers: { Location: fallbackAsset, 'Cache-Control': 'no-cache' },
   });
 };

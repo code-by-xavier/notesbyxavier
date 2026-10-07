@@ -1,0 +1,22 @@
+---
+// File: src/components/settings/MarkdownHint.astro
+// ============================================================
+// Notesby — Markdown Formatting Hint
+// Shared helper text explaining how to format long-form settings fields.
+// ============================================================
+
+import HelperText from '@/components/ui/HelperText.astro';
+---
+
+<HelperText variant="tip" icon={true} class="markdown-hint">
+  Format with Markdown: start a line with <code>## </code> for an H2 heading and <code>### </code>{' '}
+  for an H3, wrap text in <code>**double asterisks**</code> for bold, and use
+  <code>[label](https://example.com)</code> for links. Leave a blank line between paragraphs. Raw
+  HTML is not rendered.
+</HelperText>
+
+<style lang="scss">
+  .markdown-hint {
+    margin-top: 0.375rem;
+  }
+</style>

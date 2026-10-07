@@ -1,0 +1,333 @@
+---
+// File: src/components/IndustryGateway.astro
+// ============================================================
+// Notesby — Industry Gateway Showcase Section
+// Extracted from the CLSTRE ecosystem (IndustryGateway).
+// High-impact, full-bleed visual card featuring 45/55 split layout,
+// cover image, bold typography with highlight underlines, and CTA button.
+// Displayed on the home page and post footers when subscription is disabled.
+// ============================================================
+
+import type { ResolvedSiteSettings } from '@/lib/settings';
+import { escapeHtml } from '@/lib/validation';
+
+interface Props {
+  settings: ResolvedSiteSettings;
+  class?: string;
+  className?: string;
+}
+
+const { settings, class: classProp, className: classNameProp } = Astro.props;
+const className = classProp || classNameProp || '';
+
+const title = settings.showcaseHeadline || 'Showcase Your *Work* and *Projects*.';
+const body =
+  settings.showcaseSubtext ||
+  'Highlight your products, featured essays, client services, or latest releases. Fully customizable from your publication settings.';
+const buttonText = settings.showcaseCtaLabel || 'Learn More →';
+const rawButtonUrl = settings.showcaseCtaUrl || 'https://example.com';
+// Defense in depth: only http(s) or site-relative destinations may become an href.
+const buttonUrl = /^(https?:\/\/|\/(?!\/))/i.test(rawButtonUrl) ? rawButtonUrl : '#';
+const PLACEHOLDER_IMAGE = '/images/showcase-placeholder.svg';
+const rawImage = settings.showcaseImage?.trim();
+const hasCustomImage =
+  Boolean(rawImage) &&
+  rawImage !== PLACEHOLDER_IMAGE &&
+  rawImage !== '/images/showcase-graphic.svg';
+
+const imageSrc = hasCustomImage ? rawImage : PLACEHOLDER_IMAGE;
+const imageAlt =
+  settings.showcaseImageAlt || (hasCustomImage ? 'Showcase Feature' : 'Upload Image Placeholder');
+
+const isExternal = buttonUrl.startsWith('http://') || buttonUrl.startsWith('https://');
+
+function parseHighlights(text: string): string {
+  if (!text) return '';
+  // Escape first so admin-supplied text can never inject markup; only our own span is emitted.
+  return escapeHtml(text).replace(/\*([^*]+)\*/g, '<span class="highlight">$1</span>');
+}
+
+const finalTitleHtml = parseHighlights(title);
+const finalBodyHtml = parseHighlights(body);
+---
+
+<section class:list={['industry-gateway-section', className]} data-section-id="industryGateway">
+  <div class="industry-gateway">
+    <div class="industry-gateway__image-wrapper">
+      <img
+        src={imageSrc}
+        alt={imageAlt}
+        class:list={[
+          'industry-gateway__image',
+          !hasCustomImage && 'industry-gateway__image--placeholder',
+        ]}
+        loading="lazy"
+        decoding="async"
+        data-fallback={PLACEHOLDER_IMAGE}
+      />
+    </div>
+
+    <div class="industry-gateway__content">
+      {settings.showcaseEyebrow && (
+        <div class="industry-gateway__eyebrow">{settings.showcaseEyebrow}</div>
+      )}
+      <h2 class="industry-gateway__title">
+        <span set:html={finalTitleHtml} />
+      </h2>
+
+      <div class="industry-gateway__body">
+        <span set:html={finalBodyHtml} />
+      </div>
+
+      <div class="industry-gateway__actions">
+        <a
+          href={buttonUrl}
+          class="industry-gateway__btn"
+          target={isExternal ? '_blank' : undefined}
+          rel={isExternal ? 'noopener noreferrer' : undefined}
+        >
+          {buttonText}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Swap broken images for the placeholder (script-based so a strict CSP can forbid inline handlers).
+  document.querySelectorAll<HTMLImageElement>('img[data-fallback]').forEach((img) => {
+    const fallback = img.dataset.fallback;
+    if (!fallback) return;
+    const swap = () => {
+      if (!img.src.endsWith(fallback)) img.src = fallback;
+    };
+    img.addEventListener('error', swap, { once: true });
+    if (img.complete && img.naturalWidth === 0) swap();
+  });
+</script>
+
+<style lang="scss">
+  @use '@/styles/abstracts' as ui;
+
+  .industry-gateway-section {
+    @include ui.container;
+    margin-block: ui.$spacing-4xl;
+    padding-left: var(--spacing-lg, #{ui.$spacing-lg});
+    padding-right: var(--spacing-lg, #{ui.$spacing-lg});
+
+    &.essay-gateway,
+    &.essay-showcase {
+      margin-block: ui.$spacing-3xl;
+      padding: 0;
+      max-width: 100%;
+
+      .industry-gateway {
+        border-radius: ui.$border-radius-lg;
+      }
+    }
+  }
+
+  .industry-gateway {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--subscribe-bg, #{ui.$subscribe-bg-light});
+    border: 1px solid var(--border-color, #{ui.$border-light});
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow:
+      0 14px 40px rgba(7, 90, 170, 0.24),
+      0 4px 14px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    transition:
+      background-color ui.$transition-base,
+      border-color ui.$transition-base;
+
+    @include ui.media-breakpoint-up('md') {
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    &__image-wrapper {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      flex-shrink: 0;
+      overflow: hidden;
+      background-color: var(--code-bg, #{ui.$code-bg-light});
+      border-bottom: 1px solid var(--border-color, #{ui.$border-light});
+
+      @include ui.media-breakpoint-up('md') {
+        width: 45%;
+        flex: 0 0 45%;
+        height: auto;
+        min-height: 100%;
+        align-self: stretch;
+        border-bottom: none;
+        border-right: 1px solid var(--border-color, #{ui.$border-light});
+      }
+
+      &--empty {
+        display: none;
+      }
+
+      .industry-gateway__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        margin: 0;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+
+        @include ui.media-breakpoint-up('md') {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+        }
+
+        &--placeholder {
+          object-fit: cover;
+          background-color: #0f172a;
+        }
+      }
+    }
+
+    &__content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: var(--text-primary, #{ui.$text-primary-light});
+      padding: ui.$spacing-2xl ui.$spacing-xl;
+      padding-bottom: ui.$spacing-2xl;
+      text-align: left;
+      align-items: flex-start;
+      flex: 1;
+
+      @include ui.media-breakpoint-down('sm') {
+        padding: ui.$spacing-xl ui.$spacing-md;
+      }
+
+      @include ui.media-breakpoint-up('md') {
+        width: 55%;
+        flex: 0 0 55%;
+        padding: ui.$spacing-3xl;
+      }
+    }
+
+    &__eyebrow {
+      font-family: ui.$font-family-base;
+      font-size: ui.$font-size-2xs;
+      font-weight: ui.$font-weight-semibold;
+      text-transform: uppercase;
+      letter-spacing: ui.$letter-spacing-category;
+      color: var(--accent-color, #{ui.$primary-accent});
+      margin-bottom: ui.$spacing-xs;
+      background: var(--accent-light, rgba(7, 90, 170, 0.1));
+      border: 1px solid var(--accent-light, rgba(7, 90, 170, 0.18));
+      padding: 3px 10px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    &__title {
+      font-family: var(--font-family-headings, #{ui.$font-family-headings});
+      font-size: clamp(1.4rem, 2.5vw, 1.95rem);
+      font-weight: ui.$font-weight-semibold;
+      line-height: 1.25;
+      color: var(--text-primary, #{ui.$text-primary-light});
+      margin: 0 0 ui.$spacing-sm 0;
+
+      span {
+        color: inherit;
+        font-family: inherit;
+      }
+
+      :global(.highlight) {
+        color: var(--text-primary, #{ui.$text-primary-light}) !important;
+        border-bottom: 3px solid var(--accent-color, #{ui.$primary-accent});
+      }
+    }
+
+    &__body {
+      font-family: ui.$font-family-base;
+      font-size: ui.$font-size-base;
+      line-height: 1.7;
+      color: var(--text-secondary, #{ui.$text-secondary-light});
+      margin: 0 0 ui.$spacing-lg 0;
+      max-width: 54ch;
+
+      :global(.highlight) {
+        color: var(--text-primary, #{ui.$text-primary-light}) !important;
+        font-weight: ui.$font-weight-bold;
+      }
+    }
+
+    &__actions {
+      margin-top: ui.$spacing-xs;
+      display: flex;
+      flex-direction: column;
+      gap: ui.$spacing-sm;
+      width: 100%;
+
+      @include ui.media-breakpoint-up('md') {
+        flex-direction: row;
+        align-items: center;
+        width: auto;
+      }
+    }
+
+    &__btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-width: 190px;
+      padding: 0.75rem 1.6rem;
+      background: var(--accent-color, #{ui.$primary-accent});
+      color: #ffffff;
+      font-family: ui.$font-family-base;
+      font-size: ui.$font-size-sm;
+      font-weight: ui.$font-weight-semibold;
+      border-radius: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(7, 90, 170, 0.2);
+      transition:
+        background ui.$transition-fast,
+        color ui.$transition-fast,
+        transform ui.$transition-fast,
+        box-shadow ui.$transition-fast;
+
+      @include ui.media-breakpoint-up('md') {
+        width: auto;
+      }
+
+      &:hover {
+        background: var(--accent-hover, #{ui.$primary-accent-hover});
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(7, 90, 170, 0.28);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      :global([data-theme='dark']) & {
+        color: #0b1322;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+
+        &:hover {
+          color: #0b1322;
+          box-shadow: 0 6px 20px rgba(56, 189, 248, 0.25);
+        }
+      }
+    }
+  }
+</style>

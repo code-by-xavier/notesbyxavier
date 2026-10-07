@@ -109,6 +109,16 @@ export function initSettingsClient() {
   const touchiconLoading = document.getElementById('touchicon-loading');
   const uploadTouchiconBtn = document.getElementById('upload-touchicon-btn');
 
+  const showcaseInput = document.getElementById('showcaseImage') as HTMLInputElement | null;
+  const showcaseFileInput = document.getElementById(
+    'showcase-file-input'
+  ) as HTMLInputElement | null;
+  const showcasePreview = document.getElementById('showcase-preview') as HTMLImageElement | null;
+  const showcaseLoading = document.getElementById('showcase-loading');
+  const uploadShowcaseBtn = document.getElementById('upload-showcase-btn');
+  const uploadShowcaseBtnText = document.getElementById('upload-showcase-btn-text');
+  const removeShowcaseBtn = document.getElementById('remove-showcase-btn');
+
   // Set form dirty state
   function markDirty() {
     if (saveStatusDot) saveStatusDot.className = 'save-status-dot save-status-dot--dirty';
@@ -209,6 +219,7 @@ export function initSettingsClient() {
     { btn: uploadLogoBtn, input: logoFileInput },
     { btn: uploadFaviconBtn, input: faviconFileInput },
     { btn: uploadTouchiconBtn, input: touchiconFileInput },
+    { btn: uploadShowcaseBtn, input: showcaseFileInput },
   ].forEach(({ btn, input }) => {
     btn?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -294,6 +305,38 @@ export function initSettingsClient() {
     }
   });
 
+  showcaseFileInput?.addEventListener('change', () => {
+    if (showcaseFileInput) {
+      handleAssetUpload(
+        showcaseFileInput,
+        showcasePreview,
+        showcaseInput,
+        showcaseLoading,
+        'Gateway Image',
+        () => {
+          if (removeShowcaseBtn) removeShowcaseBtn.style.display = 'inline-flex';
+          if (uploadShowcaseBtnText) uploadShowcaseBtnText.textContent = 'Change Gateway Image';
+        }
+      );
+    }
+  });
+
+  removeShowcaseBtn?.addEventListener('click', () => {
+    if (showcaseInput) showcaseInput.value = '';
+    if (showcasePreview) {
+      showcasePreview.src = '/images/showcase-placeholder.svg';
+      showcasePreview.style.display = 'block';
+    }
+    if (uploadShowcaseBtnText) uploadShowcaseBtnText.textContent = 'Upload Gateway Image';
+    if (removeShowcaseBtn) removeShowcaseBtn.style.display = 'none';
+    markDirty();
+    showPortalNotification(
+      'info',
+      'Image Reset',
+      'Placeholder graphic restored. Click Save Changes to confirm.'
+    );
+  });
+
   // Form Submit Handler
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -309,7 +352,7 @@ export function initSettingsClient() {
 
     // Checkbox fields serialize as 'on' when checked, absent when unchecked.
     // Convert known boolean toggles to actual booleans for the API.
-    const booleanFields = ['subscriptionEnabled', 'subscriptionPopupEnabled'];
+    const booleanFields = ['subscriptionEnabled', 'subscriptionPopupEnabled', 'showcaseEnabled'];
     for (const field of booleanFields) {
       payload[field] = formData.has(field);
     }

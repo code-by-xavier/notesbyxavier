@@ -8,8 +8,8 @@
 
 import { eq } from 'drizzle-orm';
 import { db } from '@/db';
-import { users, siteSettings } from '@/db/schema';
-import { hashPassword } from '@/lib/auth';
+import { users, siteSettings, sessions } from '@/db/schema';
+import { hashPassword, PASSWORD_MIN_LENGTH, PASSWORD_MAX_BYTES } from '@/lib/auth';
 
 async function rescue() {
   const args = process.argv.slice(2);
@@ -42,8 +42,12 @@ async function rescue() {
     process.exit(0);
   }
 
-  if (newPassword.length < 8) {
-    console.error('❌ Error: Password must be at least 8 characters long.');
+  if (newPassword.length < PASSWORD_MIN_LENGTH) {
+    console.error(`❌ Error: Password must be at least ${PASSWORD_MIN_LENGTH} characters long.`);
+    process.exit(1);
+  }
+  if (Buffer.byteLength(newPassword, 'utf8') > PASSWORD_MAX_BYTES) {
+    console.error(`❌ Error: Password must be at most ${PASSWORD_MAX_BYTES} bytes long.`);
     process.exit(1);
   }
 
@@ -64,6 +68,9 @@ async function rescue() {
       updatedAt: new Date(),
     })
     .where(eq(users.id, targetUser.id));
+
+  // Revoke every active session so a compromised login cannot outlive the reset
+  await db.delete(sessions).where(eq(sessions.userId, targetUser.id));
 
   // Ensure site settings is marked completed
   await db

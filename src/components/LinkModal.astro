@@ -352,6 +352,14 @@ const { notes = [] } = Astro.props;
       });
     });
 
+    const esc = (v: string) =>
+      v
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
     // Populate Dynamic Section Headings from Editor Canvas
     function scanCanvasHeadings() {
       if (!anchorsList) return;
@@ -382,9 +390,9 @@ const { notes = [] } = Astro.props;
         item.innerHTML = `
           <div class="link-anchor-item__left">
             <span class="link-anchor-tag">${isH3 ? 'H3' : 'H2'}</span>
-            <span class="link-anchor-title">${text}</span>
+            <span class="link-anchor-title">${esc(text)}</span>
           </div>
-          <code class="link-anchor-code">#${slug}</code>
+          <code class="link-anchor-code">#${esc(slug)}</code>
         `;
 
         item.addEventListener('click', () => {
@@ -464,8 +472,8 @@ const { notes = [] } = Astro.props;
       const targetAttr = targetBlank ? ' target="_blank" rel="noopener noreferrer"' : '';
 
       previewDisplay.innerHTML = `
-        <a href="${url}" class="link-preview-anchor"${targetAttr}>${text}</a>
-        <span class="link-preview-destination">(${url})</span>
+        <a href="${esc(url)}" class="link-preview-anchor"${targetAttr}>${esc(text)}</a>
+        <span class="link-preview-destination">(${esc(url)})</span>
       `;
     }
 

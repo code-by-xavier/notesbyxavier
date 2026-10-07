@@ -9,10 +9,18 @@ import postgres from 'postgres';
 import * as schema from '@/db/schema';
 import 'dotenv/config';
 
+// Never fall back to the dev credentials on Cloud Run (K_SERVICE is set there; it is not set during build).
+if (!process.env.DATABASE_URL && process.env.K_SERVICE) {
+  throw new Error('DATABASE_URL must be set in production.');
+}
+
 const connectionString =
   process.env.DATABASE_URL || 'postgresql://notesby:notesby@127.0.0.1:5432/notesby';
 
-const maxConnections = Number(process.env.DB_MAX_CONNECTIONS || 10);
+// db-f1-micro allows ~25 connections total; keep per-instance pools small so
+// several Cloud Run instances cannot exhaust it.
+const parsedMax = Number(process.env.DB_MAX_CONNECTIONS);
+const maxConnections = Number.isInteger(parsedMax) && parsedMax > 0 ? parsedMax : 5;
 const ssl =
   process.env.DATABASE_SSL === 'true'
     ? 'require'
@@ -41,17 +49,27 @@ const client = postgres(cleanConnectionString, {
   ...(ssl ? { ssl } : {}),
   idle_timeout: 20,
   connect_timeout: 10,
+  max_lifetime: 60 * 30,
+  onnotice: () => {},
+  connection: { statement_timeout: 15_000 },
 });
 
 export const db = drizzle(client, { schema });
 export { schema, client };
 
-let schemaInitialized = false;
+let schemaPromise: Promise<void> | null = null;
 
-export async function ensureSchema() {
-  if (schemaInitialized) return;
-  try {
-    await client.unsafe(`
+/** Idempotent schema bootstrap. Concurrent callers share one run; failures are retried on the next call. */
+export function ensureSchema(): Promise<void> {
+  schemaPromise ??= runSchemaBootstrap().catch((err) => {
+    schemaPromise = null;
+    console.error('[Database] Failed to ensure schema:', err);
+  });
+  return schemaPromise;
+}
+
+async function runSchemaBootstrap(): Promise<void> {
+  await client.unsafe(`
       CREATE TABLE IF NOT EXISTS users (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         name varchar(255) NOT NULL,
@@ -101,6 +119,13 @@ export async function ensureSchema() {
         subscription_popup_subtext text,
         subscription_confirmed_headline varchar(255),
         subscription_confirmed_subtext text,
+        showcase_enabled boolean DEFAULT false,
+        showcase_eyebrow varchar(100),
+        showcase_headline varchar(255),
+        showcase_subtext text,
+        showcase_cta_label varchar(100),
+        showcase_cta_url varchar(500),
+        showcase_image text,
         updated_at timestamp DEFAULT now() NOT NULL
       );
       ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_enabled boolean DEFAULT true;
@@ -112,6 +137,13 @@ export async function ensureSchema() {
       ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_popup_subtext text;
       ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_confirmed_headline varchar(255);
       ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS subscription_confirmed_subtext text;
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS showcase_enabled boolean DEFAULT false;
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS showcase_eyebrow varchar(100);
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS showcase_headline varchar(255);
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS showcase_subtext text;
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS showcase_cta_label varchar(100);
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS showcase_cta_url varchar(500);
+      ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS showcase_image text;
       CREATE TABLE IF NOT EXISTS notes (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         title varchar(255) NOT NULL,
@@ -142,9 +174,9 @@ export async function ensureSchema() {
         source varchar(20) DEFAULT 'section' NOT NULL,
         created_at timestamp DEFAULT now() NOT NULL
       );
-    `);
-    schemaInitialized = true;
-  } catch (err) {
-    console.error('[Database] Failed to ensure schema:', err);
-  }
+      CREATE INDEX IF NOT EXISTS sessions_user_id_idx ON sessions (user_id);
+      CREATE INDEX IF NOT EXISTS sessions_expires_at_idx ON sessions (expires_at);
+      CREATE INDEX IF NOT EXISTS notes_author_id_idx ON notes (author_id);
+      CREATE INDEX IF NOT EXISTS notes_status_published_at_idx ON notes (status, published_at DESC);
+  `);
 }

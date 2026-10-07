@@ -6,124 +6,53 @@
 
 import type { APIRoute } from 'astro';
 import { getNoteById, updateNote, deleteNote } from '@/lib/notes';
+import { json, handleError, unauthorized, readJson, isUuid } from '@/lib/http';
+import { parseNoteUpdate } from '@/lib/validation';
 
 export const prerender = false;
 
+// Auto-save sends full note bodies; allow room above the global default.
+const MAX_NOTE_BODY_BYTES = 2_000_000;
+
 export const GET: APIRoute = async ({ params, locals }) => {
   const user = locals.user;
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  const { id } = params;
-  if (!id) {
-    return new Response(JSON.stringify({ error: 'Note ID is required' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  if (!user) return unauthorized();
+  if (!isUuid(params.id)) return json({ error: 'Note not found' }, 404);
 
   try {
-    const note = await getNoteById(id, user.id);
-    if (!note) {
-      return new Response(JSON.stringify({ error: 'Note not found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    return new Response(JSON.stringify({ success: true, note }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const note = await getNoteById(params.id, user.id);
+    if (!note) return json({ error: 'Note not found' }, 404);
+    return json({ success: true, note });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch note';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return handleError('notes:get', err, 'Failed to fetch note');
   }
 };
 
 export const PUT: APIRoute = async ({ params, request, locals }) => {
   const user = locals.user;
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  const { id } = params;
-  if (!id) {
-    return new Response(JSON.stringify({ error: 'Note ID is required' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  if (!user) return unauthorized();
+  if (!isUuid(params.id)) return json({ error: 'Note not found' }, 404);
 
   try {
-    const body = await request.json();
-    const updated = await updateNote(id, user.id, body);
-
-    if (!updated) {
-      return new Response(JSON.stringify({ error: 'Note not found or unauthorized' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    return new Response(JSON.stringify({ success: true, note: updated }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const input = parseNoteUpdate(await readJson(request, MAX_NOTE_BODY_BYTES));
+    const updated = await updateNote(params.id, user.id, input);
+    if (!updated) return json({ error: 'Note not found or unauthorized' }, 404);
+    return json({ success: true, note: updated });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to update note';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return handleError('notes:update', err, 'Failed to update note');
   }
 };
 
 export const DELETE: APIRoute = async ({ params, locals }) => {
   const user = locals.user;
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  const { id } = params;
-  if (!id) {
-    return new Response(JSON.stringify({ error: 'Note ID is required' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  if (!user) return unauthorized();
+  if (!isUuid(params.id)) return json({ error: 'Note not found' }, 404);
 
   try {
-    const deleted = await deleteNote(id, user.id);
-    if (!deleted) {
-      return new Response(JSON.stringify({ error: 'Note not found or unauthorized' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    return new Response(JSON.stringify({ success: true, message: 'Note deleted' }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const deleted = await deleteNote(params.id, user.id);
+    if (!deleted) return json({ error: 'Note not found or unauthorized' }, 404);
+    return json({ success: true, message: 'Note deleted' });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to delete note';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return handleError('notes:delete', err, 'Failed to delete note');
   }
 };

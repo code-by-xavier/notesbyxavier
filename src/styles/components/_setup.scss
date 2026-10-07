@@ -85,7 +85,7 @@
     }
   }
 
-  :global([data-theme='dark']) & {
+  [data-theme='dark'] & {
     .setup-brand__logo--light {
       display: none;
     }

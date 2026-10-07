@@ -8,14 +8,14 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getSiteSettings } from '@/lib/settings';
 import { ROUTES } from '@/links';
-import { marked } from 'marked';
+import { parseMarkdown } from '@/lib/notes';
 
 export const prerender = false;
 
 const settings = await getSiteSettings();
 const entityName = settings.legalEntityName || settings.authorName || settings.siteTitle;
 const customHtml = settings.termsOfServiceText
-  ? await marked.parse(settings.termsOfServiceText)
+  ? parseMarkdown(settings.termsOfServiceText).html
   : null;
 ---
 

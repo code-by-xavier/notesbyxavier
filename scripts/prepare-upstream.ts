@@ -53,8 +53,6 @@ try {
   // 4. Remove site-specific downstream files
   console.log('🧹 Stripping site-specific files, cheatsheets, and sync scripts...');
   const filesToRemove = [
-    'src/pages/projects.astro',
-    'src/data/projects.ts',
     'src/content/notes/first-note.mdx',
     'docs/deployment-cheatsheet.md',
     'public/images/avatar.webp',
@@ -74,12 +72,6 @@ try {
   const configPath = path.join(process.cwd(), 'notes.config.ts');
   if (fs.existsSync(configPath)) {
     let configContent = fs.readFileSync(configPath, 'utf-8');
-
-    // Strip downstream-only nav links not part of the engine
-    configContent = configContent.replace(
-      /\s*\{\s*label:\s*'Projects',\s*href:\s*'\/projects'\s*\},?\n?/g,
-      '\n'
-    );
 
     // Reset to generic template defaults
     configContent = configContent.replace(/siteTitle:\s*'[^']+'/, "siteTitle: 'Notesby'");
@@ -122,8 +114,6 @@ try {
   const linksPath = path.join(process.cwd(), 'src/links.ts');
   if (fs.existsSync(linksPath)) {
     let linksContent = fs.readFileSync(linksPath, 'utf-8');
-    // Strip downstream-only routes not part of the engine
-    linksContent = linksContent.replace(/\s*PROJECTS:\s*'\/projects',?\n?/g, '\n');
     // Reset to generic ecosystem defaults
     linksContent = linksContent.replace(/AUTHOR:\s*'[^']+'/, "AUTHOR: 'https://clstre.com'");
     fs.writeFileSync(linksPath, linksContent, 'utf-8');

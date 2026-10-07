@@ -55,6 +55,16 @@ export interface NotesConfig {
     confirmedHeadline?: string;
     confirmedSubtext?: string;
   };
+  showcase?: {
+    enabled?: boolean;
+    eyebrow?: string;
+    headline?: string;
+    subtext?: string;
+    ctaLabel?: string;
+    ctaUrl?: string;
+    image?: string;
+    imageAlt?: string;
+  };
 }
 
 export const notesConfig: NotesConfig = {
@@ -93,15 +103,13 @@ export const notesConfig: NotesConfig = {
   },
   navLinks: [
     { label: 'Notes', href: ROUTES.HOME },
-    // ⚠️  DOWNSTREAM-ONLY — DO NOT REMOVE ON UPSTREAM MERGE
-    { label: 'Projects', href: ROUTES.PROJECTS },
     { label: 'About', href: ROUTES.ABOUT },
     { label: 'RSS', href: ROUTES.RSS, isRss: true },
     { label: 'CLSTRE ↗', href: EXTERNAL_LINKS.CLSTRE, external: true },
   ],
   footer: {
     copyrightText: `© ${new Date().getFullYear()} Jane Doe. All rights reserved.`,
-    poweredByText: 'Built with Notesby — an open-source static publishing engine by CLSTRE.',
+    poweredByText: 'Built with Notesby, an open-source static publishing engine by CLSTRE.',
   },
   emailSubscription: {
     enabled: true,
@@ -117,5 +125,16 @@ export const notesConfig: NotesConfig = {
     popupDismissLabel: 'No thanks',
     confirmedHeadline: "You're in.",
     confirmedSubtext: 'The next essay lands in your inbox. Follow along on social in the meantime.',
+  },
+  showcase: {
+    enabled: true,
+    eyebrow: 'Featured',
+    headline: 'Showcase Your *Work* and *Projects*.',
+    subtext:
+      'Highlight your products, featured essays, client services, or latest releases. Fully customizable from your publication settings.',
+    ctaLabel: 'Learn More →',
+    ctaUrl: 'https://example.com',
+    image: '/images/showcase-placeholder.svg',
+    imageAlt: 'Showcase Feature',
   },
 };
